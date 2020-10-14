@@ -1,5 +1,5 @@
 ### YamlMime:ModuleUnit
-uid: {{learRepo}}.{{moduleName}}.{{unitName}}
+uid: {{learRepo}}.{{moduleName}}.1-introduction
 title: Introduction
 metadata:
   title: Introduction
@@ -11,4 +11,4 @@ metadata:
   ms.prod: learning-azure
 durationInMinutes: 1
 content: |
-  [!include[](includes/{{unitName}}.md)]
+  [!include[](includes/1-introduction.md)]
