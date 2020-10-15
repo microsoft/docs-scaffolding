@@ -5,7 +5,7 @@ import {
   window,
   Range,
 } from "vscode";
-import { join } from "path";
+import { join, parse } from "path";
 import { alias, gitHubID, learnRepoId } from "./userSettings";
 
 const replace = require("replace-in-file");
@@ -98,10 +98,10 @@ function renameRepoReferences(modulePath: string, moduleName: any) {
   };
   const results = replace.sync(options);
   console.log("Replacement results:", results);
-  renameGithIDReferences(scaffoldModule, moduleName);
+  renameGithubIdReferences(scaffoldModule, moduleName);
 }
 
-function renameGithIDReferences(modulePath: string, moduleName: any) {
+function renameGithubIdReferences(modulePath: string, moduleName: any) {
   if (!author) {
     author = "{{github}}";
   }
@@ -112,10 +112,10 @@ function renameGithIDReferences(modulePath: string, moduleName: any) {
   };
   const results = replace.sync(options);
   console.log("Replacement results:", results);
-  renameGithAuthorReferences(scaffoldModule);
+  renameGithubAuthorReferences(scaffoldModule);
 }
 
-function renameGithAuthorReferences(modulePath: string) {
+function renameGithubAuthorReferences(modulePath: string) {
   if (!msAuthor) {
     msAuthor = "{{msuser}}";
   }
@@ -130,7 +130,15 @@ function renameGithAuthorReferences(modulePath: string) {
 
 function moveSelectionDown() {
   commands.executeCommand("editor.action.moveLinesDownAction");
-  commands.executeCommand("cursorLineStart");
+  // commands.executeCommand("cursorLineStart");
+  incrementUnitNumber();
+}
+
+function moveSelectionUp() {
+  commands.executeCommand("editor.action.moveLinesUpAction");
+}
+
+function incrementUnitNumber() {
   const editor = window.activeTextEditor;
   if (editor) {
     const range = new Range(
@@ -140,12 +148,13 @@ function moveSelectionDown() {
       1000
     );
     try {
+      // get text from current line
       const lineText = editor.document.getText(range);
+
       // get current unit path (use for renames)
       let currentUnitPath = lineText.replace("- ", "").split(".");
-      // get current unit name
       let currentUnitName = currentUnitPath.slice(-1).pop();
-
+      
       // get current unit number
       let currentUnitNumber: any = currentUnitName?.charAt(0);
       currentUnitNumber = currentUnitNumber.trim();
@@ -161,26 +170,14 @@ function moveSelectionDown() {
         newUnitNumber
       );
 
-      const newLinePosition: any = editor.selection.active;
-      editor.edit((update) => {
-        update.insert(newLinePosition, newUnitName!);
-      });
+      // write updated unit to editor
+      const newLineText = lineText.replace(currentUnitName!, newUnitName!);
+      editor.edit(update => {
+				update.replace(range, newLineText);
+			});
 
-      // let moduleDirectory: any = parse(editor.document.fileName!).dir;
-      /*       const options = {
-        files: `${moduleDirectory}/index.yml`,
-        from: currentUnitName,
-        to: newUnitName,
-      };
-      const results = replace.sync(options);
-      console.log("Replacement results:", results);
-      editor.document.save(); */
     } catch (error) {
       console.log(error);
     }
   }
-}
-
-function moveSelectionUp() {
-  commands.executeCommand("editor.action.moveLinesUpAction");
 }
