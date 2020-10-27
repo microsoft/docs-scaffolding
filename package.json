@@ -1,6 +1,6 @@
 {
-	"name": "scaffolding-context-proto",
-	"displayName": "scaffolding-context-proto",
+	"name": "learn-scaffolding",
+	"displayName": "learn-scaffolding",
 	"description": "",
 	"version": "0.0.1",
 	"publisher": "jw",
@@ -17,11 +17,11 @@
 	"contributes": {
 		"commands": [
 			{
-				"command": "extension.getSelectedFolder",
+				"command": "scaffoldModule",
 				"title": "Learn scaffolding: Create standard module"
 			},
 			{
-				"command": "extension.moveSelectionUp",
+				"command": "moveSelectionUp",
 				"title": "Learn scaffolding: Move selection up"
 			},
 			{
@@ -47,20 +47,25 @@
 					"type": "string",
 					"default": "",
 					"description": "Default Learn repo"
+				},
+				"docs.scaffolding.content_repo": {
+					"type": "string",
+					"default": "https://github.com/MicrosoftDocs/learn-scaffolding",
+					"description": "Default Learn repo"
 				}
 			}
 		},
 		"menus": {
 			"explorer/context": [
 				{
-					"command": "extension.getSelectedFolder",
+					"command": "scaffoldModule",
 					"group": "1_modification"
 				}
 			],
 			"editor/context": [
 				{
 					"when": "editorTextFocus && resourceFilename == index.yml",
-					"command": "extension.moveSelectionUp",
+					"command": "moveSelectionUp",
 					"group": "1_modification"
 				},
 				{
@@ -93,7 +98,11 @@
 		"vscode-test": "^1.3.0"
 	},
 	"dependencies": {
+		"@octokit/rest": "^18.0.6",
+		"axios": "^0.19.0",
+		"download-git-repo": "^1.0.2",
 		"fs-extra": "^9.0.1",
-		"replace-in-file": "^6.1.0"
+		"replace-in-file": "^6.1.0",
+		"vscode-extension-telemetry": "^0.1.1"
 	}
 }
