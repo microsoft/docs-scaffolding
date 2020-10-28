@@ -1,6 +1,6 @@
 import { commands, ExtensionContext, Uri } from "vscode";
 import { join } from "path";
-import { getSelectedFolder, moveSelectionDown, moveSelectionUp } from './controllers/scaffolding-controller';
+import { moduleSelectionQuickPick, moveSelectionDown, moveSelectionUp } from './controllers/scaffolding-controller';
 
 const fse = require("fs-extra");
 
@@ -15,7 +15,7 @@ export async function activate(context: ExtensionContext) {
   const disposableScaffoldModule = commands.registerCommand(
     "scaffoldModule",
     async (uri: Uri) => {
-      await getSelectedFolder(uri);
+      await moduleSelectionQuickPick(uri);
     }
   );
   const disposableMoveUp = commands.registerCommand(
@@ -30,7 +30,6 @@ export async function activate(context: ExtensionContext) {
       moveSelectionDown();
     }
   );
-
 
   context.subscriptions.push(
     disposableScaffoldModule,
