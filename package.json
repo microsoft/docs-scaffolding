@@ -18,7 +18,7 @@
 		"commands": [
 			{
 				"command": "scaffoldModule",
-				"title": "Learn scaffolding: Create standard module"
+				"title": "Learn scaffolding: Create new module"
 			},
 			{
 				"command": "moveSelectionUp",

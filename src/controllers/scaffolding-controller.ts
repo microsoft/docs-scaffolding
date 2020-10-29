@@ -68,22 +68,12 @@ export async function moduleSelectionQuickPick(uri: Uri) {
 
 export async function showModuleSelector(uri: Uri, moduleTypes: any[]) {
   const selection = await window.showQuickPick(moduleTypes);
-  console.log(selection);
-  switch (selection.toLowerCase()) {
-    case "choose":
-      await getSelectedFolder(uri, selection);
-      // commandOption = 'image';
-      break;
-  }
+  await getSelectedFolder(uri, selection);
 }
 
 export function getSelectedFolder(uri: Uri, moduleType: string) {
   const fse = require("fs-extra");
-  const directoryPath = join(
-    docsAuthoringDirectory,
-    "learn-scaffolding-main" /* ,
-    "module-type-definitions" */
-  );
+  const directoryPath = join(docsAuthoringDirectory, "learn-scaffolding-main");
   const selectedFolder = uri.fsPath;
   const getUserInput = window.showInputBox({
     prompt: "Enter module name.",
@@ -95,194 +85,93 @@ export function getSelectedFolder(uri: Uri, moduleType: string) {
       return;
     }
     moduleName = moduleName.replace(/ /g, "-");
+    // module path and media placeholder
     const scaffoldModule = join(selectedFolder, moduleName);
-    let jsonPath = join(
-      directoryPath,
-      "module-type-definitions",
-      `${moduleType}.json`
-    );
-    const moduleJson = readFileSync(jsonPath, "utf8");
-    let data = JSON.parse(moduleJson);
-    const moduleTemplate = join(
-      directoryPath,
-      "content-templates",
-      "default-index.yml"
-    );
-    const unitTemplate = join(
-      directoryPath,
-      "content-templates",
-      "default-unit.yml"
-    );
-    const knowledgeCheckStandaloneTemplate = join(
-      directoryPath,
-      "content-templates",
-      "default-knowledge-check-standalone-unit.yml"
-    );
     const mediaPlaceholder = join(directoryPath, "media", "placeholder.png");
+
+    // module index
+    const moduleYML = join(directoryPath, "content-templates", "default-index.yml");
+
+    // units
+    const introductionMarkdown = join(directoryPath, "content-templates", "default-introduction-unit.md");
+    const learningContentYML = join(directoryPath, "content-templates", "default-unit.yml");
+    const knowledgeCheckStandaloneYML = join(directoryPath, "content-templates", "default-knowledge-check-standalone-unit.yml");
+    const exerciseYML = join(directoryPath, "content-templates", "default-unit.yml");
+
+    // includes
+    const learningContentMarkdown = join(directoryPath, "content-templates", "default-learning-content-unit.md");
+    const exerciseMarkdown = join(directoryPath, "content-templates", "default-exercise-unit.md");
+
     switch (moduleType) {
       case "choose":
-        fse.copySync(moduleTemplate, join(scaffoldModule, "index.yml"));
-        fse.copySync(
-          mediaPlaceholder,
-          join(scaffoldModule, "media", "placeholder.png")
-        );
-        fse.copySync(unitTemplate, join(scaffoldModule, "1-introduction.yml"));
-        fse.copySync(
-          unitTemplate,
-          join(scaffoldModule, "includes", "1-introduction.md")
-        );
-        fse.copySync(
-          unitTemplate,
-          join(scaffoldModule, "2-identify-{product}-options.yml")
-        );
-        fse.copySync(
-          unitTemplate,
-          join(scaffoldModule, "includes", "2-identify-{product}-options.md")
-        );
-        fse.copySync(
-          unitTemplate,
-          join(scaffoldModule, "3-analyze-decision-criteria.yml")
-        );
-        fse.copySync(
-          unitTemplate,
-          join(scaffoldModule, "includes", "3-analyze-decision-criteria.md")
-        );
-        fse.copySync(
-          unitTemplate,
-          join(scaffoldModule, "4-use-{product1}.yml")
-        );
-        fse.copySync(
-          unitTemplate,
-          join(scaffoldModule, "includes", "4-use-{product1}.md")
-        );
-        fse.copySync(
-          unitTemplate,
-          join(scaffoldModule, "5-use-{product2}.yml")
-        );
-        fse.copySync(
-          unitTemplate,
-          join(scaffoldModule, "includes", "5-use-{product2}.md")
-        );
-        fse.copySync(
-          unitTemplate,
-          join(scaffoldModule, "6-use-{product3}.yml")
-        );
-        fse.copySync(
-          unitTemplate,
-          join(scaffoldModule, "includes", "6-use-{product3}.md")
-        );
-        fse.copySync(
-          unitTemplate,
-          join(scaffoldModule, "7-use-{product4}.yml")
-        );
-        fse.copySync(
-          unitTemplate,
-          join(scaffoldModule, "includes", "7-use-{product4}.md")
-        );
-        fse.copySync(
-          knowledgeCheckStandaloneTemplate,
-          join(scaffoldModule, "8-knowledge-check.yml")
-        );
-        fse.copySync(
-          knowledgeCheckStandaloneTemplate,
-          join(scaffoldModule, "includes", "8-knowledge-check.md")
-        );
-        fse.copySync(unitTemplate, join(scaffoldModule, "9-summary.yml"));
-        fse.copySync(
-          unitTemplate,
-          join(scaffoldModule, "includes", "9-summary.md")
-        );
+        fse.copySync(moduleYML, join(scaffoldModule, "index.yml"));
+        fse.copySync(mediaPlaceholder, join(scaffoldModule, "media", "placeholder.png"));
+
+        fse.copySync(learningContentYML, join(scaffoldModule, "1-introduction.yml"));
+        fse.copySync(introductionMarkdown, join(scaffoldModule, "includes", "1-introduction.md"));
+
+        fse.copySync(learningContentYML, join(scaffoldModule, `2-identify-${moduleName}-options.yml`));
+        fse.copySync(learningContentMarkdown, join(scaffoldModule, "includes", `2-identify-${moduleName}-options.md`));
+
+        fse.copySync(learningContentYML, join(scaffoldModule, "3-analyze-decision-criteria.yml"));
+        fse.copySync(learningContentMarkdown, join(scaffoldModule, "includes", "3-analyze-decision-criteria.md"));
+
+        fse.copySync(learningContentYML, join(scaffoldModule, "4-use-{product1}.yml"));
+        fse.copySync(learningContentMarkdown, join(scaffoldModule, "includes", "4-use-{product1}.md"));
+
+        fse.copySync(learningContentYML, join(scaffoldModule, "5-use-{product2}.yml"));
+        fse.copySync(learningContentMarkdown, join(scaffoldModule, "includes", "5-use-{product2}.md"));
+
+        fse.copySync(learningContentYML, join(scaffoldModule, "6-use-{product3}.yml"));
+        fse.copySync(learningContentMarkdown, join(scaffoldModule, "includes", "6-use-{product3}.md"));
+
+        fse.copySync(learningContentYML, join(scaffoldModule, "7-use-{product4}.yml"));
+        fse.copySync(learningContentMarkdown, join(scaffoldModule, "includes", "7-use-{product4}.md"));
+
+        fse.copySync(knowledgeCheckStandaloneYML, join(scaffoldModule, "8-knowledge-check.yml"));
+
+        fse.copySync(learningContentYML, join(scaffoldModule, "9-summary.yml"));
+        fse.copySync(learningContentMarkdown, join(scaffoldModule, "includes", "9-summary.md"));
+        break;
       case "introduction":
-        fse.copySync(moduleTemplate, join(scaffoldModule, "index.yml"));
-        fse.copySync(
-          mediaPlaceholder,
-          join(scaffoldModule, "media", "placeholder.png")
-        );
-        fse.copySync(unitTemplate, join(scaffoldModule, "1-introduction.yml"));
-        fse.copySync(
-          unitTemplate,
-          join(scaffoldModule, "includes", "1-introduction.md")
-        );
-        fse.copySync(
-          unitTemplate,
-          join(scaffoldModule, "2-what-is-{product}.yml")
-        );
-        fse.copySync(
-          unitTemplate,
-          join(scaffoldModule, "includes", "2-what-is-{product}.md")
-        );
-        fse.copySync(
-          unitTemplate,
-          join(scaffoldModule, "3-how-{product}-works.yml")
-        );
-        fse.copySync(
-          unitTemplate,
-          join(scaffoldModule, "includes", "3-how-{product}-works.md")
-        );
-        fse.copySync(
-          unitTemplate,
-          join(scaffoldModule, "4-when-to-use-{product}.yml")
-        );
-        fse.copySync(
-          unitTemplate,
-          join(scaffoldModule, "includes", "4-when-to-use-{product}.md")
-        );
-        fse.copySync(
-          knowledgeCheckStandaloneTemplate,
-          join(scaffoldModule, "5-knowledge-check.yml")
-        );
-        fse.copySync(
-          knowledgeCheckStandaloneTemplate,
-          join(scaffoldModule, "includes", "5-knowledge-check.md")
-        );
-        fse.copySync(unitTemplate, join(scaffoldModule, "6-summary.yml"));
-        fse.copySync(
-          unitTemplate,
-          join(scaffoldModule, "includes", "6-summary.md")
-        );
+        fse.copySync(moduleYML, join(scaffoldModule, "index.yml"));
+        fse.copySync(mediaPlaceholder, join(scaffoldModule, "media", "placeholder.png"));
+
+        fse.copySync(learningContentYML, join(scaffoldModule, "1-introduction.yml"));
+        fse.copySync(introductionMarkdown, join(scaffoldModule, "includes", "1-introduction.md"));
+
+        fse.copySync(learningContentYML, join(scaffoldModule, `2-what-is-${moduleName}.yml`));
+        fse.copySync(learningContentMarkdown, join(scaffoldModule, "includes", `2-what-is-${moduleName}.md`));
+
+        fse.copySync(learningContentYML, join(scaffoldModule, `3-how-${moduleName}-works.yml`));
+        fse.copySync(learningContentMarkdown, join(scaffoldModule, "includes", `3-how-${moduleName}-works.md`));
+
+        fse.copySync(learningContentYML, join(scaffoldModule, `4-when-to-use-${moduleName}.yml`));
+        fse.copySync(learningContentMarkdown, join(scaffoldModule, "includes", `4-when-to-use-${moduleName}.md`));
+
+        fse.copySync(knowledgeCheckStandaloneYML, join(scaffoldModule, "5-knowledge-check.yml"));
+
+        fse.copySync(learningContentYML, join(scaffoldModule, "6-summary.yml"));
+        fse.copySync(learningContentMarkdown, join(scaffoldModule, "includes", "6-summary.md"));
+        break;
       case "standard":
-        fse.copySync(moduleTemplate, join(scaffoldModule, "index.yml"));
-        fse.copySync(
-          mediaPlaceholder,
-          join(scaffoldModule, "media", "placeholder.png")
-        );
-        fse.copySync(unitTemplate, join(scaffoldModule, "1-introduction.yml"));
-        fse.copySync(
-          unitTemplate,
-          join(scaffoldModule, "includes", "1-introduction.md")
-        );
-        fse.copySync(
-          unitTemplate,
-          join(scaffoldModule, "2-learning-content.yml")
-        );
-        fse.copySync(
-          unitTemplate,
-          join(scaffoldModule, "includes", "2-learning-content.md")
-        );
-        fse.copySync(unitTemplate, join(scaffoldModule, "3-exercise.yml"));
-        fse.copySync(
-          unitTemplate,
-          join(scaffoldModule, "includes", "3-exercise.md")
-        );
-        fse.copySync(
-          unitTemplate,
-          join(scaffoldModule, "4-knowledge-check.yml")
-        );
-        fse.copySync(
-          unitTemplate,
-          join(scaffoldModule, "includes", "4-knowledge-check.md")
-        );
-        fse.copySync(unitTemplate, join(scaffoldModule, "5-summary.yml"));
-        fse.copySync(
-          unitTemplate,
-          join(scaffoldModule, "includes", "5-summary.md")
-        );
+        fse.copySync(moduleYML, join(scaffoldModule, "index.yml"));
+        fse.copySync(mediaPlaceholder, join(scaffoldModule, "media", "placeholder.png"));
+
+        fse.copySync(learningContentYML, join(scaffoldModule, "1-introduction.yml"));
+        fse.copySync(introductionMarkdown, join(scaffoldModule, "includes", "1-introduction.md"));
+
+        fse.copySync(learningContentYML, join(scaffoldModule, "2-learning-content.yml"));
+        fse.copySync(learningContentMarkdown, join(scaffoldModule, "includes", "2-learning-content.md"));
+
+        fse.copySync(exerciseYML, join(scaffoldModule, "3-exercise.yml"));
+        fse.copySync(exerciseMarkdown, join(scaffoldModule, "includes", "3-exercise.md"));
+
+        fse.copySync(knowledgeCheckStandaloneYML, join(scaffoldModule, "5-knowledge-check.yml"));
+
+        fse.copySync(learningContentYML, join(scaffoldModule, "5-summary.yml"));
+        fse.copySync(learningContentMarkdown, join(scaffoldModule, "includes", "5-summary.md"));
+        break;
     }
-    /* fse.copy(templateFolder, scaffoldModule, (err: any) => {
-      if (err) {
-        return console.error(err);
-      }
-      renameModuleReferences(scaffoldModule, moduleName);
-    }); */
   });
 }
