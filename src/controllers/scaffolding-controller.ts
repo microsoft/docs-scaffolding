@@ -1,4 +1,4 @@
-import { commands, Uri, window, QuickPickItem } from "vscode";
+import { commands, Uri, window, QuickPickItem, QuickPickOptions } from "vscode";
 import { join } from "path";
 import { cleanupDownloadFiles } from "../helper/cleanup";
 import {
@@ -7,7 +7,7 @@ import {
   showStatusMessage,
 } from "../helper/common";
 import { templateFolder } from "../extension";
-import { renameModuleReferences } from "../helper/module";
+import { generateBaseUid, stubModuleReferences } from "../helper/module";
 import { incrementUnitNumber } from "../helper/unit";
 import { readFileSync } from "fs";
 
@@ -60,15 +60,18 @@ export async function moduleSelectionQuickPick(uri: Uri) {
       let jsonPath = join(directoryPath, file);
       const moduleJson = readFileSync(jsonPath, "utf8");
       let data = JSON.parse(moduleJson);
-      moduleTypes.push(data.moduleType);
+      let patterns = data.moduleType.charAt(0).toUpperCase() + data.moduleType.slice(1)
+      // moduleTypes.push(data.moduleType);
+      moduleTypes.push(patterns);
     });
     return showModuleSelector(uri, moduleTypes);
   });
 }
 
 export async function showModuleSelector(uri: Uri, moduleTypes: any[]) {
-  const selection = await window.showQuickPick(moduleTypes);
-  await getSelectedFolder(uri, selection);
+  const opts: QuickPickOptions = { placeHolder: 'Select module pattern' };
+  const selection = await window.showQuickPick(moduleTypes, opts);
+  await getSelectedFolder(uri, selection.toLowerCase());
 }
 
 export function getSelectedFolder(uri: Uri, moduleType: string) {
@@ -173,5 +176,6 @@ export function getSelectedFolder(uri: Uri, moduleType: string) {
         fse.copySync(learningContentMarkdown, join(scaffoldModule, "includes", "5-summary.md"));
         break;
     }
+    generateBaseUid(scaffoldModule, moduleName);
   });
 }
