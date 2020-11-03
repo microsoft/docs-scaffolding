@@ -19,14 +19,6 @@
 			{
 				"command": "scaffoldModule",
 				"title": "Learn scaffolding: Create new module"
-			},
-			{
-				"command": "moveSelectionUp",
-				"title": "Learn scaffolding: Move selection up"
-			},
-			{
-				"command": "extension.moveSelectionDown",
-				"title": "Learn scaffolding: Move selection down"
 			}
 		],
 		"configuration": {
@@ -51,7 +43,7 @@
 				"docs.scaffolding.content_repo": {
 					"type": "string",
 					"default": "https://github.com/MicrosoftDocs/learn-scaffolding",
-					"description": "Default Learn repo"
+					"description": "Learn template repo"
 				}
 			}
 		},
@@ -59,18 +51,6 @@
 			"explorer/context": [
 				{
 					"command": "scaffoldModule",
-					"group": "1_modification"
-				}
-			],
-			"editor/context": [
-				{
-					"when": "editorTextFocus && resourceFilename == index.yml",
-					"command": "moveSelectionUp",
-					"group": "1_modification"
-				},
-				{
-					"when": "editorTextFocus && resourceFilename == index.yml",
-					"command": "extension.moveSelectionDown",
 					"group": "1_modification"
 				}
 			]
@@ -103,6 +83,8 @@
 		"download-git-repo": "^1.0.2",
 		"fs-extra": "^9.0.1",
 		"replace-in-file": "^6.1.0",
-		"vscode-extension-telemetry": "^0.1.1"
+		"vscode-extension-telemetry": "^0.1.1",
+		"extract-zip": "^2.0.1",
+		"open": "^7.3.0"
 	}
 }

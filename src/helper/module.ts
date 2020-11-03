@@ -1,5 +1,5 @@
 import { alias, gitHubID, learnRepoId } from "../userSettings";
-import { basename, join, parse } from 'path';
+import { basename, join } from 'path';
 import { postInformation } from '../helper/common';
 
 const replace = require("replace-in-file");
@@ -40,10 +40,10 @@ function stubRepoReferences(modulePath: string, moduleName: any) {
     to: learnRepo,
   };
   replace.sync(options);
-  stubGithubIdReferences(modulePath, moduleName);
+  stubGithubIdReferences(modulePath);
 }
 
-function stubGithubIdReferences(modulePath: string, moduleName: any) {
+function stubGithubIdReferences(modulePath: string) {
   if (!author) {
     author = "{{github}}";
   }
