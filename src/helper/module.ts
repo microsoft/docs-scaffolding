@@ -84,11 +84,9 @@ function stubDateReferences(modulePath: string) {
 function stubUnitReferences(modulePath: string) {
   const fs = require("fs");
   fs.readdir(modulePath, function (err: string, files: any[]) {
-    //handling error
     if (err) {
       return console.log("Unable to scan directory: " + err);
     }
-    //listing all files using forEach
     files.forEach(function (file) {
       let unitFilePath = join(modulePath, file);
       let unitName = basename(unitFilePath.replace('.yml', ''));

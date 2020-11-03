@@ -2,20 +2,16 @@ import { commands, ExtensionContext, Uri } from "vscode";
 import { join } from "path";
 import { scaffoldModule } from './controllers/scaffolding-controller';
 
-const fse = require("fs-extra");
-
 export let extensionName: any;
-export let templateFolder: any;
+const fse = require("fs-extra");
 
 export async function activate(context: ExtensionContext) {
   let extensionPath = join(context.extensionPath, "package.json");
   extensionName = JSON.parse(fse.readFileSync(extensionPath, "utf8"));
   extensionPath = context.extensionPath;
-  templateFolder = join(extensionPath, "template");
   const disposableScaffoldModule = commands.registerCommand(
     "scaffoldModule",
     async (uri: Uri) => {
-      // await moduleSelectionQuickPick(uri);
       await scaffoldModule(uri);
     }
   );

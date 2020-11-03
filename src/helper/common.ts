@@ -4,12 +4,9 @@ import { Uri, window, workspace } from 'vscode';
 import { reporter } from './telemetry';
 import { join } from 'path';
 import { homedir } from 'os';
-import { templateFolder } from '../extension';
 
 export const output = window.createOutputChannel('docs-article-templates');
-
 export const docsAuthoringDirectory = join(homedir(), 'Docs Authoring');
-export const templateDirectory = join(docsAuthoringDirectory, 'Templates');
 
 /**
  * Create a posted warning message and applies the message to the log
