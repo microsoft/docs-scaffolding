@@ -1,4 +1,4 @@
-import { alias, gitHubID, learnRepoId } from "../userSettings";
+import { alias, gitHubID, learnRepoId } from "../helper/user-settings";
 import { basename, join } from 'path';
 import { postInformation } from '../helper/common';
 

@@ -1,6 +1,6 @@
 {
-	"name": "learn-scaffolding",
-	"displayName": "learn-scaffolding",
+	"name": "docs-scaffolding",
+	"displayName": "docs-scaffolding",
 	"description": "",
 	"version": "0.0.1",
 	"publisher": "jw",
@@ -40,9 +40,9 @@
 					"default": "",
 					"description": "Default Learn repo"
 				},
-				"docs.scaffolding.content_repo": {
+				"docs.scaffolding.template_repo": {
 					"type": "string",
-					"default": "https://github.com/MicrosoftDocs/learn-scaffolding",
+					"default": "https://github.com/MicrosoftDocs/learn-scaffolding/archive/main.zip",
 					"description": "Learn template repo"
 				}
 			}

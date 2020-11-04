@@ -4,6 +4,7 @@ import { docsAuthoringDirectory } from "../helper/common";
 import { generateBaseUid } from "../helper/module";
 import { readFileSync, existsSync } from "fs";
 import { homedir } from 'os';
+import { templateRepo } from '../helper/user-settings';
 
 const templateZip = join(homedir(), 'Downloads', 'learn-scaffolding-main.zip');
 const localTemplateRepoPath = join(docsAuthoringDirectory, "learn-scaffolding-main");
@@ -18,7 +19,7 @@ export async function scaffoldModule(uri: Uri) {
     unzipTemplates(uri);
   } else {
     const open = require('open');
-    open("https://github.com/MicrosoftDocs/learn-scaffolding/archive/main.zip");
+    open(templateRepo);
     unzipTemplates(uri);
   }
 }
@@ -47,7 +48,7 @@ export async function moduleSelectionQuickPick(uri: Uri) {
     }
 
     files.forEach(function (file) {
-      let jsonPath = join(typeDefinitionJsonDirectory, file);
+      const jsonPath = join(typeDefinitionJsonDirectory, file);
       const moduleJson = readFileSync(jsonPath, "utf8");
       let data = JSON.parse(moduleJson);
       let patterns = data.moduleType.charAt(0).toUpperCase() + data.moduleType.slice(1);
