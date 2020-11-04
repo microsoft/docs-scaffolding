@@ -8,9 +8,6 @@ let author: string = gitHubID;
 let msAuthor: string = alias;
 
 export function generateBaseUid(modulePath: string, moduleName: any) {
-  if (!learnRepo) {
-    learnRepo = "learn";
-  }
   const options = {
     files: `${modulePath}/*.yml`,
     from: /{{moduleName}}/g,
@@ -27,16 +24,16 @@ export function stubModuleReferences(modulePath: string, moduleName: any) {
     to: moduleName,
   };
   replace.sync(options);
-  stubRepoReferences(modulePath, moduleName);
+  stubRepoReferences(modulePath);
 }
 
-function stubRepoReferences(modulePath: string, moduleName: any) {
+function stubRepoReferences(modulePath: string) {
   if (!learnRepo) {
     learnRepo = "learn";
   }
   const options = {
     files: `${modulePath}/*.yml`,
-    from: /{{learRepo}}/g,
+    from: /{{learnRepo}}/g,
     to: learnRepo,
   };
   replace.sync(options);
@@ -45,11 +42,11 @@ function stubRepoReferences(modulePath: string, moduleName: any) {
 
 function stubGithubIdReferences(modulePath: string) {
   if (!author) {
-    author = "{{github}}";
+    author = "{{githubUsername}}";
   }
   const options = {
     files: `${modulePath}/*.yml`,
-    from: /{{github}}/g,
+    from: /{{githubUsername}}/g,
     to: author,
   };
   replace.sync(options);
@@ -58,11 +55,11 @@ function stubGithubIdReferences(modulePath: string) {
 
 function stubGithubAuthorReferences(modulePath: string) {
   if (!msAuthor) {
-    msAuthor = "{{msuser}}";
+    msAuthor = "{{msUser}}";
   }
   const options = {
     files: `${modulePath}/*.yml`,
-    from: /{{msuser}}/g,
+    from: /{{msUser}}/g,
     to: msAuthor,
   };
   replace.sync(options);

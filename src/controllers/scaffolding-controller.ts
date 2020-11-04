@@ -21,13 +21,12 @@ export function scaffoldingeCommand() {
 check for repo zip file and download if it doesn't exist. */
 export async function scaffoldModule(uri: Uri) {
   if (existsSync(templateZip)) {
-    window.showWarningMessage('template zip already exists in download directory. Delete file to refresh templates.');
-    unzipTemplates(uri);
+    console.log('template zip already exists in download directory. Delete file to refresh templates.');
   } else {
     const open = require('open');
     open(templateRepo);
-    unzipTemplates(uri);
   }
+  unzipTemplates(uri);
 }
 
 /* temp code until template repo is public 
