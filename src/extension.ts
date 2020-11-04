@@ -1,20 +1,22 @@
-import { commands, ExtensionContext, Uri } from "vscode";
-import { join } from "path";
-import { scaffoldModule } from './controllers/scaffolding-controller';
+import { commands, ExtensionContext } from "vscode";
+import { scaffoldingeCommand } from './controllers/scaffolding-controller';
+
+export let extensionPath: any;
 
 export async function activate(context: ExtensionContext) {
-  let extensionPath = join(context.extensionPath, "package.json");
   extensionPath = context.extensionPath;
-  const disposableScaffoldModule = commands.registerCommand(
-    "scaffoldModule",
-    async (uri: Uri) => {
-      await scaffoldModule(uri);
-    }
-  );
+  const ScaffoldingCommands: any = [];
+	scaffoldingeCommand().forEach(cmd => ScaffoldingCommands.push(cmd));
 
-  context.subscriptions.push(
-    disposableScaffoldModule
-  );
+	try {
+		ScaffoldingCommands.map((cmd: any) => {
+			const commandName = cmd.command;
+			const command = commands.registerCommand(commandName, cmd.callback);
+			context.subscriptions.push(command);
+		});
+	} catch (error) {
+		console.log(`Error registering commands with vscode extension context: ${error}`);
+	}
 }
 
 // this method is called when your extension is deactivated

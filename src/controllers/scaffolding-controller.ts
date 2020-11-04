@@ -5,11 +5,17 @@ import { generateBaseUid } from "../helper/module";
 import { readFileSync, existsSync } from "fs";
 import { homedir } from 'os';
 import { templateRepo } from '../helper/user-settings';
+import { extensionPath } from '../extension';
 
 const templateZip = join(homedir(), 'Downloads', 'learn-scaffolding-main.zip');
 const localTemplateRepoPath = join(docsAuthoringDirectory, "learn-scaffolding-main");
 const typeDefinitionJsonDirectory = join(localTemplateRepoPath, "module-type-definitions");
 const fse = require("fs-extra");
+
+export function scaffoldingeCommand() {
+	const commands = [{ command: scaffoldModule.name, callback: scaffoldModule }];
+	return commands;
+}
 
 /* temp solution until template repo is made public. 
 check for repo zip file and download if it doesn't exist. */
@@ -90,7 +96,7 @@ export function copyTemplates(moduleName: string, moduleType: string, selectedFo
 
   // module path and media placeholder
   const scaffoldModule = join(selectedFolder, moduleName);
-  // const mediaPlaceholder = join(directoryPath, "media", "placeholder.png");
+  const mediaPlaceholder = join(extensionPath, "media", "docs-logo-ms.png");
 
   // module index
   const moduleYML = join(localTemplateRepoPath, "content-templates", "default-index.yml");
@@ -108,7 +114,7 @@ export function copyTemplates(moduleName: string, moduleType: string, selectedFo
   switch (moduleType) {
     case "choose":
       fse.copySync(moduleYML, join(scaffoldModule, "index.yml"));
-      // fse.copySync(mediaPlaceholder, join(scaffoldModule, "media", "placeholder.png"));
+      fse.copySync(mediaPlaceholder, join(scaffoldModule, "media", "docs-logo-ms.png"));
 
       fse.copySync(learningContentYML, join(scaffoldModule, "1-introduction.yml"));
       fse.copySync(introductionMarkdown, join(scaffoldModule, "includes", "1-introduction.md"));
@@ -138,7 +144,7 @@ export function copyTemplates(moduleName: string, moduleType: string, selectedFo
       break;
     case "introduction":
       fse.copySync(moduleYML, join(scaffoldModule, "index.yml"));
-      // fse.copySync(mediaPlaceholder, join(scaffoldModule, "media", "placeholder.png"));
+      fse.copySync(mediaPlaceholder, join(scaffoldModule, "media", "placeholder.png"));
 
       fse.copySync(learningContentYML, join(scaffoldModule, "1-introduction.yml"));
       fse.copySync(introductionMarkdown, join(scaffoldModule, "includes", "1-introduction.md"));
@@ -159,7 +165,7 @@ export function copyTemplates(moduleName: string, moduleType: string, selectedFo
       break;
     case "standard":
       fse.copySync(moduleYML, join(scaffoldModule, "index.yml"));
-      // fse.copySync(mediaPlaceholder, join(scaffoldModule, "media", "placeholder.png"));
+      fse.copySync(mediaPlaceholder, join(scaffoldModule, "media", "placeholder.png"));
 
       fse.copySync(learningContentYML, join(scaffoldModule, "1-introduction.yml"));
       fse.copySync(introductionMarkdown, join(scaffoldModule, "includes", "1-introduction.md"));
