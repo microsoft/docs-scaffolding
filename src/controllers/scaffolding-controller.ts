@@ -1,5 +1,5 @@
 import { Uri, window, QuickPickItem, QuickPickOptions } from "vscode";
-import { join } from "path";
+import { basename, join } from "path";
 import { docsAuthoringDirectory } from "../helper/common";
 import { generateBaseUid } from "../helper/module";
 import { readFileSync, existsSync } from "fs";
@@ -13,8 +13,8 @@ const typeDefinitionJsonDirectory = join(localTemplateRepoPath, "module-type-def
 const fse = require("fs-extra");
 
 export function scaffoldingeCommand() {
-	const commands = [{ command: scaffoldModule.name, callback: scaffoldModule }];
-	return commands;
+  const commands = [{ command: scaffoldModule.name, callback: scaffoldModule }];
+  return commands;
 }
 
 /* temp solution until template repo is made public. 
@@ -45,7 +45,7 @@ async function unzipTemplates(uri: Uri) {
 /* loop through module type definitions directory and store each module type */
 export async function moduleSelectionQuickPick(uri: Uri) {
   const fs = require("fs");
-  
+
   let moduleTypes: QuickPickItem[] = [];
   fs.readdir(typeDefinitionJsonDirectory, function (err: string, files: any[]) {
     if (err) {
@@ -92,6 +92,9 @@ to-do: use json info to copy files instead of hard-coding paths and types */
 export function copyTemplates(moduleName: string, moduleType: string, selectedFolder: string) {
   let jsonPath = join(typeDefinitionJsonDirectory, `${moduleType}.json`);
   const moduleJson = readFileSync(jsonPath, "utf8");
+  let data = JSON.parse(moduleJson);
+  let moduleUnitTemplatePath: string;
+  let templatePath = join(localTemplateRepoPath, "content-templates");
 
   // module path and media placeholder
   const scaffoldModule = join(selectedFolder, moduleName);
@@ -112,34 +115,49 @@ export function copyTemplates(moduleName: string, moduleType: string, selectedFo
 
   switch (moduleType) {
     case "choose":
-      fse.copySync(moduleYML, join(scaffoldModule, "index.yml"));
-      fse.copySync(mediaPlaceholder, join(scaffoldModule, "media", "docs-logo-ms.png"));
+      // fse.copySync(moduleYML, join(scaffoldModule, "index.yml"));
+      // fse.copySync(mediaPlaceholder, join(scaffoldModule, "media", "docs-logo-ms.png"));
 
-      fse.copySync(learningContentYML, join(scaffoldModule, "1-introduction.yml"));
-      fse.copySync(introductionMarkdown, join(scaffoldModule, "includes", "1-introduction.md"));
+      // fse.copySync(learningContentYML, join(scaffoldModule, "1-introduction.yml"));
+      // fse.copySync(introductionMarkdown, join(scaffoldModule, "includes", "1-introduction.md"));
 
-      fse.copySync(learningContentYML, join(scaffoldModule, `2-identify-${moduleName}-options.yml`));
-      fse.copySync(learningContentMarkdown, join(scaffoldModule, "includes", `2-identify-${moduleName}-options.md`));
+      // fse.copySync(learningContentYML, join(scaffoldModule, `2-identify-${moduleName}-options.yml`));
+      // fse.copySync(learningContentMarkdown, join(scaffoldModule, "includes", `2-identify-${moduleName}-options.md`));
 
-      fse.copySync(learningContentYML, join(scaffoldModule, "3-analyze-decision-criteria.yml"));
-      fse.copySync(learningContentMarkdown, join(scaffoldModule, "includes", "3-analyze-decision-criteria.md"));
+      // fse.copySync(learningContentYML, join(scaffoldModule, "3-analyze-decision-criteria.yml"));
+      // fse.copySync(learningContentMarkdown, join(scaffoldModule, "includes", "3-analyze-decision-criteria.md"));
 
-      fse.copySync(learningContentYML, join(scaffoldModule, "4-use-{product1}.yml"));
-      fse.copySync(learningContentMarkdown, join(scaffoldModule, "includes", "4-use-{product1}.md"));
+      // fse.copySync(learningContentYML, join(scaffoldModule, "4-use-{product1}.yml"));
+      // fse.copySync(learningContentMarkdown, join(scaffoldModule, "includes", "4-use-{product1}.md"));
 
-      fse.copySync(learningContentYML, join(scaffoldModule, "5-use-{product2}.yml"));
-      fse.copySync(learningContentMarkdown, join(scaffoldModule, "includes", "5-use-{product2}.md"));
+      // fse.copySync(learningContentYML, join(scaffoldModule, "5-use-{product2}.yml"));
+      // fse.copySync(learningContentMarkdown, join(scaffoldModule, "includes", "5-use-{product2}.md"));
 
-      fse.copySync(learningContentYML, join(scaffoldModule, "6-use-{product3}.yml"));
-      fse.copySync(learningContentMarkdown, join(scaffoldModule, "includes", "6-use-{product3}.md"));
+      // fse.copySync(learningContentYML, join(scaffoldModule, "6-use-{product3}.yml"));
+      // fse.copySync(learningContentMarkdown, join(scaffoldModule, "includes", "6-use-{product3}.md"));
 
-      fse.copySync(learningContentYML, join(scaffoldModule, "7-use-{product4}.yml"));
-      fse.copySync(learningContentMarkdown, join(scaffoldModule, "includes", "7-use-{product4}.md"));
+      // fse.copySync(learningContentYML, join(scaffoldModule, "7-use-{product4}.yml"));
+      // fse.copySync(learningContentMarkdown, join(scaffoldModule, "includes", "7-use-{product4}.md"));
 
-      fse.copySync(knowledgeCheckStandaloneYML, join(scaffoldModule, "8-knowledge-check.yml"));
+      // fse.copySync(knowledgeCheckStandaloneYML, join(scaffoldModule, "8-knowledge-check.yml"));
 
-      fse.copySync(learningContentYML, join(scaffoldModule, "9-summary.yml"));
-      fse.copySync(learningContentMarkdown, join(scaffoldModule, "includes", "9-summary.md"));
+      // fse.copySync(learningContentYML, join(scaffoldModule, "9-summary.yml"));
+      // fse.copySync(learningContentMarkdown, join(scaffoldModule, "includes", "9-summary.md"));
+
+      let contentTemplatePath: any;
+      let templateFile: any;
+      let scaffoldFilename: any;
+      data.units.forEach((obj: any, i: any) => {
+        moduleUnitTemplatePath = basename(obj.moduleUnitTemplatePath);
+        scaffoldFilename = obj.scaffoldFilename;
+        templateFile = join(templatePath, moduleUnitTemplatePath);
+        fse.copySync(templateFile, join(scaffoldModule, `${scaffoldFilename}.yml`));
+        if (obj.contentTemplatePath) {
+          contentTemplatePath = basename(obj.contentTemplatePath);
+          templateFile = join(templatePath, contentTemplatePath);
+          fse.copySync(templateFile, join(scaffoldModule, "includes", `${scaffoldFilename}.md`));
+        }
+      });
       break;
     case "introduction":
       fse.copySync(moduleYML, join(scaffoldModule, "index.yml"));

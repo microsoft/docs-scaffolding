@@ -7,7 +7,6 @@ export async function activate(context: ExtensionContext) {
   extensionPath = context.extensionPath;
   const ScaffoldingCommands: any = [];
 	scaffoldingeCommand().forEach(cmd => ScaffoldingCommands.push(cmd));
-
 	try {
 		ScaffoldingCommands.map((cmd: any) => {
 			const commandName = cmd.command;
