@@ -27,17 +27,17 @@
 			"properties": {
 				"docs.scaffolding.alias": {
 					"type": "string",
-					"default": "jamarw",
+					"default": "",
 					"description": "Microsoft alias"
 				},
 				"docs.scaffolding.githubid": {
 					"type": "string",
-					"default": "warrenj",
+					"default": "",
 					"description": "GitHub ID"
 				},
 				"docs.scaffolding.learn_repo_id": {
 					"type": "string",
-					"default": "vsc",
+					"default": "",
 					"description": "Default Learn repo"
 				},
 				"docs.scaffolding.template_repo": {
