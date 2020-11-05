@@ -1,8 +1,8 @@
 import { Uri, window, QuickPickItem, QuickPickOptions } from "vscode";
-import { basename, join } from "path";
+import { join, resolve } from "path";
 import { docsAuthoringDirectory } from "../helper/common";
 import { generateBaseUid } from "../helper/module";
-import { readFileSync, existsSync, readdir } from "fs";
+import { readFileSync, existsSync } from "fs";
 import { homedir } from 'os';
 import { templateRepo } from '../helper/user-settings';
 import { extensionPath } from '../extension';
@@ -89,20 +89,18 @@ export function getSelectedFolder(uri: Uri, moduleType: string) {
 /* temp code to copy template files from template directory to new module directory
 to-do: use json info to copy files instead of hard-coding paths and types */
 export function copyTemplates(moduleName: string, moduleType: string, selectedFolder: string) {
-  let jsonPath = join(typeDefinitionJsonDirectory, `${moduleType}.json`);
+  const jsonPath = join(typeDefinitionJsonDirectory, `${moduleType}.json`);
   const moduleJson = readFileSync(jsonPath, "utf8");
-  let data = JSON.parse(moduleJson);
-  let moduleUnitTemplatePath: string;
-  let templatePath = join(localTemplateRepoPath, "content-templates");
-
+  const data = JSON.parse(moduleJson);
   const scaffoldModule = join(selectedFolder, moduleName);
+
   /* to-do: update error workflow */
   if (existsSync(scaffoldModule)) {
     window.showWarningMessage(`${scaffoldModule} already exists. Please provide a new module name.`);
   }
 
   // copy index.yml
-  const moduleYMLSource = join(localTemplateRepoPath, "content-templates", "default-index.yml");
+  const moduleYMLSource = resolve(typeDefinitionJsonDirectory, data.moduleTemplatePath);
   const moduleYMLTarget = join(scaffoldModule, "index.yml");
   fse.copySync(moduleYMLSource, moduleYMLTarget);
 
@@ -111,19 +109,16 @@ export function copyTemplates(moduleName: string, moduleType: string, selectedFo
   const mediaPlaceholderTarget = join(scaffoldModule, "media", "placeholder.png");
   fse.copySync(mediaPlaceholderSource, mediaPlaceholderTarget);
 
-  let contentTemplatePath: any;
   let templateFile: any;
   let scaffoldFilename: any;
 
   // loop through the selected module definition and copy files from the template template directory to the new module directory
   data.units.forEach((obj: any) => {
-    moduleUnitTemplatePath = basename(obj.moduleUnitTemplatePath);
     scaffoldFilename = obj.scaffoldFilename;
-    templateFile = join(templatePath, moduleUnitTemplatePath);
+    templateFile = resolve(typeDefinitionJsonDirectory, obj.moduleUnitTemplatePath);
     fse.copySync(templateFile, join(scaffoldModule, `${scaffoldFilename}.yml`));
     if (obj.contentTemplatePath) {
-      contentTemplatePath = basename(obj.contentTemplatePath);
-      templateFile = join(templatePath, contentTemplatePath);
+      templateFile = resolve(typeDefinitionJsonDirectory, obj.contentTemplatePath);
       fse.copySync(templateFile, join(scaffoldModule, "includes", `${scaffoldFilename}.md`));
     }
   });
