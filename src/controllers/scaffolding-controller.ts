@@ -115,11 +115,17 @@ export function copyTemplates(moduleName: string, moduleType: string, selectedFo
   // loop through the selected module definition and copy files from the template template directory to the new module directory
   data.units.forEach((obj: any) => {
     scaffoldFilename = obj.scaffoldFilename;
-    templateFile = resolve(typeDefinitionJsonDirectory, obj.moduleUnitTemplatePath);
-    fse.copySync(templateFile, join(scaffoldModule, `${scaffoldFilename}.yml`));
-    if (obj.contentTemplatePath) {
-      templateFile = resolve(typeDefinitionJsonDirectory, obj.contentTemplatePath);
-      fse.copySync(templateFile, join(scaffoldModule, "includes", `${scaffoldFilename}.md`));
+    try {
+      templateFile = resolve(typeDefinitionJsonDirectory, obj.moduleUnitTemplatePath);
+      if(!existsSync(templateFile)) throw `${templateFile} does not exist and will be ommitted from the scaffolding process.`;
+      fse.copySync(templateFile, join(scaffoldModule, `${scaffoldFilename}.yml`));
+      if (obj.contentTemplatePath) {
+        templateFile = resolve(typeDefinitionJsonDirectory, obj.contentTemplatePath);
+        if(!existsSync(templateFile)) throw `${templateFile} does not exist and will be ommitted from the scaffolding process.`;
+        fse.copySync(templateFile, join(scaffoldModule, "includes", `${scaffoldFilename}.md`));
+      }
+    } catch (error) {
+      window.showWarningMessage(error);
     }
   });
   generateBaseUid(scaffoldModule, moduleName);
