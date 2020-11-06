@@ -38,7 +38,12 @@
 				"docs.scaffolding.learn_repo_id": {
 					"type": "string",
 					"default": "",
-					"description": "Default Learn repo"
+					"description": "Default prefix i.e. learn"
+				},
+				"docs.scaffolding.product": {
+					"type": "string",
+					"default": "",
+					"description": "Default prefix i.e. azure"
 				},
 				"docs.scaffolding.template_repo": {
 					"type": "string",

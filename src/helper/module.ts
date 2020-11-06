@@ -1,9 +1,9 @@
-import { alias, gitHubID, learnRepoId } from "../helper/user-settings";
+import { alias, gitHubID, defaultPrefix } from "../helper/user-settings";
 import { basename, join } from 'path';
 import { postInformation } from '../helper/common';
 
 const replace = require("replace-in-file");
-let learnRepo: string = learnRepoId;
+let learnRepo: string = defaultPrefix;
 let author: string = gitHubID;
 let msAuthor: string = alias;
 
