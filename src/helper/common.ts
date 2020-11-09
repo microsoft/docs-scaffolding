@@ -2,12 +2,9 @@
 
 import { Uri, window, workspace } from 'vscode';
 import { reporter } from './telemetry';
-import { join } from 'path';
-import { homedir } from 'os';
 import { rmdir } from 'fs';
 
 export const output = window.createOutputChannel('docs-scaffolding');
-export const docsAuthoringDirectory = join(homedir(), 'Docs Authoring');
 
 /**
  * Create a posted warning message and applies the message to the log
@@ -36,7 +33,7 @@ export function postError(message: string) {
 export function hasValidWorkSpaceRootPath(senderName: string) {
 	const folderPath = workspace.rootPath;
 
-	if (folderPath == null) {
+	if (folderPath === null) {
 		postWarning(
 			`The ${senderName} command requires an active workspace. Please open VS Code from the root of your clone to continue.`
 		);

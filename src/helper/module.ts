@@ -7,7 +7,7 @@ let learnRepo: string = defaultPrefix;
 let author: string = gitHubID;
 let msAuthor: string = alias;
 
-export function generateBaseUid(modulePath: string, moduleName: any) {
+export function generateBaseUid(modulePath: string, moduleName: any, moduleType: string, rawTitle: string) {
   const options = {
     files: `${modulePath}/*.yml`,
     from: /{{moduleName}}/g,
