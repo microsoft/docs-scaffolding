@@ -43,7 +43,7 @@
 				"docs.scaffolding.product": {
 					"type": "string",
 					"default": "",
-					"description": "Default prefix i.e. azure"
+					"description": "Default product i.e. azure"
 				},
 				"docs.scaffolding.template_repo": {
 					"type": "string",
@@ -76,11 +76,11 @@
 		"@types/mocha": "^7.0.1",
 		"@types/node": "^12.11.7",
 		"@types/vscode": "^1.50.0",
+		"@typescript-eslint/eslint-plugin": "^2.18.0",
+		"@typescript-eslint/parser": "^2.18.0",
 		"chai": "^4.2.0",
 		"chai-spies": "^1.0.0",
 		"eslint": "^6.8.0",
-		"@typescript-eslint/parser": "^2.18.0",
-		"@typescript-eslint/eslint-plugin": "^2.18.0",
 		"glob": "^7.1.6",
 		"mocha": "^7.0.1",
 		"sinon": "^9.0.1",
@@ -89,12 +89,15 @@
 	},
 	"dependencies": {
 		"@octokit/rest": "^18.0.6",
+		"@types/sinon": "^9.0.8",
 		"axios": "^0.19.0",
 		"download-git-repo": "^1.0.2",
-		"fs-extra": "^9.0.1",
-		"replace-in-file": "^6.1.0",
-		"vscode-extension-telemetry": "^0.1.1",
 		"extract-zip": "^2.0.1",
-		"open": "^7.3.0"
+		"fs-extra": "^9.0.1",
+		"open": "^7.3.0",
+		"replace-in-file": "^6.1.0",
+		"sinon": "^9.0.1",
+		"tmp": "^0.2.1",
+		"vscode-extension-telemetry": "^0.1.1"
 	}
 }

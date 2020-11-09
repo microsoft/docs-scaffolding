@@ -1,17 +1,20 @@
+/* eslint-disable no-throw-literal, curly */
+
 import { Uri, window, QuickPickItem, QuickPickOptions } from "vscode";
 import { join, resolve } from "path";
-import { docsAuthoringDirectory } from "../helper/common";
 import { generateBaseUid } from "../helper/module";
 import { readFileSync, existsSync } from "fs";
 import { homedir } from 'os';
-import { templateRepo } from '../helper/user-settings';
 import { extensionPath } from '../extension';
+import { cleanupTempDirectory, postError, showStatusMessage } from '../helper/common';
 
 const templateZip = join(homedir(), 'Downloads', 'learn-scaffolding-main.zip');
-const localTemplateRepoPath = join(docsAuthoringDirectory, "learn-scaffolding-main");
-const typeDefinitionJsonDirectory = join(localTemplateRepoPath, "module-type-definitions");
 const fse = require("fs-extra");
 const fs = require("fs");
+
+export let localTemplateRepoPath: string;
+let rawModuleTitle: string;
+let typeDefinitionJsonDirectory: string;
 
 export function scaffoldingeCommand() {
   const commands = [{ command: scaffoldModule.name, callback: scaffoldModule }];
@@ -21,45 +24,52 @@ export function scaffoldingeCommand() {
 /* temp solution until template repo is made public. 
 check for repo zip file and download if it doesn't exist. */
 export async function scaffoldModule(uri: Uri) {
-  if (existsSync(templateZip)) {
-    console.log('template zip already exists in download directory. Delete file to refresh templates.');
-  } else {
-    const open = require('open');
-    open(templateRepo);
+  try {
+    const tmp = require('tmp');
+    localTemplateRepoPath = tmp.dirSync({unsafeCleanup: true}).name;
+    showStatusMessage(`Temp working directory ${localTemplateRepoPath} has been created.`);
+    typeDefinitionJsonDirectory = join(localTemplateRepoPath, "learn-scaffolding-main", "module-type-definitions");
+    unzipTemplates(uri);
+  } catch (error) {
+    postError(error);
+    showStatusMessage(error);
   }
-  unzipTemplates(uri);
 }
 
 /* temp code until template repo is public 
 unzip template package*/
 async function unzipTemplates(uri: Uri) {
   const extract = require('extract-zip');
-  const target = docsAuthoringDirectory;
   try {
-    await extract(templateZip, { dir: target });
+    await extract(templateZip, { dir: localTemplateRepoPath });
     moduleSelectionQuickPick(uri);
-  } catch (err) {
-    console.log(err);
+  } catch (error) {
+    postError(error);
+    showStatusMessage(error);
   }
 }
 
 /* loop through module type definitions directory and store each module type */
 export async function moduleSelectionQuickPick(uri: Uri) {
-  let moduleTypes: QuickPickItem[] = [];
-  fs.readdir(typeDefinitionJsonDirectory, function (err: string, files: any[]) {
-    if (err) {
-      return console.log("Unable to scan directory: " + err);
-    }
-
-    files.forEach(function (file) {
-      const jsonPath = join(typeDefinitionJsonDirectory, file);
-      const moduleJson = readFileSync(jsonPath, "utf8");
-      let data = JSON.parse(moduleJson);
-      let patterns = data.moduleType.charAt(0).toUpperCase() + data.moduleType.slice(1);
-      moduleTypes.push(patterns);
+  try {
+    let moduleTypes: QuickPickItem[] = [];
+    fs.readdir(typeDefinitionJsonDirectory, function (err: string, files: any[]) {
+      if (err) {
+        return postError("Unable to scan directory: " + err);
+      }
+      files.forEach(function (file) {
+        const jsonPath = join(typeDefinitionJsonDirectory, file);
+        const moduleJson = readFileSync(jsonPath, "utf8");
+        let data = JSON.parse(moduleJson);
+        let patterns = data.moduleType.charAt(0).toUpperCase() + data.moduleType.slice(1);
+        moduleTypes.push(patterns);
+      });
+      return showModuleSelector(uri, moduleTypes);
     });
-    return showModuleSelector(uri, moduleTypes);
-  });
+  } catch (error) {
+    postError(error);
+    showStatusMessage(error);
+  }
 }
 
 /* display each module type to the user in a quickpick */
@@ -81,14 +91,15 @@ export function getSelectedFolder(uri: Uri, moduleType: string) {
     if (!moduleName) {
       return;
     }
-    moduleName = moduleName.replace(/ /g, "-");
-    copyTemplates(moduleName, moduleType, selectedFolder)
+    rawModuleTitle = moduleName;
+    moduleName = moduleName.replace(/ /g, "-").toLowerCase();
+    copyTemplates(moduleName, moduleType, selectedFolder);
   });
 }
 
 /* temp code to copy template files from template directory to new module directory
 to-do: use json info to copy files instead of hard-coding paths and types */
-export function copyTemplates(moduleName: string, moduleType: string, selectedFolder: string) {
+export async function copyTemplates(moduleName: string, moduleType: string, selectedFolder: string) {
   const jsonPath = join(typeDefinitionJsonDirectory, `${moduleType}.json`);
   const moduleJson = readFileSync(jsonPath, "utf8");
   const data = JSON.parse(moduleJson);
@@ -114,19 +125,20 @@ export function copyTemplates(moduleName: string, moduleType: string, selectedFo
 
   // loop through the selected module definition and copy files from the template template directory to the new module directory
   data.units.forEach((obj: any) => {
-    scaffoldFilename = obj.scaffoldFilename;
     try {
+      scaffoldFilename = obj.scaffoldFilename;
       templateFile = resolve(typeDefinitionJsonDirectory, obj.moduleUnitTemplatePath);
-      if(!existsSync(templateFile)) throw `${templateFile} does not exist and will be ommitted from the scaffolding process.`;
+      if (!existsSync(templateFile)) throw `${templateFile} does not exist and will be ommitted from the scaffolding process.`;
       fse.copySync(templateFile, join(scaffoldModule, `${scaffoldFilename}.yml`));
       if (obj.contentTemplatePath) {
         templateFile = resolve(typeDefinitionJsonDirectory, obj.contentTemplatePath);
-        if(!existsSync(templateFile)) throw `${templateFile} does not exist and will be ommitted from the scaffolding process.`;
+        if (!existsSync(templateFile)) throw `${templateFile} does not exist and will be ommitted from the scaffolding process.`;
         fse.copySync(templateFile, join(scaffoldModule, "includes", `${scaffoldFilename}.md`));
       }
     } catch (error) {
       window.showWarningMessage(error);
     }
   });
-  generateBaseUid(scaffoldModule, moduleName);
+  await cleanupTempDirectory(localTemplateRepoPath);
+  generateBaseUid(scaffoldModule, moduleName, moduleType, rawModuleTitle);
 }

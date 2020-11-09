@@ -4,8 +4,9 @@ import { Uri, window, workspace } from 'vscode';
 import { reporter } from './telemetry';
 import { join } from 'path';
 import { homedir } from 'os';
+import { rmdir } from 'fs';
 
-export const output = window.createOutputChannel('docs-article-templates');
+export const output = window.createOutputChannel('docs-scaffolding');
 export const docsAuthoringDirectory = join(homedir(), 'Docs Authoring');
 
 /**
@@ -87,3 +88,11 @@ export function showStatusMessage(message: string) {
 	output.appendLine(`[${msTimeValue}] - ${message}`);
 }
 
+export function cleanupTempDirectory(tempDirectory: string) {
+	rmdir(tempDirectory, { recursive: true }, (err: any) => {
+		if (err) {
+			throw err;
+		}
+		showStatusMessage(`Temp working directory ${tempDirectory} has been delted.`);
+	});
+}
