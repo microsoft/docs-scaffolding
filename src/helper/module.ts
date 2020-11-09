@@ -27,7 +27,7 @@ export function stubModuleReferences(modulePath: string, moduleName: any) {
   stubRepoReferences(modulePath);
 }
 
-function stubRepoReferences(modulePath: string) {
+export function stubRepoReferences(modulePath: string) {
   if (!learnRepo) {
     learnRepo = "learn";
   }
@@ -40,7 +40,7 @@ function stubRepoReferences(modulePath: string) {
   stubGithubIdReferences(modulePath);
 }
 
-function stubGithubIdReferences(modulePath: string) {
+export function stubGithubIdReferences(modulePath: string) {
   if (!author) {
     author = "{{githubUsername}}";
   }
@@ -53,7 +53,7 @@ function stubGithubIdReferences(modulePath: string) {
   stubGithubAuthorReferences(modulePath);
 }
 
-function stubGithubAuthorReferences(modulePath: string) {
+export function stubGithubAuthorReferences(modulePath: string) {
   if (!msAuthor) {
     msAuthor = "{{msUser}}";
   }
@@ -66,7 +66,7 @@ function stubGithubAuthorReferences(modulePath: string) {
   stubDateReferences(modulePath);
 }
 
-function stubDateReferences(modulePath: string) {
+export function stubDateReferences(modulePath: string) {
   let date: any = new Date(Date.now());
   date = date.toLocaleDateString();
   const options = {
@@ -78,7 +78,7 @@ function stubDateReferences(modulePath: string) {
   stubUnitReferences(modulePath);
 }
 
-function stubUnitReferences(modulePath: string) {
+export function stubUnitReferences(modulePath: string) {
   const fs = require("fs");
   fs.readdir(modulePath, function (err: string, files: any[]) {
     if (err) {
