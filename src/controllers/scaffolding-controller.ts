@@ -108,6 +108,9 @@ export async function copyTemplates(moduleName: string, moduleType: string, sele
   /* to-do: update error workflow */
   if (existsSync(scaffoldModule)) {
     window.showWarningMessage(`${scaffoldModule} already exists. Please provide a new module name.`);
+    showStatusMessage(`${scaffoldModule} already exists. Please provide a new module name.`);
+    await cleanupTempDirectory(localTemplateRepoPath);
+    return;
   }
 
   // copy index.yml
