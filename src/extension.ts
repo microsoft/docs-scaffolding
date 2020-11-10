@@ -20,13 +20,11 @@ export async function activate(context: ExtensionContext) {
 	const extensionName = 'docs.scaffolding';
 	workspace.onDidChangeConfiguration((e: any) => {
 		if (
-			e.affectsConfiguration(
-				`${extensionName}.githubid` ||
-				`${extensionName}.alias` ||
-				`${extensionName}.learn_repo_id` ||
-				`${extensionName}.product` ||
-				`${extensionName}.template_repo`
-			)
+			e.affectsConfiguration(`${extensionName}.githubid`) ||
+			e.affectsConfiguration(`${extensionName}.alias`) ||
+			e.affectsConfiguration(`${extensionName}.learn_repo_id`) ||
+			e.affectsConfiguration(`${extensionName}.template_repo`) ||
+			e.affectsConfiguration(`${extensionName}.product`)
 		) {
 			window
 				.showInformationMessage(
