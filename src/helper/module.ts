@@ -1,6 +1,6 @@
 import { alias, gitHubID, defaultPrefix } from "../helper/user-settings";
 import { basename, join } from 'path';
-import { postInformation } from '../helper/common';
+import { postError, postInformation } from '../helper/common';
 
 const replace = require("replace-in-file");
 let learnRepo: string = defaultPrefix;
@@ -82,16 +82,24 @@ export function stubUnitReferences(modulePath: string) {
   const fs = require("fs");
   fs.readdir(modulePath, function (err: string, files: any[]) {
     if (err) {
-      return console.log("Unable to scan directory: " + err);
+      return postError("Unable to scan directory: " + err);
     }
     files.forEach(function (file) {
       let unitFilePath = join(modulePath, file);
       let unitName = basename(unitFilePath.replace('.yml', ''));
 
-      // no numbers in uid
+      // include/content values should use filenames
+      let options = {
+        files: `${modulePath}/${unitName}.yml`,
+        from: /includes\/{{unitName}}/g,
+        to: `includes/${unitName}`,
+      };
+      replace.sync(options);
+
+      // remove numbers from uid
       const regex = /^([0-9]*)-/gm;
       let formattedUnitName = unitName.replace(regex, '');
-      const options = {
+      options = {
         files: `${modulePath}/${unitName}.yml`,
         from: /{{unitName}}/g,
         to: formattedUnitName,
