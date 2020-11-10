@@ -87,10 +87,14 @@ export function stubUnitReferences(modulePath: string) {
     files.forEach(function (file) {
       let unitFilePath = join(modulePath, file);
       let unitName = basename(unitFilePath.replace('.yml', ''));
+
+      // no numbers in uid
+      const regex = /^([0-9]*)-/gm;
+      let formattedUnitName = unitName.replace(regex, '');
       const options = {
         files: `${modulePath}/${unitName}.yml`,
         from: /{{unitName}}/g,
-        to: unitName,
+        to: formattedUnitName,
       };
       replace.sync(options);
     });
