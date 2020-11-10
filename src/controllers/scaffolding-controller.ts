@@ -97,8 +97,6 @@ export function getSelectedFolder(uri: Uri, moduleType: string) {
   });
 }
 
-/* temp code to copy template files from template directory to new module directory
-to-do: use json info to copy files instead of hard-coding paths and types */
 export async function copyTemplates(moduleName: string, moduleType: string, selectedFolder: string) {
   const jsonPath = join(typeDefinitionJsonDirectory, `${moduleType}.json`);
   const moduleJson = readFileSync(jsonPath, "utf8");
