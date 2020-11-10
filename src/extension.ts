@@ -1,13 +1,12 @@
-import { commands, ExtensionContext } from "vscode";
+import { commands, ExtensionContext, workspace, window } from "vscode";
 import { scaffoldingeCommand } from './controllers/scaffolding-controller';
 
 export let extensionPath: any;
 
 export async function activate(context: ExtensionContext) {
-  extensionPath = context.extensionPath;
-  const ScaffoldingCommands: any = [];
+	extensionPath = context.extensionPath;
+	const ScaffoldingCommands: any = [];
 	scaffoldingeCommand().forEach(cmd => ScaffoldingCommands.push(cmd));
-
 	try {
 		ScaffoldingCommands.map((cmd: any) => {
 			const commandName = cmd.command;
@@ -17,7 +16,29 @@ export async function activate(context: ExtensionContext) {
 	} catch (error) {
 		console.log(`Error registering commands with vscode extension context: ${error}`);
 	}
+	// if the user changes scaffolding settings.json, display message telling them to reload.
+	const extensionName = 'docs.scaffolding';
+	workspace.onDidChangeConfiguration((e: any) => {
+		if (
+			e.affectsConfiguration(`${extensionName}.githubid`) ||
+			e.affectsConfiguration(`${extensionName}.alias`) ||
+			e.affectsConfiguration(`${extensionName}.learn_repo_id`) ||
+			e.affectsConfiguration(`${extensionName}.template_repo`) ||
+			e.affectsConfiguration(`${extensionName}.product`)
+		) {
+			window
+				.showInformationMessage(
+					'Your updated configuration has been recorded, but you must reload to see its effects.',
+					'Reload'
+				)
+				.then(result => {
+					if (result === 'Reload') {
+						commands.executeCommand('workbench.action.reloadWindow');
+					}
+				});
+		}
+	});
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() { }

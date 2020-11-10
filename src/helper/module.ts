@@ -1,13 +1,13 @@
-import { alias, gitHubID, learnRepoId } from "../helper/user-settings";
+import { alias, gitHubID, defaultPrefix } from "../helper/user-settings";
 import { basename, join } from 'path';
-import { postInformation } from '../helper/common';
+import { postError, postInformation } from '../helper/common';
 
 const replace = require("replace-in-file");
-let learnRepo: string = learnRepoId;
+let learnRepo: string = defaultPrefix;
 let author: string = gitHubID;
 let msAuthor: string = alias;
 
-export function generateBaseUid(modulePath: string, moduleName: any) {
+export function generateBaseUid(modulePath: string, moduleName: any, moduleType: string, rawTitle: string) {
   const options = {
     files: `${modulePath}/*.yml`,
     from: /{{moduleName}}/g,
@@ -27,7 +27,7 @@ export function stubModuleReferences(modulePath: string, moduleName: any) {
   stubRepoReferences(modulePath);
 }
 
-function stubRepoReferences(modulePath: string) {
+export function stubRepoReferences(modulePath: string) {
   if (!learnRepo) {
     learnRepo = "learn";
   }
@@ -40,7 +40,7 @@ function stubRepoReferences(modulePath: string) {
   stubGithubIdReferences(modulePath);
 }
 
-function stubGithubIdReferences(modulePath: string) {
+export function stubGithubIdReferences(modulePath: string) {
   if (!author) {
     author = "{{githubUsername}}";
   }
@@ -53,7 +53,7 @@ function stubGithubIdReferences(modulePath: string) {
   stubGithubAuthorReferences(modulePath);
 }
 
-function stubGithubAuthorReferences(modulePath: string) {
+export function stubGithubAuthorReferences(modulePath: string) {
   if (!msAuthor) {
     msAuthor = "{{msUser}}";
   }
@@ -66,7 +66,7 @@ function stubGithubAuthorReferences(modulePath: string) {
   stubDateReferences(modulePath);
 }
 
-function stubDateReferences(modulePath: string) {
+export function stubDateReferences(modulePath: string) {
   let date: any = new Date(Date.now());
   date = date.toLocaleDateString();
   const options = {
@@ -78,19 +78,31 @@ function stubDateReferences(modulePath: string) {
   stubUnitReferences(modulePath);
 }
 
-function stubUnitReferences(modulePath: string) {
+export function stubUnitReferences(modulePath: string) {
   const fs = require("fs");
   fs.readdir(modulePath, function (err: string, files: any[]) {
     if (err) {
-      return console.log("Unable to scan directory: " + err);
+      return postError("Unable to scan directory: " + err);
     }
     files.forEach(function (file) {
       let unitFilePath = join(modulePath, file);
       let unitName = basename(unitFilePath.replace('.yml', ''));
-      const options = {
+
+      // include/content values should use filenames
+      let options = {
+        files: `${modulePath}/${unitName}.yml`,
+        from: /includes\/{{unitName}}/g,
+        to: `includes/${unitName}`,
+      };
+      replace.sync(options);
+
+      // remove numbers from uid
+      const regex = /^([0-9]*)-/gm;
+      let formattedUnitName = unitName.replace(regex, '');
+      options = {
         files: `${modulePath}/${unitName}.yml`,
         from: /{{unitName}}/g,
-        to: unitName,
+        to: formattedUnitName,
       };
       replace.sync(options);
     });

@@ -2,11 +2,9 @@
 
 import { Uri, window, workspace } from 'vscode';
 import { reporter } from './telemetry';
-import { join } from 'path';
-import { homedir } from 'os';
+import { rmdir } from 'fs';
 
-export const output = window.createOutputChannel('docs-article-templates');
-export const docsAuthoringDirectory = join(homedir(), 'Docs Authoring');
+export const output = window.createOutputChannel('docs-scaffolding');
 
 /**
  * Create a posted warning message and applies the message to the log
@@ -35,7 +33,7 @@ export function postError(message: string) {
 export function hasValidWorkSpaceRootPath(senderName: string) {
 	const folderPath = workspace.rootPath;
 
-	if (folderPath == null) {
+	if (folderPath === null) {
 		postWarning(
 			`The ${senderName} command requires an active workspace. Please open VS Code from the root of your clone to continue.`
 		);
@@ -87,3 +85,11 @@ export function showStatusMessage(message: string) {
 	output.appendLine(`[${msTimeValue}] - ${message}`);
 }
 
+export function cleanupTempDirectory(tempDirectory: string) {
+	rmdir(tempDirectory, { recursive: true }, (err: any) => {
+		if (err) {
+			throw err;
+		}
+		showStatusMessage(`Temp working directory ${tempDirectory} has been delted.`);
+	});
+}
