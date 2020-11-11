@@ -6,8 +6,9 @@ import { generateBaseUid } from "../helper/module";
 import { readFileSync, existsSync } from "fs";
 import { homedir } from 'os';
 import { extensionPath } from '../extension';
-import { cleanupTempDirectory, postError, showStatusMessage } from '../helper/common';
+import { cleanupTempDirectory, postError, showStatusMessage, sendTelemetryData } from '../helper/common';
 
+const telemetryCommand: string = 'create-module';
 const templateZip = join(homedir(), 'Downloads', 'learn-scaffolding-main.zip');
 const fse = require("fs-extra");
 const fs = require("fs");
@@ -93,6 +94,7 @@ export function getSelectedFolder(uri: Uri, moduleType: string) {
     }
     rawModuleTitle = moduleName;
     moduleName = moduleName.replace(/ /g, "-").toLowerCase();
+    sendTelemetryData(telemetryCommand, moduleType, moduleName);
     copyTemplates(moduleName, moduleType, selectedFolder);
   });
 }

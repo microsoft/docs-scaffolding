@@ -1,10 +1,12 @@
 import { commands, ExtensionContext, workspace, window } from "vscode";
 import { scaffoldingeCommand } from './controllers/scaffolding-controller';
+import { Reporter } from './helper/telemetry';
 
 export let extensionPath: any;
 
 export async function activate(context: ExtensionContext) {
 	extensionPath = context.extensionPath;
+	context.subscriptions.push(new Reporter(context));
 	const ScaffoldingCommands: any = [];
 	scaffoldingeCommand().forEach(cmd => ScaffoldingCommands.push(cmd));
 	try {
