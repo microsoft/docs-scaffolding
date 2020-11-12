@@ -66,13 +66,8 @@ export function getRepoName(workspacePath: Uri) {
 	}
 }
 
-export function sendTelemetryData(telemetryCommand: string, commandOption: string) {
-	const editor = window.activeTextEditor;
-	const workspaceUri = editor!.document.uri;
-	const activeRepo = getRepoName(workspaceUri);
-	const telemetryProperties = activeRepo
-		? { command_option: commandOption, repo_name: activeRepo }
-		: { command_option: commandOption, repo_name: '' };
+export function sendTelemetryData(telemetryCommand: string, commandOption: string, moduleName: string) {
+	const telemetryProperties = { module_pattern: commandOption, module_name: moduleName };
 	reporter.sendTelemetryEvent(telemetryCommand, telemetryProperties);
 }
 
