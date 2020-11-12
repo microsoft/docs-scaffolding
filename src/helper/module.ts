@@ -14,13 +14,29 @@ export function generateBaseUid(modulePath: string, moduleName: any, moduleType:
     to: moduleName,
   };
   replace.sync(options);
+  stubModuleIndex(modulePath, moduleName, moduleType, rawTitle);
+}
+
+export function stubModuleIndex(modulePath: string, moduleName: any, moduleType: string, rawTitle: string) {
+  let options = {
+    files: `${modulePath}/index.yml`,
+    from: /{{patternType}}.*/g,
+    to: moduleType,
+  };
+  replace.sync(options);
+  options = {
+    files: `${modulePath}/index.yml`,
+    from: /title:.*/gm,
+    to: `title: ${rawTitle}`,
+  };
+  replace.sync(options);
   stubModuleReferences(modulePath, moduleName);
 }
 
 export function stubModuleReferences(modulePath: string, moduleName: any) {
   const options = {
     files: `${modulePath}/*.yml`,
-    from: /{{moduleName}}/g,
+    from: /{{moduleName}}.*/g,
     to: moduleName,
   };
   replace.sync(options);
@@ -46,7 +62,7 @@ export function stubGithubIdReferences(modulePath: string) {
   }
   const options = {
     files: `${modulePath}/*.yml`,
-    from: /{{githubUsername}}/g,
+    from: /{{githubUsername}}.*/g,
     to: author,
   };
   replace.sync(options);
@@ -59,7 +75,7 @@ export function stubGithubAuthorReferences(modulePath: string) {
   }
   const options = {
     files: `${modulePath}/*.yml`,
-    from: /{{msUser}}/g,
+    from: /{{msUser}}.*/g,
     to: msAuthor,
   };
   replace.sync(options);
@@ -71,7 +87,7 @@ export function stubDateReferences(modulePath: string) {
   date = date.toLocaleDateString();
   const options = {
     files: `${modulePath}/*.yml`,
-    from: /{{msDate}}/g,
+    from: /{{msDate}}.*/g,
     to: date,
   };
   replace.sync(options);
@@ -91,7 +107,7 @@ export function stubUnitReferences(modulePath: string) {
       // include/content values should use filenames
       let options = {
         files: `${modulePath}/${unitName}.yml`,
-        from: /includes\/{{unitName}}/g,
+        from: /includes\/{{unitName}}.*/g,
         to: `includes/${unitName}`,
       };
       replace.sync(options);
@@ -101,7 +117,7 @@ export function stubUnitReferences(modulePath: string) {
       let formattedUnitName = unitName.replace(regex, '');
       options = {
         files: `${modulePath}/${unitName}.yml`,
-        from: /{{unitName}}/g,
+        from: /{{unitName}}.*/g,
         to: formattedUnitName,
       };
       replace.sync(options);
@@ -110,3 +126,4 @@ export function stubUnitReferences(modulePath: string) {
     postInformation(`Successfully created : ${moduleName}`);
   });
 }
+
