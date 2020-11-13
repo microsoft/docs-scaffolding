@@ -1,4 +1,4 @@
-import { alias, gitHubID, defaultPrefix } from "../helper/user-settings";
+import { alias, gitHubID, defaultPrefix, defaultProduct } from "../helper/user-settings";
 import { basename, join } from 'path';
 import { postError, postInformation } from '../helper/common';
 
@@ -10,7 +10,7 @@ let msAuthor: string = alias;
 export function generateBaseUid(modulePath: string, moduleName: any, moduleType: string, rawTitle: string) {
   const options = {
     files: `${modulePath}/*.yml`,
-    from: /{{moduleName}}/g,
+    from: /{{moduleName}}.*/g,
     to: moduleName,
   };
   replace.sync(options);
@@ -124,6 +124,7 @@ export function stubUnitReferences(modulePath: string) {
         to: formattedUnitName,
       };
       replace.sync(options);
+
       moduleName = basename(modulePath);
       if (!["includes", "index", "media"].includes(formattedUnitName)) {
         unitBlock.push(`  - ${moduleName}.${formattedUnitName}\n`);
@@ -139,6 +140,34 @@ export function stubUnitBlock(moduleName: string, modulePath: string, unitBlock:
     files: `${modulePath}/index.yml`,
     from: /\s?{{units}}/g,
     to: unitList,
+  };
+  replace.sync(options);
+  stubProductBlock(moduleName, modulePath);
+}
+
+export function stubProductBlock(moduleName: string, modulePath: string) {
+  let options = {
+    files: `${modulePath}/index.yml`,
+    from: /\s?{{product}}/g,
+    to: `  - ${defaultProduct}`,
+  };
+  replace.sync(options);
+  moduleCleanup(moduleName, modulePath);
+}
+
+export function moduleCleanup(moduleName: string, modulePath: string) {
+  // cleanup remaining stub comments
+  let options = {
+    files: `${modulePath}/index.yml`,
+    from: /#\s?stub.*/g,
+    to: ` `,
+  };
+  replace.sync(options);
+  // remove any blank lines
+  options = {
+    files: `${modulePath}/index.yml`,
+    from: /^\s*\n/gm,
+    to: ` `,
   };
   replace.sync(options);
   postInformation(`Successfully created : ${moduleName}`);
