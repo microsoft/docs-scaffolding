@@ -96,6 +96,9 @@ export function stubDateReferences(modulePath: string) {
 
 export function stubUnitReferences(modulePath: string) {
   const fs = require("fs");
+  let unitBlock: string[] = [];
+  let moduleName: string;
+  let formattedUnitName: string;
   fs.readdir(modulePath, function (err: string, files: any[]) {
     if (err) {
       return postError("Unable to scan directory: " + err);
@@ -114,16 +117,29 @@ export function stubUnitReferences(modulePath: string) {
 
       // remove numbers from uid
       const regex = /^([0-9]*)-/gm;
-      let formattedUnitName = unitName.replace(regex, '');
+      formattedUnitName = unitName.replace(regex, '');
       options = {
         files: `${modulePath}/${unitName}.yml`,
         from: /{{unitName}}.*/g,
         to: formattedUnitName,
       };
       replace.sync(options);
+      moduleName = basename(modulePath);
+      if (!["includes", "index", "media"].includes(formattedUnitName)) {
+        unitBlock.push(`  - ${moduleName}.${formattedUnitName}\n`);
+      }
     });
-    const moduleName = basename(modulePath);
-    postInformation(`Successfully created : ${moduleName}`);
+    stubUnitBlock(moduleName, modulePath, unitBlock);
   });
 }
 
+export function stubUnitBlock(moduleName: string, modulePath: string, unitBlock: any) {
+  let unitList = unitBlock.join(" ");
+  let options = {
+    files: `${modulePath}/index.yml`,
+    from: /\s?{{units}}/g,
+    to: unitList,
+  };
+  replace.sync(options);
+  postInformation(`Successfully created : ${moduleName}`);
+}
