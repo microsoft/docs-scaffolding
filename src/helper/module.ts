@@ -6,6 +6,7 @@ const replace = require("replace-in-file");
 let learnRepo: string = defaultPrefix;
 let author: string = gitHubID;
 let msAuthor: string = alias;
+let product: string = defaultProduct;
 
 export function generateBaseUid(modulePath: string, moduleName: any, moduleType: string, rawTitle: string) {
   const options = {
@@ -146,10 +147,13 @@ export function stubUnitBlock(moduleName: string, modulePath: string, unitBlock:
 }
 
 export function stubProductBlock(moduleName: string, modulePath: string) {
+  if (!product) {
+    product = "{{product}}";
+  }
   let options = {
     files: `${modulePath}/index.yml`,
     from: /\s?{{product}}/g,
-    to: `  - ${defaultProduct}`,
+    to: `  - ${product}`,
   };
   replace.sync(options);
   moduleCleanup(moduleName, modulePath);
@@ -163,6 +167,7 @@ export function moduleCleanup(moduleName: string, modulePath: string) {
     to: ` `,
   };
   replace.sync(options);
+  
   // remove any blank lines
   options = {
     files: `${modulePath}/index.yml`,
