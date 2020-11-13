@@ -1,6 +1,6 @@
 import { alias, gitHubID, defaultPrefix, defaultProduct } from "../helper/user-settings";
 import { basename, join } from 'path';
-import { postError, postInformation } from '../helper/common';
+import { postError, postInformation, showStatusMessage } from '../helper/common';
 
 const replace = require("replace-in-file");
 let learnRepo: string = defaultPrefix;
@@ -11,7 +11,7 @@ let product: string = defaultProduct;
 export function generateBaseUid(modulePath: string, moduleName: any, moduleType: string, rawTitle: string) {
   const options = {
     files: `${modulePath}/*.yml`,
-    from: /{{moduleName}}.*/g,
+    from: /{{moduleName}}/g,
     to: moduleName,
   };
   replace.sync(options);
@@ -20,15 +20,15 @@ export function generateBaseUid(modulePath: string, moduleName: any, moduleType:
 
 export function stubModuleIndex(modulePath: string, moduleName: any, moduleType: string, rawTitle: string) {
   let options = {
-    files: `${modulePath}/index.yml`,
-    from: /{{patternType}}.*/g,
+    files: `${modulePath}/*.yml`,
+    from: /{{patternType}}/g,
     to: moduleType,
   };
   replace.sync(options);
   options = {
-    files: `${modulePath}/index.yml`,
-    from: /title:.*/gm,
-    to: `title: ${rawTitle}`,
+    files: `${modulePath}/*.yml`,
+    from: /{{moduleTitle}}/gm,
+    to: rawTitle,
   };
   replace.sync(options);
   stubModuleReferences(modulePath, moduleName);
@@ -37,7 +37,7 @@ export function stubModuleIndex(modulePath: string, moduleName: any, moduleType:
 export function stubModuleReferences(modulePath: string, moduleName: any) {
   const options = {
     files: `${modulePath}/*.yml`,
-    from: /{{moduleName}}.*/g,
+    from: /{{moduleName}}/g,
     to: moduleName,
   };
   replace.sync(options);
@@ -46,40 +46,46 @@ export function stubModuleReferences(modulePath: string, moduleName: any) {
 
 export function stubRepoReferences(modulePath: string) {
   if (!learnRepo) {
+    showStatusMessage('No value for prefix setting so placeholder value will be used.');
+  } else {
     learnRepo = "learn";
+    const options = {
+      files: `${modulePath}/*.yml`,
+      from: /{{learnRepo}}/g,
+      to: learnRepo,
+    };
+    replace.sync(options);
   }
-  const options = {
-    files: `${modulePath}/*.yml`,
-    from: /{{learnRepo}}/g,
-    to: learnRepo,
-  };
-  replace.sync(options);
   stubGithubIdReferences(modulePath);
 }
 
 export function stubGithubIdReferences(modulePath: string) {
   if (!author) {
+    showStatusMessage('No value for GitHub ID setting so placeholder value will be used.');
+  } else {
     author = "{{githubUsername}}";
+    const options = {
+      files: `${modulePath}/*.yml`,
+      from: /{{githubUsername}}/g,
+      to: author,
+    };
+    replace.sync(options);
   }
-  const options = {
-    files: `${modulePath}/*.yml`,
-    from: /{{githubUsername}}.*/g,
-    to: author,
-  };
-  replace.sync(options);
   stubGithubAuthorReferences(modulePath);
 }
 
 export function stubGithubAuthorReferences(modulePath: string) {
   if (!msAuthor) {
+    showStatusMessage('No value for alias setting so placeholder value will be used.');
+  } else {
     msAuthor = "{{msUser}}";
+    const options = {
+      files: `${modulePath}/*.yml`,
+      from: /{{msUser}}/g,
+      to: msAuthor,
+    };
+    replace.sync(options);
   }
-  const options = {
-    files: `${modulePath}/*.yml`,
-    from: /{{msUser}}.*/g,
-    to: msAuthor,
-  };
-  replace.sync(options);
   stubDateReferences(modulePath);
 }
 
@@ -88,7 +94,7 @@ export function stubDateReferences(modulePath: string) {
   date = date.toLocaleDateString();
   const options = {
     files: `${modulePath}/*.yml`,
-    from: /{{msDate}}.*/g,
+    from: /{{msDate}}/g,
     to: date,
   };
   replace.sync(options);
@@ -111,7 +117,7 @@ export function stubUnitReferences(modulePath: string) {
       // include/content values should use filenames
       let options = {
         files: `${modulePath}/${unitName}.yml`,
-        from: /includes\/{{unitName}}.*/g,
+        from: /includes\/{{unitName}}/g,
         to: `includes/${unitName}`,
       };
       replace.sync(options);
@@ -121,7 +127,7 @@ export function stubUnitReferences(modulePath: string) {
       formattedUnitName = unitName.replace(regex, '');
       options = {
         files: `${modulePath}/${unitName}.yml`,
-        from: /{{unitName}}.*/g,
+        from: /{{unitName}}/g,
         to: formattedUnitName,
       };
       replace.sync(options);
@@ -148,27 +154,29 @@ export function stubUnitBlock(moduleName: string, modulePath: string, unitBlock:
 
 export function stubProductBlock(moduleName: string, modulePath: string) {
   if (!product) {
+    showStatusMessage('No value for product setting so placeholder value will be used.');
+  } else {
     product = "{{product}}";
+    let options = {
+      files: `${modulePath}/index.yml`,
+      from: /\s?{{product}}/g,
+      to: `  - ${product}`,
+    };
+    replace.sync(options);
   }
-  let options = {
-    files: `${modulePath}/index.yml`,
-    from: /\s?{{product}}/g,
-    to: `  - ${product}`,
-  };
-  replace.sync(options);
   moduleCleanup(moduleName, modulePath);
 }
 
 export function moduleCleanup(moduleName: string, modulePath: string) {
-  // cleanup remaining stub comments
+  // remove stub comments
   let options = {
-    files: `${modulePath}/index.yml`,
+    files: `${modulePath}/*.yml`,
     from: /#\s?stub.*/g,
     to: ` `,
   };
   replace.sync(options);
   
-  // remove any blank lines
+  // remove any blank lines created during scaffolding
   options = {
     files: `${modulePath}/index.yml`,
     from: /^\s*\n/gm,
