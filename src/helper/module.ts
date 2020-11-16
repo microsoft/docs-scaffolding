@@ -47,8 +47,8 @@ export function stubModuleReferences(modulePath: string, moduleName: any) {
 export function stubRepoReferences(modulePath: string) {
   if (!learnRepo) {
     showStatusMessage('No value for prefix setting so placeholder value will be used.');
+    learnRepo = "{{learnRepo}}";
   } else {
-    learnRepo = "learn";
     const options = {
       files: `${modulePath}/*.yml`,
       from: /{{learnRepo}}/g,
@@ -62,8 +62,9 @@ export function stubRepoReferences(modulePath: string) {
 export function stubGithubIdReferences(modulePath: string) {
   if (!author) {
     showStatusMessage('No value for GitHub ID setting so placeholder value will be used.');
-  } else {
     author = "{{githubUsername}}";
+  } else {
+    
     const options = {
       files: `${modulePath}/*.yml`,
       from: /{{githubUsername}}/g,
@@ -77,8 +78,8 @@ export function stubGithubIdReferences(modulePath: string) {
 export function stubGithubAuthorReferences(modulePath: string) {
   if (!msAuthor) {
     showStatusMessage('No value for alias setting so placeholder value will be used.');
-  } else {
     msAuthor = "{{msUser}}";
+  } else {
     const options = {
       files: `${modulePath}/*.yml`,
       from: /{{msUser}}/g,
@@ -155,8 +156,8 @@ export function stubUnitBlock(moduleName: string, modulePath: string, unitBlock:
 export function stubProductBlock(moduleName: string, modulePath: string) {
   if (!product) {
     showStatusMessage('No value for product setting so placeholder value will be used.');
-  } else {
     product = "{{product}}";
+  } else {
     let options = {
       files: `${modulePath}/index.yml`,
       from: /\s?{{product}}/g,
