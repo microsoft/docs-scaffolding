@@ -64,7 +64,6 @@ export function stubGithubIdReferences(modulePath: string) {
     showStatusMessage('No value for GitHub ID setting so placeholder value will be used.');
     author = "{{githubUsername}}";
   } else {
-    
     const options = {
       files: `${modulePath}/*.yml`,
       from: /{{githubUsername}}/g,
