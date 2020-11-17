@@ -16,7 +16,7 @@ export let localTemplateRepoPath: string;
 let rawModuleTitle: string;
 let typeDefinitionJsonDirectory: string;
 
-export function scaffoldingeCommand() {
+export function scaffoldingCommand() {
   const commands = [{ command: scaffoldModule.name, callback: scaffoldModule }];
   return commands;
 }
@@ -129,11 +129,11 @@ export async function copyTemplates(moduleName: string, moduleType: string, sele
     try {
       scaffoldFilename = obj.scaffoldFilename;
       templateFile = resolve(typeDefinitionJsonDirectory, obj.moduleUnitTemplatePath);
-      if (!existsSync(templateFile)) throw `${templateFile} does not exist and will be ommitted from the scaffolding process.`;
+      if (!existsSync(templateFile)) throw `${templateFile} does not exist and will be omitted from the scaffolding process.`;
       fse.copySync(templateFile, join(scaffoldModule, `${scaffoldFilename}.yml`));
       if (obj.contentTemplatePath) {
         templateFile = resolve(typeDefinitionJsonDirectory, obj.contentTemplatePath);
-        if (!existsSync(templateFile)) throw `${templateFile} does not exist and will be ommitted from the scaffolding process.`;
+        if (!existsSync(templateFile)) throw `${templateFile} does not exist and will be omitted from the scaffolding process.`;
         fse.copySync(templateFile, join(scaffoldModule, "includes", `${scaffoldFilename}.md`));
       }
     } catch (error) {
