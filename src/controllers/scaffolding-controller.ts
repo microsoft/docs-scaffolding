@@ -7,8 +7,9 @@ import { readFileSync, existsSync } from "fs";
 import { homedir } from 'os';
 import { extensionPath } from '../extension';
 import { cleanupTempDirectory, postError, showStatusMessage } from '../helper/common';
+import { templateRepo } from '../helper/user-settings';
 
-const templateZip = join(homedir(), 'Downloads', 'learn-scaffolding-main.zip');
+let templateZip: any;
 const fse = require("fs-extra");
 const fs = require("fs");
 
@@ -24,16 +25,20 @@ export function scaffoldingCommand() {
 /* temp solution until template repo is made public. 
 check for repo zip file and download if it doesn't exist. */
 export async function scaffoldModule(uri: Uri) {
+  const download = require('download');
+  const tmp = require('tmp');
+  localTemplateRepoPath = tmp.dirSync({unsafeCleanup: true}).name;
+  showStatusMessage(`Temp working directory ${localTemplateRepoPath} has been created.`);
   try {
-    const tmp = require('tmp');
-    localTemplateRepoPath = tmp.dirSync({unsafeCleanup: true}).name;
-    showStatusMessage(`Temp working directory ${localTemplateRepoPath} has been created.`);
+    await download(templateRepo, localTemplateRepoPath);
+    templateZip = join(homedir(), 'Downloads', 'learn-scaffolding-main.zip');
+  } catch (error) {
+    templateZip = join(extensionPath, 'offline-template-zip', 'learn-scaffolding-main.zip');
+    postError(error);
+    showStatusMessage(`Error downloading templates from ${templateRepo}. Loading local templates.`);
+  }
     typeDefinitionJsonDirectory = join(localTemplateRepoPath, "learn-scaffolding-main", "module-type-definitions");
     unzipTemplates(uri);
-  } catch (error) {
-    postError(error);
-    showStatusMessage(error);
-  }
 }
 
 /* temp code until template repo is public 
