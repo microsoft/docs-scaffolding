@@ -10,6 +10,7 @@ import { cleanupTempDirectory, postError, showStatusMessage } from '../helper/co
 import { templateRepo } from '../helper/user-settings';
 
 let templateZip: any;
+
 const fse = require("fs-extra");
 const fs = require("fs");
 
@@ -98,6 +99,7 @@ export function getSelectedFolder(uri: Uri, moduleType: string) {
     }
     rawModuleTitle = moduleName;
     moduleName = moduleName.replace(/ /g, "-").toLowerCase();
+    sendTelemetryData(telemetryCommand, moduleType, moduleName);
     copyTemplates(moduleName, moduleType, selectedFolder);
   });
 }
