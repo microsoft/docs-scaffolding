@@ -1,5 +1,5 @@
 import { commands, ExtensionContext, workspace, window } from "vscode";
-import { scaffoldingeCommand } from './controllers/scaffolding-controller';
+import { scaffoldingCommand } from './controllers/scaffolding-controller';
 import { Reporter } from './helper/telemetry';
 
 export let extensionPath: any;

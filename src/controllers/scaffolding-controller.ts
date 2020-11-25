@@ -6,15 +6,16 @@ import { generateBaseUid } from "../helper/module";
 import { readFileSync, existsSync } from "fs";
 import { homedir } from 'os';
 import { extensionPath } from '../extension';
-import { cleanupTempDirectory, postError, showStatusMessage } from '../helper/common';
+import { cleanupTempDirectory, postError, showStatusMessage, sendTelemetryData } from '../helper/common';
 import { templateRepo } from '../helper/user-settings';
 
-let templateZip: any;
+export let localTemplateRepoPath: string;
 
+const telemetryCommand: string = 'create-module';
 const fse = require("fs-extra");
 const fs = require("fs");
 
-export let localTemplateRepoPath: string;
+let templateZip: any;
 let rawModuleTitle: string;
 let typeDefinitionJsonDirectory: string;
 
