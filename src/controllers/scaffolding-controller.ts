@@ -15,7 +15,7 @@ const telemetryCommand: string = 'create-module';
 const fse = require("fs-extra");
 const fs = require("fs");
 
-let templateZip: any;
+let templateZip: string;
 let rawModuleTitle: string;
 let typeDefinitionJsonDirectory: string;
 
