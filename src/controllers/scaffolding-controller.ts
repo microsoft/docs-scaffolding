@@ -98,18 +98,35 @@ export function getSelectedFolder(uri: Uri, moduleType: string) {
     if (!moduleName) {
       return;
     }
+    const termsJsonPath = join(localTemplateRepoPath, "learn-scaffolding-main", "terms.json");
+    const termsJson = readFileSync(termsJsonPath, "utf8");
+    let data = JSON.parse(termsJson);
+
+    let modifiedModuleName: string = moduleName;
+
+    Object.entries(data.titleReplacements).forEach(function ([key, value]) {
+      var replace = key;
+      let targetString: string | unknown = value;
+      modifiedModuleName = formatModuleName(modifiedModuleName, replace, targetString);
+    });
+
     rawModuleTitle = moduleName;
     moduleName = moduleName.replace(/ /g, "-").toLowerCase();
     sendTelemetryData(telemetryCommand, moduleType, moduleName);
-    copyTemplates(moduleName, moduleType, selectedFolder);
+    copyTemplates(modifiedModuleName, moduleName, moduleType, selectedFolder);
   });
 }
 
-export async function copyTemplates(moduleName: string, moduleType: string, selectedFolder: string) {
+function formatModuleName(moduleName: any, filteredTerm: any, replacementTerm: any) {
+  let re = new RegExp("\\b(" + filteredTerm + ")\\b","g");
+  return moduleName.replace(re,replacementTerm).replace(/ /g, "-").replace(/--/g, "-").toLowerCase();
+}
+
+export async function copyTemplates(modifiedModuleName: string, moduleName: string, moduleType: string, selectedFolder: string) {
   const jsonPath = join(typeDefinitionJsonDirectory, `${moduleType}.json`);
   const moduleJson = readFileSync(jsonPath, "utf8");
   const data = JSON.parse(moduleJson);
-  const scaffoldModule = join(selectedFolder, moduleName);
+  const scaffoldModule = join(selectedFolder, modifiedModuleName);
 
   /* to-do: update error workflow */
   if (existsSync(scaffoldModule)) {

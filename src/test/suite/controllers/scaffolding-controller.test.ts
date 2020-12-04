@@ -46,7 +46,7 @@ suite('Scaffolding Controller', () => {
 	});
 	test('Copy templates', async () => {
 		const spy = chai.spy.on(scaffoldingController, 'copyTemplates');
-		copyTemplates('test module', 'choose', contextSelectedFolder);
+		copyTemplates('modified title', 'test module', 'choose', contextSelectedFolder);
 		await sleep(sleepTime);
 		expect(spy).to.have.been.called();
 	});

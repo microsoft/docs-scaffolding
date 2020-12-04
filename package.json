@@ -1,10 +1,11 @@
 {
 	"name": "docs-scaffolding",
 	"displayName": "docs-scaffolding",
-	"description": "",
+	"description": "Extension to help scaffold Microsoft Learn Modules",
+	"icon": "media/docs-logo-ms.png",
 	"aiKey": "0a0e5961-85c2-451a-bce8-6a54e37c93be",
 	"version": "0.0.1",
-	"publisher": "jw",
+	"publisher": "docsmsft",
 	"engines": {
 		"vscode": "^1.50.0"
 	},
