@@ -39,6 +39,7 @@ export async function scaffoldModule(uri: Uri) {
     postError(error);
     showStatusMessage(`Error downloading templates from ${templateRepo}. Loading local templates.`);
   }
+  templateZip = join(extensionPath, 'offline-template-zip', 'learn-scaffolding-main.zip');
     typeDefinitionJsonDirectory = join(localTemplateRepoPath, "learn-scaffolding-main", "module-type-definitions");
     unzipTemplates(uri);
 }

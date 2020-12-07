@@ -37,15 +37,15 @@
 					"default": "",
 					"description": "GitHub ID"
 				},
-				"docs.scaffolding.learn_repo_id": {
+				"docs.scaffolding.prefix": {
 					"type": "string",
 					"default": "",
-					"description": "Default prefix i.e. learn"
+					"description": "Default prefix e.g. learn"
 				},
 				"docs.scaffolding.product": {
 					"type": "string",
 					"default": "",
-					"description": "Default product i.e. azure"
+					"description": "Default product e.g. azure"
 				},
 				"docs.scaffolding.template_repo": {
 					"type": "string",

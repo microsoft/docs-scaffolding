@@ -155,11 +155,11 @@ export function stubUnitBlock(moduleName: string, modulePath: string, unitBlock:
 export function stubProductBlock(moduleName: string, modulePath: string) {
   if (!product) {
     showStatusMessage('No value for product setting so placeholder value will be used.');
-    product = "{{product}}";
+    product = "{{products}}";
   } else {
     let options = {
       files: `${modulePath}/index.yml`,
-      from: /\s?{{product}}/g,
+      from: /\s?{{products}}/g,
       to: `  - ${product}`,
     };
     replace.sync(options);
