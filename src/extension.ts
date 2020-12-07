@@ -24,7 +24,7 @@ export async function activate(context: ExtensionContext) {
 		if (
 			e.affectsConfiguration(`${extensionName}.githubid`) ||
 			e.affectsConfiguration(`${extensionName}.alias`) ||
-			e.affectsConfiguration(`${extensionName}.learn_repo_id`) ||
+			e.affectsConfiguration(`${extensionName}.prefix`) ||
 			e.affectsConfiguration(`${extensionName}.template_repo`) ||
 			e.affectsConfiguration(`${extensionName}.product`)
 		) {
