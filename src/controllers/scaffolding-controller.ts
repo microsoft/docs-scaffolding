@@ -5,7 +5,7 @@ import { join, resolve } from "path";
 import { generateBaseUid } from "../helper/module";
 import { readFileSync, existsSync } from "fs";
 import { extensionPath } from '../extension';
-import { cleanupTempDirectory, getOSPlatform, postError, showStatusMessage, sendTelemetryData } from '../helper/common';
+import { cleanupTempDirectory, postError, showStatusMessage, sendTelemetryData } from '../helper/common';
 import { templateRepo } from '../helper/user-settings';
 
 export let localTemplateRepoPath: string;
@@ -137,9 +137,7 @@ export async function copyTemplates(modifiedModuleName: string, moduleName: stri
   }
 
   // copy index.yml
-  let contentTemplatePath = data.moduleTemplatePath;
-  contentTemplatePath = contentTemplatePath.replace(platformRegex, '/');
-  const moduleYMLSource = resolve(typeDefinitionJsonDirectory, contentTemplatePath);
+  const moduleYMLSource = resolve(typeDefinitionJsonDirectory, data.moduleTemplatePath.replace(platformRegex, '/'));
   const moduleYMLTarget = join(scaffoldModule, "index.yml");
   fse.copySync(moduleYMLSource, moduleYMLTarget);
 
