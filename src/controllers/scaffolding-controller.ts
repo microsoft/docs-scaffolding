@@ -33,13 +33,12 @@ export async function scaffoldModule(uri: Uri) {
   showStatusMessage(`Temp working directory ${localTemplateRepoPath} has been created.`);
   try {
     await download(templateRepo, localTemplateRepoPath);
-    templateZip = join(homedir(), 'Downloads', 'learn-scaffolding-main.zip');
+    templateZip = join(localTemplateRepoPath, 'learn-scaffolding-main.zip');
   } catch (error) {
     templateZip = join(extensionPath, 'offline-template-zip', 'learn-scaffolding-main.zip');
     postError(error);
     showStatusMessage(`Error downloading templates from ${templateRepo}. Loading local templates.`);
   }
-  templateZip = join(extensionPath, 'offline-template-zip', 'learn-scaffolding-main.zip');
     typeDefinitionJsonDirectory = join(localTemplateRepoPath, "learn-scaffolding-main", "module-type-definitions");
     unzipTemplates(uri);
 }
