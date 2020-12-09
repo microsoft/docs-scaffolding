@@ -4,9 +4,8 @@ import { Uri, window, QuickPickItem, QuickPickOptions } from "vscode";
 import { join, resolve } from "path";
 import { generateBaseUid } from "../helper/module";
 import { readFileSync, existsSync } from "fs";
-import { homedir } from 'os';
 import { extensionPath } from '../extension';
-import { cleanupTempDirectory, postError, showStatusMessage, sendTelemetryData } from '../helper/common';
+import { cleanupTempDirectory, getOSPlatform, postError, showStatusMessage, sendTelemetryData } from '../helper/common';
 import { templateRepo } from '../helper/user-settings';
 
 export let localTemplateRepoPath: string;
@@ -137,7 +136,13 @@ export async function copyTemplates(modifiedModuleName: string, moduleName: stri
   }
 
   // copy index.yml
-  const moduleYMLSource = resolve(typeDefinitionJsonDirectory, data.moduleTemplatePath);
+  let contentTemplatePath = data.moduleTemplatePath;
+  const osPlatform = getOSPlatform();
+  if (osPlatform !== 'win32') {
+    const regex = /\\/g;
+    contentTemplatePath = contentTemplatePath.replace(regex, '/');
+  }
+  const moduleYMLSource = resolve(typeDefinitionJsonDirectory, contentTemplatePath);
   const moduleYMLTarget = join(scaffoldModule, "index.yml");
   fse.copySync(moduleYMLSource, moduleYMLTarget);
 
@@ -168,3 +173,4 @@ export async function copyTemplates(modifiedModuleName: string, moduleName: stri
   await cleanupTempDirectory(localTemplateRepoPath);
   generateBaseUid(scaffoldModule, moduleName, moduleType, rawModuleTitle);
 }
+
