@@ -10,6 +10,7 @@ import { templateRepo } from '../helper/user-settings';
 
 export let localTemplateRepoPath: string;
 
+const platformRegex = /\\/g;
 const telemetryCommand: string = 'create-module';
 const fse = require("fs-extra");
 const fs = require("fs");
@@ -137,11 +138,7 @@ export async function copyTemplates(modifiedModuleName: string, moduleName: stri
 
   // copy index.yml
   let contentTemplatePath = data.moduleTemplatePath;
-  const osPlatform = getOSPlatform();
-  if (osPlatform !== 'win32') {
-    const regex = /\\/g;
-    contentTemplatePath = contentTemplatePath.replace(regex, '/');
-  }
+  contentTemplatePath = contentTemplatePath.replace(platformRegex, '/');
   const moduleYMLSource = resolve(typeDefinitionJsonDirectory, contentTemplatePath);
   const moduleYMLTarget = join(scaffoldModule, "index.yml");
   fse.copySync(moduleYMLSource, moduleYMLTarget);
@@ -158,11 +155,11 @@ export async function copyTemplates(modifiedModuleName: string, moduleName: stri
   data.units.forEach((obj: any) => {
     try {
       scaffoldFilename = obj.scaffoldFilename;
-      templateFile = resolve(typeDefinitionJsonDirectory, obj.moduleUnitTemplatePath);
+      templateFile = resolve(typeDefinitionJsonDirectory, obj.moduleUnitTemplatePath.replace(platformRegex, '/'));
       if (!existsSync(templateFile)) throw `${templateFile} does not exist and will be omitted from the scaffolding process.`;
       fse.copySync(templateFile, join(scaffoldModule, `${scaffoldFilename}.yml`));
       if (obj.contentTemplatePath) {
-        templateFile = resolve(typeDefinitionJsonDirectory, obj.contentTemplatePath);
+        templateFile = resolve(typeDefinitionJsonDirectory, obj.contentTemplatePath.replace(platformRegex, '/'));
         if (!existsSync(templateFile)) throw `${templateFile} does not exist and will be omitted from the scaffolding process.`;
         fse.copySync(templateFile, join(scaffoldModule, "includes", `${scaffoldFilename}.md`));
       }
