@@ -89,14 +89,3 @@ export function cleanupTempDirectory(tempDirectory: string) {
 		showStatusMessage(`Temp working directory ${tempDirectory} has been delted.`);
 	});
 }
-
-/**
- * Provide current os platform
- */
-export function getOSPlatform(this: any) {
-	if (this.osPlatform == null) {
-		this.osPlatform = os.platform();
-		this.osPlatform = this.osPlatform;
-	}
-	return this.osPlatform;
-}
