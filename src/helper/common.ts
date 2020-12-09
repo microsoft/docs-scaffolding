@@ -3,7 +3,6 @@
 import { Uri, window, workspace } from 'vscode';
 import { reporter } from './telemetry';
 import { rmdir } from 'fs';
-import * as os from 'os';
 
 export const output = window.createOutputChannel('docs-scaffolding');
 
