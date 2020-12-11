@@ -4,20 +4,22 @@ import { Uri, window, QuickPickItem, QuickPickOptions } from "vscode";
 import { join, resolve } from "path";
 import { generateBaseUid } from "../helper/module";
 import { readFileSync, existsSync } from "fs";
-import { homedir } from 'os';
 import { extensionPath } from '../extension';
 import { cleanupTempDirectory, postError, showStatusMessage, sendTelemetryData } from '../helper/common';
+import { templateRepo } from '../helper/user-settings';
 
+export let localTemplateRepoPath: string;
+
+const platformRegex = /\\/g;
 const telemetryCommand: string = 'create-module';
-const templateZip = join(homedir(), 'Downloads', 'learn-scaffolding-main.zip');
 const fse = require("fs-extra");
 const fs = require("fs");
 
-export let localTemplateRepoPath: string;
+let templateZip: string;
 let rawModuleTitle: string;
 let typeDefinitionJsonDirectory: string;
 
-export function scaffoldingeCommand() {
+export function scaffoldingCommand() {
   const commands = [{ command: scaffoldModule.name, callback: scaffoldModule }];
   return commands;
 }
@@ -25,16 +27,20 @@ export function scaffoldingeCommand() {
 /* temp solution until template repo is made public. 
 check for repo zip file and download if it doesn't exist. */
 export async function scaffoldModule(uri: Uri) {
+  const download = require('download');
+  const tmp = require('tmp');
+  localTemplateRepoPath = tmp.dirSync({unsafeCleanup: true}).name;
+  showStatusMessage(`Temp working directory ${localTemplateRepoPath} has been created.`);
   try {
-    const tmp = require('tmp');
-    localTemplateRepoPath = tmp.dirSync({unsafeCleanup: true}).name;
-    showStatusMessage(`Temp working directory ${localTemplateRepoPath} has been created.`);
+    await download(templateRepo, localTemplateRepoPath);
+    templateZip = join(localTemplateRepoPath, 'learn-scaffolding-main.zip');
+  } catch (error) {
+    templateZip = join(extensionPath, 'offline-template-zip', 'learn-scaffolding-main.zip');
+    postError(error);
+    showStatusMessage(`Error downloading templates from ${templateRepo}. Loading local templates.`);
+  }
     typeDefinitionJsonDirectory = join(localTemplateRepoPath, "learn-scaffolding-main", "module-type-definitions");
     unzipTemplates(uri);
-  } catch (error) {
-    postError(error);
-    showStatusMessage(error);
-  }
 }
 
 /* temp code until template repo is public 
@@ -92,18 +98,35 @@ export function getSelectedFolder(uri: Uri, moduleType: string) {
     if (!moduleName) {
       return;
     }
+    const termsJsonPath = join(localTemplateRepoPath, "learn-scaffolding-main", "terms.json");
+    const termsJson = readFileSync(termsJsonPath, "utf8");
+    let data = JSON.parse(termsJson);
+
+    let modifiedModuleName: string = moduleName;
+
+    Object.entries(data.titleReplacements).forEach(function ([key, value]) {
+      var replace = key;
+      let targetString: string | unknown = value;
+      modifiedModuleName = formatModuleName(modifiedModuleName, replace, targetString);
+    });
+
     rawModuleTitle = moduleName;
     moduleName = moduleName.replace(/ /g, "-").toLowerCase();
     sendTelemetryData(telemetryCommand, moduleType, moduleName);
-    copyTemplates(moduleName, moduleType, selectedFolder);
+    copyTemplates(modifiedModuleName, moduleName, moduleType, selectedFolder);
   });
 }
 
-export async function copyTemplates(moduleName: string, moduleType: string, selectedFolder: string) {
+function formatModuleName(moduleName: any, filteredTerm: any, replacementTerm: any) {
+  let re = new RegExp("\\b(" + filteredTerm + ")\\b","g");
+  return moduleName.replace(re,replacementTerm).replace(/ /g, "-").replace(/--/g, "-").toLowerCase();
+}
+
+export async function copyTemplates(modifiedModuleName: string, moduleName: string, moduleType: string, selectedFolder: string) {
   const jsonPath = join(typeDefinitionJsonDirectory, `${moduleType}.json`);
   const moduleJson = readFileSync(jsonPath, "utf8");
   const data = JSON.parse(moduleJson);
-  const scaffoldModule = join(selectedFolder, moduleName);
+  const scaffoldModule = join(selectedFolder, modifiedModuleName);
 
   /* to-do: update error workflow */
   if (existsSync(scaffoldModule)) {
@@ -114,7 +137,7 @@ export async function copyTemplates(moduleName: string, moduleType: string, sele
   }
 
   // copy index.yml
-  const moduleYMLSource = resolve(typeDefinitionJsonDirectory, data.moduleTemplatePath);
+  const moduleYMLSource = resolve(typeDefinitionJsonDirectory, data.moduleTemplatePath.replace(platformRegex, '/'));
   const moduleYMLTarget = join(scaffoldModule, "index.yml");
   fse.copySync(moduleYMLSource, moduleYMLTarget);
 
@@ -130,12 +153,12 @@ export async function copyTemplates(moduleName: string, moduleType: string, sele
   data.units.forEach((obj: any) => {
     try {
       scaffoldFilename = obj.scaffoldFilename;
-      templateFile = resolve(typeDefinitionJsonDirectory, obj.moduleUnitTemplatePath);
-      if (!existsSync(templateFile)) throw `${templateFile} does not exist and will be ommitted from the scaffolding process.`;
+      templateFile = resolve(typeDefinitionJsonDirectory, obj.moduleUnitTemplatePath.replace(platformRegex, '/'));
+      if (!existsSync(templateFile)) throw `${templateFile} does not exist and will be omitted from the scaffolding process.`;
       fse.copySync(templateFile, join(scaffoldModule, `${scaffoldFilename}.yml`));
       if (obj.contentTemplatePath) {
-        templateFile = resolve(typeDefinitionJsonDirectory, obj.contentTemplatePath);
-        if (!existsSync(templateFile)) throw `${templateFile} does not exist and will be ommitted from the scaffolding process.`;
+        templateFile = resolve(typeDefinitionJsonDirectory, obj.contentTemplatePath.replace(platformRegex, '/'));
+        if (!existsSync(templateFile)) throw `${templateFile} does not exist and will be omitted from the scaffolding process.`;
         fse.copySync(templateFile, join(scaffoldModule, "includes", `${scaffoldFilename}.md`));
       }
     } catch (error) {
@@ -145,3 +168,4 @@ export async function copyTemplates(moduleName: string, moduleType: string, sele
   await cleanupTempDirectory(localTemplateRepoPath);
   generateBaseUid(scaffoldModule, moduleName, moduleType, rawModuleTitle);
 }
+

@@ -10,7 +10,7 @@ import { sleep, sleepTime } from '../../test.common/common';
 import sinon = require('sinon');
 import * as scaffoldingController from './../../../controllers/scaffolding-controller';
 import {
-	moduleSelectionQuickPick, scaffoldingeCommand, scaffoldModule, copyTemplates
+	moduleSelectionQuickPick, scaffoldingCommand, scaffoldModule, copyTemplates
 } from '../../../controllers/scaffolding-controller';
 
 chai.use(spies);
@@ -36,7 +36,7 @@ suite('Scaffolding Controller', () => {
 	});
 	test('Scaffolding Command', () => {
 		const controllerCommands = [{ command: scaffoldModule.name, callback: scaffoldModule }];
-		expect(scaffoldingeCommand()).to.deep.equal(controllerCommands);
+		expect(scaffoldingCommand()).to.deep.equal(controllerCommands);
 	});
 	test('Module selector', async () => {
 		const spy = chai.spy.on(scaffoldingController, 'moduleSelectionQuickPick');
@@ -46,7 +46,7 @@ suite('Scaffolding Controller', () => {
 	});
 	test('Copy templates', async () => {
 		const spy = chai.spy.on(scaffoldingController, 'copyTemplates');
-		copyTemplates('test module', 'choose', contextSelectedFolder);
+		copyTemplates('modified title', 'test module', 'choose', contextSelectedFolder);
 		await sleep(sleepTime);
 		expect(spy).to.have.been.called();
 	});

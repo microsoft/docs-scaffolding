@@ -1,10 +1,11 @@
 {
 	"name": "docs-scaffolding",
 	"displayName": "docs-scaffolding",
-	"description": "",
+	"description": "Extension to help scaffold Microsoft Learn Modules",
+	"icon": "media/docs-logo-ms.png",
 	"aiKey": "0a0e5961-85c2-451a-bce8-6a54e37c93be",
 	"version": "0.0.1",
-	"publisher": "jw",
+	"publisher": "docsmsft",
 	"engines": {
 		"vscode": "^1.50.0"
 	},
@@ -36,15 +37,15 @@
 					"default": "",
 					"description": "GitHub ID"
 				},
-				"docs.scaffolding.learn_repo_id": {
+				"docs.scaffolding.prefix": {
 					"type": "string",
 					"default": "",
-					"description": "Default prefix i.e. learn"
+					"description": "Default prefix e.g. learn"
 				},
 				"docs.scaffolding.product": {
 					"type": "string",
 					"default": "",
-					"description": "Default product i.e. azure"
+					"description": "Default product e.g. azure"
 				},
 				"docs.scaffolding.template_repo": {
 					"type": "string",
@@ -92,6 +93,7 @@
 		"@octokit/rest": "^18.0.6",
 		"@types/sinon": "^9.0.8",
 		"axios": "^0.19.0",
+		"download": "^8.0.0",
 		"download-git-repo": "^1.0.2",
 		"extract-zip": "^2.0.1",
 		"fs-extra": "^9.0.1",

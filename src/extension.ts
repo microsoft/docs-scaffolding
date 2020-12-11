@@ -1,5 +1,5 @@
 import { commands, ExtensionContext, workspace, window } from "vscode";
-import { scaffoldingeCommand } from './controllers/scaffolding-controller';
+import { scaffoldingCommand } from './controllers/scaffolding-controller';
 import { Reporter } from './helper/telemetry';
 
 export let extensionPath: any;
@@ -8,7 +8,7 @@ export async function activate(context: ExtensionContext) {
 	extensionPath = context.extensionPath;
 	context.subscriptions.push(new Reporter(context));
 	const ScaffoldingCommands: any = [];
-	scaffoldingeCommand().forEach(cmd => ScaffoldingCommands.push(cmd));
+	scaffoldingCommand().forEach(cmd => ScaffoldingCommands.push(cmd));
 	try {
 		ScaffoldingCommands.map((cmd: any) => {
 			const commandName = cmd.command;
@@ -24,7 +24,7 @@ export async function activate(context: ExtensionContext) {
 		if (
 			e.affectsConfiguration(`${extensionName}.githubid`) ||
 			e.affectsConfiguration(`${extensionName}.alias`) ||
-			e.affectsConfiguration(`${extensionName}.learn_repo_id`) ||
+			e.affectsConfiguration(`${extensionName}.prefix`) ||
 			e.affectsConfiguration(`${extensionName}.template_repo`) ||
 			e.affectsConfiguration(`${extensionName}.product`)
 		) {
