@@ -1,6 +1,6 @@
 /* eslint-disable no-throw-literal, curly */
 
-import { Uri, window, QuickPickItem, QuickPickOptions } from "vscode";
+import { commands, Uri, window, QuickPickItem, QuickPickOptions } from "vscode";
 import { join, resolve } from "path";
 import { generateBaseUid } from "../helper/module";
 import { readFileSync, existsSync } from "fs";
@@ -20,7 +20,9 @@ let rawModuleTitle: string;
 let typeDefinitionJsonDirectory: string;
 
 export function scaffoldingCommand() {
-  const commands = [{ command: scaffoldModule.name, callback: scaffoldModule }];
+  const commands = [{ command: scaffoldModule.name, callback: scaffoldModule },
+  { command: moveSelectionDown.name, callback: moveSelectionDown },
+  { command: moveSelectionUp.name, callback: moveSelectionUp }];
   return commands;
 }
 
@@ -29,7 +31,7 @@ check for repo zip file and download if it doesn't exist. */
 export async function scaffoldModule(uri: Uri) {
   const download = require('download');
   const tmp = require('tmp');
-  localTemplateRepoPath = tmp.dirSync({unsafeCleanup: true}).name;
+  localTemplateRepoPath = tmp.dirSync({ unsafeCleanup: true }).name;
   showStatusMessage(`Temp working directory ${localTemplateRepoPath} has been created.`);
   try {
     await download(templateRepo, localTemplateRepoPath);
@@ -39,8 +41,8 @@ export async function scaffoldModule(uri: Uri) {
     postError(error);
     showStatusMessage(`Error downloading templates from ${templateRepo}. Loading local templates.`);
   }
-    typeDefinitionJsonDirectory = join(localTemplateRepoPath, "learn-scaffolding-main", "module-type-definitions");
-    unzipTemplates(uri);
+  typeDefinitionJsonDirectory = join(localTemplateRepoPath, "learn-scaffolding-main", "module-type-definitions");
+  unzipTemplates(uri);
 }
 
 /* temp code until template repo is public 
@@ -118,8 +120,8 @@ export function getSelectedFolder(uri: Uri, moduleType: string) {
 }
 
 function formatModuleName(moduleName: any, filteredTerm: any, replacementTerm: any) {
-  let re = new RegExp("\\b(" + filteredTerm + ")\\b","g");
-  return moduleName.replace(re,replacementTerm).replace(/ /g, "-").replace(/--/g, "-").toLowerCase();
+  let re = new RegExp("\\b(" + filteredTerm + ")\\b", "g");
+  return moduleName.replace(re, replacementTerm).replace(/ /g, "-").replace(/--/g, "-").toLowerCase();
 }
 
 export async function copyTemplates(modifiedModuleName: string, moduleName: string, moduleType: string, selectedFolder: string) {
@@ -169,3 +171,10 @@ export async function copyTemplates(modifiedModuleName: string, moduleName: stri
   generateBaseUid(scaffoldModule, moduleName, moduleType, rawModuleTitle);
 }
 
+export function moveSelectionDown() {
+  commands.executeCommand("editor.action.moveLinesDownAction");
+}
+
+export function moveSelectionUp() {
+  commands.executeCommand("editor.action.moveLinesUpAction");
+} 

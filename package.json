@@ -21,6 +21,14 @@
 			{
 				"command": "scaffoldModule",
 				"title": "Learn scaffolding: Create new module"
+			},
+			{
+				"command": "moveSelectionUp",
+				"title": "Learn scaffolding: Move selection up"
+			},
+			{
+				"command": "moveSelectionDown",
+				"title": "Learn scaffolding: Move selection down"
 			}
 		],
 		"configuration": {
@@ -58,6 +66,18 @@
 			"explorer/context": [
 				{
 					"command": "scaffoldModule",
+					"group": "1_modification"
+				}
+			],
+			"editor/context": [
+				{
+					"when": "editorTextFocus && resourceFilename == index.yml",
+					"command": "moveSelectionUp",
+					"group": "1_modification"
+				},
+				{
+					"when": "editorTextFocus && resourceFilename == index.yml",
+					"command": "moveSelectionDown",
 					"group": "1_modification"
 				}
 			]
