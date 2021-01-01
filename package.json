@@ -67,6 +67,14 @@
 				{
 					"command": "scaffoldModule",
 					"group": "1_modification"
+				},
+				{
+					"command": "moveSelectionDown",
+					"group": "1_modification"
+				},
+				{
+					"command": "moveSelectionUp",
+					"group": "1_modification"
 				}
 			],
 			"editor/context": [

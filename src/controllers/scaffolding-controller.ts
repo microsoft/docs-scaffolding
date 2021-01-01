@@ -7,6 +7,7 @@ import { readFileSync, existsSync } from "fs";
 import { extensionPath } from '../extension';
 import { cleanupTempDirectory, postError, showStatusMessage, sendTelemetryData } from '../helper/common';
 import { templateRepo } from '../helper/user-settings';
+import { getSelectedFile } from "../helper/unit";
 
 export let localTemplateRepoPath: string;
 
@@ -171,10 +172,10 @@ export async function copyTemplates(modifiedModuleName: string, moduleName: stri
   generateBaseUid(scaffoldModule, moduleName, moduleType, rawModuleTitle);
 }
 
-export function moveSelectionDown() {
-  commands.executeCommand("editor.action.moveLinesDownAction");
+export function moveSelectionDown(uri: Uri) {
+  getSelectedFile(uri, true);
 }
 
-export function moveSelectionUp() {
-  commands.executeCommand("editor.action.moveLinesUpAction");
+export function moveSelectionUp(uri: Uri) {
+  getSelectedFile(uri, false);
 } 
