@@ -1,5 +1,6 @@
 import { commands, ExtensionContext, workspace, window } from "vscode";
 import { scaffoldingCommand } from './controllers/scaffolding-controller';
+import { downloadTemplateZip } from './controllers/github-controller';
 import { Reporter } from './helper/telemetry';
 
 export let extensionPath: any;
@@ -7,6 +8,7 @@ export let extensionPath: any;
 export async function activate(context: ExtensionContext) {
 	extensionPath = context.extensionPath;
 	context.subscriptions.push(new Reporter(context));
+	downloadTemplateZip();
 	const ScaffoldingCommands: any = [];
 	scaffoldingCommand().forEach(cmd => ScaffoldingCommands.push(cmd));
 	try {

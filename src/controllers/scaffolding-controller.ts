@@ -1,22 +1,19 @@
 /* eslint-disable no-throw-literal, curly */
 
-import { commands, Uri, window, QuickPickItem, QuickPickOptions } from "vscode";
+import { Uri, window, QuickPickItem, QuickPickOptions } from "vscode";
 import { join, resolve } from "path";
 import { generateBaseUid } from "../helper/module";
 import { readFileSync, existsSync } from "fs";
 import { extensionPath } from '../extension';
 import { cleanupTempDirectory, postError, showStatusMessage, sendTelemetryData } from '../helper/common';
-import { templateRepo } from '../helper/user-settings';
 import { addNewUnit, getSelectedFile } from "../helper/unit";
-
-export let localTemplateRepoPath: string;
+import { localTemplateRepoPath } from './github-controller';
 
 const platformRegex = /\\/g;
 const telemetryCommand: string = 'create-module';
 const fse = require("fs-extra");
 const fs = require("fs");
 
-let templateZip: string;
 let rawModuleTitle: string;
 let typeDefinitionJsonDirectory: string;
 
@@ -28,46 +25,9 @@ export function scaffoldingCommand() {
   return commands;
 }
 
-/* temp solution until template repo is made public. 
-check for repo zip file and download if it doesn't exist. */
-export async function scaffoldModule(uri: Uri, addUnit?: boolean) {
-  const download = require('download');
-  const tmp = require('tmp');
-  localTemplateRepoPath = tmp.dirSync({ unsafeCleanup: true }).name;
-  showStatusMessage(`Temp working directory ${localTemplateRepoPath} has been created.`);
-  try {
-    await download(templateRepo, localTemplateRepoPath);
-    templateZip = join(localTemplateRepoPath, 'learn-scaffolding-main.zip');
-  } catch (error) {
-    templateZip = join(extensionPath, 'offline-template-zip', 'learn-scaffolding-main.zip');
-    postError(error);
-    showStatusMessage(`Error downloading templates from ${templateRepo}. Loading local templates.`);
-  }
-  if (addUnit) {
-    typeDefinitionJsonDirectory = join(localTemplateRepoPath, "learn-scaffolding-main", "content-templates");
-    unzipTemplates(uri, true, typeDefinitionJsonDirectory);
-  } else {
-    typeDefinitionJsonDirectory = join(localTemplateRepoPath, "learn-scaffolding-main", "module-type-definitions");
-    unzipTemplates(uri);
-  }
-}
-
-/* temp code until template repo is public 
-unzip template package*/
-async function unzipTemplates(uri: Uri, addUnit?: boolean, templatePath?: string) {
-  const extract = require('extract-zip');
-  try {
-    await extract(templateZip, { dir: localTemplateRepoPath });
-    if (addUnit) {
-      addNewUnit(templatePath!);
-    } else {
-      moduleSelectionQuickPick(uri);
-    }
-    
-  } catch (error) {
-    postError(error);
-    showStatusMessage(error);
-  }
+export async function scaffoldModule(uri: Uri) {
+  typeDefinitionJsonDirectory = join(localTemplateRepoPath, "learn-scaffolding-main", "module-type-definitions");
+  moduleSelectionQuickPick(uri);
 }
 
 /* loop through module type definitions directory and store each module type */
@@ -179,7 +139,7 @@ export async function copyTemplates(modifiedModuleName: string, moduleName: stri
       window.showWarningMessage(error);
     }
   });
-  await cleanupTempDirectory(localTemplateRepoPath);
+  // await cleanupTempDirectory(localTemplateRepoPath);
   generateBaseUid(scaffoldModule, moduleName, moduleType, rawModuleTitle);
 }
 
@@ -192,5 +152,5 @@ export function moveSelectionUp(uri: Uri) {
 } 
 
 export function insertNewUnit(uri: Uri) {
-  scaffoldModule(uri, true);
+  addNewUnit(uri);
 } 

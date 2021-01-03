@@ -1,7 +1,8 @@
 import { Uri, QuickPickItem, QuickPickOptions, window } from "vscode";
 import { join, parse } from "path";
 import { readdirSync } from "fs";
-import { scaffoldingCommand, scaffoldModule } from "../controllers/scaffolding-controller";
+import { localTemplateRepoPath } from '../controllers/github-controller';
+import { postError, showStatusMessage } from '../helper/common';
 
 const fse = require("fs-extra");
 const replace = require("replace-in-file");
@@ -47,45 +48,43 @@ export function renameUnit(selectedFileDir: any, currentFilename: string, newUni
     const results = replace.sync(options);
 }
 
-export function addNewUnit(typeDefinitionJsonDirectory: string) {
+export function addNewUnit(uri: Uri) {
+    const constentTemplateDirectory = join(localTemplateRepoPath, "learn-scaffolding-main", "content-templates");
     try {
         let moduleTypes: QuickPickItem[] = [];
-        fs.readdir(typeDefinitionJsonDirectory, function (err: string, files: any[]) {
+        fs.readdir(constentTemplateDirectory, function (err: string, files: any[]) {
             if (err) {
-                // return postError("Unable to scan directory: " + err);
+                return postError("Unable to scan directory: " + err);
             }
             files.forEach(function (file) {
                 moduleTypes.push(file);
             });
-            return showUnitSelector(moduleTypes);
+            return showUnitSelector(uri, moduleTypes, constentTemplateDirectory);
         });
     } catch (error) {
-        /* postError(error);
-        showStatusMessage(error); */
+        postError(error);
+        showStatusMessage(error);
     }
 }
 
-export async function showUnitSelector(moduleTypes: any[]) {
+export async function showUnitSelector(uri: Uri, moduleTypes: any[], contentTemplateDirectory: string) {
     const opts: QuickPickOptions = { placeHolder: 'Select unit type' };
     const ymlExtension = '.yml';
     const unitFilter = [] = moduleTypes.filter(file => file.endsWith(ymlExtension))
     const selection = await window.showQuickPick(unitFilter, opts);
-    // await getSelectedFolder(uri, selection.toLowerCase());
+    await copyUnitSelection(uri, selection, contentTemplateDirectory);
 }
 
-export function copyUnitSelection(unitType: string) {
+export function copyUnitSelection(uri: Uri, unitType: string, contentTemplateDirectory: string) {
+    const selectedFileFullPath = uri.fsPath;
     switch (unitType) {
         case 'default-knowledge-check-embedded.yml':
-            // code block
             break;
         case 'default-knowledge-check-standalone-unit.yml':
-            // code block
             break;
         case 'default-knowledge-check-unit.yml':
-            // code block
             break;
         case 'default-unit.yml':
-            // code block
             break;
     }
 }
