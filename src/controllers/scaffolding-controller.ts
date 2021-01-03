@@ -7,7 +7,7 @@ import { readFileSync, existsSync } from "fs";
 import { extensionPath } from '../extension';
 import { cleanupTempDirectory, postError, showStatusMessage, sendTelemetryData } from '../helper/common';
 import { templateRepo } from '../helper/user-settings';
-import { getSelectedFile } from "../helper/unit";
+import { addNewUnit, getSelectedFile } from "../helper/unit";
 
 export let localTemplateRepoPath: string;
 
@@ -23,13 +23,14 @@ let typeDefinitionJsonDirectory: string;
 export function scaffoldingCommand() {
   const commands = [{ command: scaffoldModule.name, callback: scaffoldModule },
   { command: moveSelectionDown.name, callback: moveSelectionDown },
-  { command: moveSelectionUp.name, callback: moveSelectionUp }];
+  { command: moveSelectionUp.name, callback: moveSelectionUp },
+  { command: insertNewUnit.name, callback: insertNewUnit }];
   return commands;
 }
 
 /* temp solution until template repo is made public. 
 check for repo zip file and download if it doesn't exist. */
-export async function scaffoldModule(uri: Uri) {
+export async function scaffoldModule(uri: Uri, addUnit?: boolean) {
   const download = require('download');
   const tmp = require('tmp');
   localTemplateRepoPath = tmp.dirSync({ unsafeCleanup: true }).name;
@@ -42,17 +43,27 @@ export async function scaffoldModule(uri: Uri) {
     postError(error);
     showStatusMessage(`Error downloading templates from ${templateRepo}. Loading local templates.`);
   }
-  typeDefinitionJsonDirectory = join(localTemplateRepoPath, "learn-scaffolding-main", "module-type-definitions");
-  unzipTemplates(uri);
+  if (addUnit) {
+    typeDefinitionJsonDirectory = join(localTemplateRepoPath, "learn-scaffolding-main", "content-templates");
+    unzipTemplates(uri, true, typeDefinitionJsonDirectory);
+  } else {
+    typeDefinitionJsonDirectory = join(localTemplateRepoPath, "learn-scaffolding-main", "module-type-definitions");
+    unzipTemplates(uri);
+  }
 }
 
 /* temp code until template repo is public 
 unzip template package*/
-async function unzipTemplates(uri: Uri) {
+async function unzipTemplates(uri: Uri, addUnit?: boolean, templatePath?: string) {
   const extract = require('extract-zip');
   try {
     await extract(templateZip, { dir: localTemplateRepoPath });
-    moduleSelectionQuickPick(uri);
+    if (addUnit) {
+      addNewUnit(templatePath!);
+    } else {
+      moduleSelectionQuickPick(uri);
+    }
+    
   } catch (error) {
     postError(error);
     showStatusMessage(error);
@@ -178,4 +189,8 @@ export function moveSelectionDown(uri: Uri) {
 
 export function moveSelectionUp(uri: Uri) {
   getSelectedFile(uri, false);
+} 
+
+export function insertNewUnit(uri: Uri) {
+  scaffoldModule(uri, true);
 } 

@@ -29,6 +29,10 @@
 			{
 				"command": "moveSelectionDown",
 				"title": "Learn scaffolding: Move selection down"
+			},
+			{
+				"command": "insertNewUnit",
+				"title": "Learn scaffolding: Insert a new unit"
 			}
 		],
 		"configuration": {
@@ -74,6 +78,10 @@
 				},
 				{
 					"command": "moveSelectionUp",
+					"group": "1_modification"
+				},
+				{
+					"command": "insertNewUnit",
 					"group": "1_modification"
 				}
 			],

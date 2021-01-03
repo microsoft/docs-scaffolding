@@ -1,9 +1,11 @@
-import { Uri } from "vscode";
+import { Uri, QuickPickItem, QuickPickOptions, window } from "vscode";
 import { join, parse } from "path";
 import { readdirSync } from "fs";
+import { scaffoldingCommand, scaffoldModule } from "../controllers/scaffolding-controller";
 
 const fse = require("fs-extra");
 const replace = require("replace-in-file");
+const fs = require("fs");
 
 export function getSelectedFile(uri: Uri, moveDown: boolean) {
     const selectedFileFullPath = parse(uri.fsPath);
@@ -43,4 +45,47 @@ export function renameUnit(selectedFileDir: any, currentFilename: string, newUni
         to: newFilename,
     };
     const results = replace.sync(options);
+}
+
+export function addNewUnit(typeDefinitionJsonDirectory: string) {
+    try {
+        let moduleTypes: QuickPickItem[] = [];
+        fs.readdir(typeDefinitionJsonDirectory, function (err: string, files: any[]) {
+            if (err) {
+                // return postError("Unable to scan directory: " + err);
+            }
+            files.forEach(function (file) {
+                moduleTypes.push(file);
+            });
+            return showUnitSelector(moduleTypes);
+        });
+    } catch (error) {
+        /* postError(error);
+        showStatusMessage(error); */
+    }
+}
+
+export async function showUnitSelector(moduleTypes: any[]) {
+    const opts: QuickPickOptions = { placeHolder: 'Select unit type' };
+    const ymlExtension = '.yml';
+    const unitFilter = [] = moduleTypes.filter(file => file.endsWith(ymlExtension))
+    const selection = await window.showQuickPick(unitFilter, opts);
+    // await getSelectedFolder(uri, selection.toLowerCase());
+}
+
+export function copyUnitSelection(unitType: string) {
+    switch (unitType) {
+        case 'default-knowledge-check-embedded.yml':
+            // code block
+            break;
+        case 'default-knowledge-check-standalone-unit.yml':
+            // code block
+            break;
+        case 'default-knowledge-check-unit.yml':
+            // code block
+            break;
+        case 'default-unit.yml':
+            // code block
+            break;
+    }
 }
