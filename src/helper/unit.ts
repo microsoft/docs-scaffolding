@@ -77,14 +77,28 @@ export async function showUnitSelector(uri: Uri, moduleTypes: any[], contentTemp
 
 export function copyUnitSelection(uri: Uri, unitType: string, contentTemplateDirectory: string) {
     const selectedFileFullPath = uri.fsPath;
-    switch (unitType) {
-        case 'default-knowledge-check-embedded.yml':
-            break;
-        case 'default-knowledge-check-standalone-unit.yml':
-            break;
-        case 'default-knowledge-check-unit.yml':
-            break;
-        case 'default-unit.yml':
-            break;
-    }
+    const getUserInput = window.showInputBox({
+        prompt: "Enter unit name.",
+        validateInput: (userInput) =>
+            userInput.length > 0 ? "" : "Please provide a unit name.",
+    });
+    getUserInput.then((unitName) => {
+        if (!unitName) {
+            return;
+        }
+        switch (unitType) {
+            case 'default-knowledge-check-embedded.yml':
+                fse.copySync(join(contentTemplateDirectory, unitType), join(selectedFileFullPath, `${unitName}.yml`));
+                break;
+            case 'default-knowledge-check-standalone-unit.yml':
+                fse.copySync(join(contentTemplateDirectory, unitType), join(selectedFileFullPath, `${unitName}.yml`));
+                break;
+            case 'default-knowledge-check-unit.yml':
+                fse.copySync(join(contentTemplateDirectory, unitType), join(selectedFileFullPath, `${unitName}.yml`));
+                break;
+            case 'default-unit.yml':
+                fse.copySync(join(contentTemplateDirectory, unitType), join(selectedFileFullPath, `${unitName}.yml`));
+                break;
+        }
+    });
 }
