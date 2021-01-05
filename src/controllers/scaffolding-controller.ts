@@ -6,7 +6,7 @@ import { generateBaseUid } from "../helper/module";
 import { readFileSync, existsSync } from "fs";
 import { extensionPath } from '../extension';
 import { cleanupTempDirectory, postError, showStatusMessage, sendTelemetryData } from '../helper/common';
-import { addNewUnit, getSelectedFile } from "../helper/unit";
+import { addNewUnit, getSelectedFile, renamePeerAndTargetUnits } from "../helper/unit";
 import { localTemplateRepoPath } from './github-controller';
 
 const platformRegex = /\\/g;
@@ -144,7 +144,8 @@ export async function copyTemplates(modifiedModuleName: string, moduleName: stri
 }
 
 export function moveSelectionDown(uri: Uri) {
-  getSelectedFile(uri, true);
+  // getSelectedFile(uri, true);
+  renamePeerAndTargetUnits(uri, true);
 }
 
 export function moveSelectionUp(uri: Uri) {
