@@ -2,7 +2,7 @@ import { Uri, QuickPickItem, QuickPickOptions, window } from "vscode";
 import { join, parse } from "path";
 import { readdirSync } from "fs";
 import { localTemplateRepoPath } from '../controllers/github-controller';
-import { postError, showStatusMessage } from '../helper/common';
+import { output, postError, showStatusMessage } from '../helper/common';
 import { stubUnitReferences } from './module';
 
 const fse = require("fs-extra");
@@ -53,6 +53,7 @@ export function renameUnit(selectedFileDir: any, currentFilename: string, newUni
         to: newFilename,
     };
     const results = replace.sync(options);
+    updateIndex(selectedFileDir);
 }
 
 export function addNewUnit(uri: Uri) {
@@ -106,18 +107,21 @@ export function updateIndex(moduleDirectory: string) {
     const options = {
         files: moduleIndex,
         from: /^(units:)([^]+?)(badge:)$/gm,
-        to: 'units:\n {{units}}',
+        to: 'units:\n  {{units}}\nbadge:',
     };
     replace.sync(options);
-    // stubUnitReferences(moduleDirectory);
-    const yaml = require('js-yaml');
+    stubUnitReferences(moduleDirectory);
+}
 
+export function removeUnit(uri: Uri) {
     try {
-        let fileContents = fs.readFileSync(moduleIndex, 'utf8');
-        let data = yaml.loadAll(fileContents);
-        console.log(data[0].metadata);
-
-    } catch (e) {
-        console.log(e);
+        let { selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber } = getSelectedFile(uri, true);
+        const selectedFile = join(selectedFileDir, `${currentFilename}.yml`);
+        const includeMarkdown = join(selectedFileDir, 'includes', `${currentFilename}.md`);
+        fs.unlinkSync(selectedFile);
+        fs.unlinkSync(includeMarkdown);
+        updateIndex(selectedFileDir);
+    } catch (error) {
+        output.appendLine(error);
     }
 }

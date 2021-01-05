@@ -6,7 +6,7 @@ import { generateBaseUid } from "../helper/module";
 import { readFileSync, existsSync } from "fs";
 import { extensionPath } from '../extension';
 import { cleanupTempDirectory, postError, showStatusMessage, sendTelemetryData } from '../helper/common';
-import { addNewUnit, getSelectedFile, renamePeerAndTargetUnits } from "../helper/unit";
+import { addNewUnit, getSelectedFile, renamePeerAndTargetUnits, removeUnit } from "../helper/unit";
 import { localTemplateRepoPath } from './github-controller';
 
 const platformRegex = /\\/g;
@@ -21,7 +21,8 @@ export function scaffoldingCommand() {
   const commands = [{ command: scaffoldModule.name, callback: scaffoldModule },
   { command: moveSelectionDown.name, callback: moveSelectionDown },
   { command: moveSelectionUp.name, callback: moveSelectionUp },
-  { command: insertNewUnit.name, callback: insertNewUnit }];
+  { command: insertNewUnit.name, callback: insertNewUnit },
+  { command: deleteUnit.name, callback: deleteUnit }];
   return commands;
 }
 
@@ -154,4 +155,8 @@ export function moveSelectionUp(uri: Uri) {
 
 export function insertNewUnit(uri: Uri) {
   addNewUnit(uri);
+} 
+
+export function deleteUnit(uri: Uri) {
+  removeUnit(uri);
 } 

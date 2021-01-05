@@ -33,6 +33,10 @@
 			{
 				"command": "insertNewUnit",
 				"title": "Learn scaffolding: Insert a new unit"
+			},
+			{
+				"command": "deleteUnit",
+				"title": "Learn scaffolding: Delete selected unit"
 			}
 		],
 		"configuration": {
@@ -69,19 +73,28 @@
 		"menus": {
 			"explorer/context": [
 				{
+					"when": "explorerResourceIsFolder",
 					"command": "scaffoldModule",
 					"group": "1_modification"
 				},
 				{
+					"when": "resourceLangId == yaml",
 					"command": "moveSelectionDown",
 					"group": "1_modification"
 				},
 				{
+					"when": "resourceLangId == yaml",
 					"command": "moveSelectionUp",
 					"group": "1_modification"
 				},
 				{
+					"when": "resourceLangId == yaml",
 					"command": "insertNewUnit",
+					"group": "1_modification"
+				},
+				{
+					"when": "resourceLangId == yaml",
+					"command": "deleteUnit",
 					"group": "1_modification"
 				}
 			],
