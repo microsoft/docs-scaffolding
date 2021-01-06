@@ -1,6 +1,7 @@
 import { alias, gitHubID, defaultPrefix, defaultProduct } from "../helper/user-settings";
 import { basename, join } from 'path';
-import { postError, postInformation, showStatusMessage } from '../helper/common';
+import { getModuleUid, postError, postInformation, showStatusMessage } from '../helper/common';
+import { stringify } from "querystring";
 
 const replace = require("replace-in-file");
 let learnRepo: string = defaultPrefix;
@@ -101,11 +102,12 @@ export function stubDateReferences(modulePath: string) {
   stubUnitReferences(modulePath);
 }
 
-export function stubUnitReferences(modulePath: string) {
+export function stubUnitReferences(modulePath: string, addPrefix?: boolean) {
   const fs = require("fs");
   let unitBlock: string[] = [];
   let moduleName: string;
   let formattedUnitName: string;
+  const moduleUid = getModuleUid(modulePath);
   fs.readdir(modulePath, function (err: string, files: any[]) {
     if (err) {
       return postError("Unable to scan directory: " + err);
@@ -133,8 +135,15 @@ export function stubUnitReferences(modulePath: string) {
       replace.sync(options);
 
       moduleName = basename(modulePath);
+      let unitReplacement: string;
+      if (addPrefix) {
+        unitReplacement = `${moduleUid}.${formattedUnitName}`;
+      } else {
+        unitReplacement = formattedUnitName;
+      }
+        
       if (!["includes", "index", "media"].includes(formattedUnitName)) {
-        unitBlock.push(`  - ${moduleName}.${formattedUnitName}\n`);
+        unitBlock.push(`  - ${unitReplacement}.${formattedUnitName}\n`);
       }
     });
     stubUnitBlock(moduleName, modulePath, unitBlock);

@@ -5,8 +5,8 @@ import { join, resolve } from "path";
 import { generateBaseUid } from "../helper/module";
 import { readFileSync, existsSync } from "fs";
 import { extensionPath } from '../extension';
-import { cleanupTempDirectory, postError, showStatusMessage, sendTelemetryData } from '../helper/common';
-import { addNewUnit, getSelectedFile, renamePeerAndTargetUnits, removeUnit } from "../helper/unit";
+import { cleanupTempDirectory, getSelectedFile, postError, showStatusMessage, sendTelemetryData } from '../helper/common';
+import { addNewUnit, renamePeerAndTargetUnits, removeUnit, renameUnitNoSorting } from "../helper/unit";
 import { localTemplateRepoPath } from './github-controller';
 
 const platformRegex = /\\/g;
@@ -22,7 +22,8 @@ export function scaffoldingCommand() {
   { command: moveSelectionDown.name, callback: moveSelectionDown },
   { command: moveSelectionUp.name, callback: moveSelectionUp },
   { command: insertNewUnit.name, callback: insertNewUnit },
-  { command: deleteUnit.name, callback: deleteUnit }];
+  { command: deleteUnit.name, callback: deleteUnit },
+  { command: renameUnit.name, callback: renameUnit }];
   return commands;
 }
 
@@ -159,4 +160,8 @@ export function insertNewUnit(uri: Uri) {
 
 export function deleteUnit(uri: Uri) {
   removeUnit(uri);
+}
+
+export function renameUnit(uri: Uri) {
+  renameUnitNoSorting(uri);
 } 

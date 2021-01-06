@@ -37,6 +37,10 @@
 			{
 				"command": "deleteUnit",
 				"title": "Learn scaffolding: Delete selected unit"
+			},
+			{
+				"command": "renameUnit",
+				"title": "Learn scaffolding: Rename selected unit"
 			}
 		],
 		"configuration": {
@@ -78,12 +82,12 @@
 					"group": "1_modification"
 				},
 				{
-					"when": "resourceLangId == yaml",
+					"when": "resourceLangId == yaml && resourceFilename != 1-introduction.yml",
 					"command": "moveSelectionDown",
 					"group": "1_modification"
 				},
 				{
-					"when": "resourceLangId == yaml",
+					"when": "resourceLangId == yaml && resourceFilename != 1-introduction.yml",
 					"command": "moveSelectionUp",
 					"group": "1_modification"
 				},
@@ -93,8 +97,13 @@
 					"group": "1_modification"
 				},
 				{
-					"when": "resourceLangId == yaml",
+					"when": "resourceLangId == yaml && resourceFilename != 1-introduction.yml",
 					"command": "deleteUnit",
+					"group": "1_modification"
+				},
+				{
+					"when": "resourceLangId == yaml && resourceFilename != 1-introduction.yml",
+					"command": "renameUnit",
 					"group": "1_modification"
 				}
 			],

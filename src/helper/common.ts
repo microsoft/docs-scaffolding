@@ -3,8 +3,11 @@
 import { Uri, window, workspace } from 'vscode';
 import { reporter } from './telemetry';
 import { rmdir } from 'fs';
+import { join, parse } from "path";
 
 export const output = window.createOutputChannel('docs-scaffolding');
+const fileNumberRegex = /(.*?)-.*/;
+const fs = require("fs");
 
 /**
  * Create a posted warning message and applies the message to the log
@@ -87,4 +90,37 @@ export function cleanupTempDirectory(tempDirectory: string) {
 		}
 		showStatusMessage(`Temp working directory ${tempDirectory} has been delted.`);
 	});
+}
+
+export function getSelectedFile(uri: Uri, moveDown?: boolean) {
+	const selectedFileFullPath = parse(uri.fsPath);
+	const selectedFileDir = selectedFileFullPath.dir;
+	const currentFilename = selectedFileFullPath.name;
+	const fileNumber = currentFilename.match(fileNumberRegex);
+	const currentUnitNumber: any = parseInt(fileNumber![1]);
+	let newUnitNumber;
+	if (moveDown) {
+		newUnitNumber = currentUnitNumber + 1;
+	} else {
+		newUnitNumber = currentUnitNumber - 1;
+	}
+	return {
+		selectedFileDir,
+		currentFilename,
+		newUnitNumber,
+		currentUnitNumber
+	};
+}
+
+export function getModuleUid(selectedFileDir: string) {
+	const yaml = require('js-yaml');
+	try {
+		let moduleIndex = join(selectedFileDir, 'index.yml');
+		let fileContents = fs.readFileSync(moduleIndex, 'utf8');
+		let data = yaml.loadAll(fileContents);
+		return data[0].uid
+
+	} catch (error) {
+		output.appendLine(error);
+	}
 }
