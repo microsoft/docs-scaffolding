@@ -1,7 +1,6 @@
 import { alias, gitHubID, defaultPrefix, defaultProduct } from "../helper/user-settings";
 import { basename, join } from 'path';
 import { getModuleUid, postError, postInformation, showStatusMessage } from '../helper/common';
-import { stringify } from "querystring";
 
 const replace = require("replace-in-file");
 let learnRepo: string = defaultPrefix;
@@ -137,13 +136,13 @@ export function stubUnitReferences(modulePath: string, addPrefix?: boolean) {
       moduleName = basename(modulePath);
       let unitReplacement: string;
       if (addPrefix) {
-        unitReplacement = `${moduleUid}.${formattedUnitName}`;
+        unitReplacement = `${moduleUid}`;
       } else {
         unitReplacement = formattedUnitName;
       }
         
       if (!["includes", "index", "media"].includes(formattedUnitName)) {
-        unitBlock.push(`  - ${unitReplacement}.${formattedUnitName}\n`);
+        unitBlock.push(`- ${unitReplacement}.${formattedUnitName}\n`);
       }
     });
     stubUnitBlock(moduleName, modulePath, unitBlock);
@@ -192,5 +191,5 @@ export function moduleCleanup(moduleName: string, modulePath: string) {
     to: ` `,
   };
   replace.sync(options);
-  postInformation(`Successfully created : ${moduleName}`);
+  postInformation(`Operation successful: ${moduleName}`);
 }

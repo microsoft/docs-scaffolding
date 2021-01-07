@@ -1,40 +1,47 @@
 import { Uri, QuickPickItem, QuickPickOptions, window } from "vscode";
-import { basename, join, parse } from "path";
+import { join } from "path";
 import { readdirSync } from "fs";
 import { localTemplateRepoPath } from '../controllers/github-controller';
 import { getModuleUid, getSelectedFile, output, postError, showStatusMessage } from '../helper/common';
-import { generateBaseUid, stubUnitReferences } from './module';
+import { stubUnitReferences } from './module';
 
 const fse = require("fs-extra");
 const replace = require("replace-in-file");
 const fs = require("fs");
-const fileNumberRegex = /(.*?)-.*/;
 
 export function renamePeerAndTargetUnits(uri: Uri, moveDown: boolean) {
     let { selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber } = getSelectedFile(uri, moveDown);
-    const moduleUnits = [] = readdirSync(selectedFileDir);
-    const existingUnit = moduleUnits.filter((unit) => unit.startsWith(newUnitNumber));
-    const existingUnitName = existingUnit.toString().split('.')[0];
-    renameUnit(selectedFileDir, existingUnitName, currentUnitNumber, newUnitNumber);
-    renameUnit(selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber);
-    updateIndex(selectedFileDir);
-    getModuleUid(selectedFileDir);
+    try {
+        const moduleUnits = [] = readdirSync(selectedFileDir);
+        const existingUnit = moduleUnits.filter((unit) => unit.startsWith(newUnitNumber));
+        const existingUnitName = existingUnit.toString().split('.')[0];
+        renameUnit(selectedFileDir, existingUnitName, currentUnitNumber, newUnitNumber);
+        renameUnit(selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber);
+        updateIndex(selectedFileDir);
+        getModuleUid(selectedFileDir);  
+    } catch (error) {
+        output.appendLine(error);
+    }
 }
 
 export function renameUnit(selectedFileDir: any, currentFilename: string, newUnitNumber: any, currentUnitNumber: any) {
-    const newFilename = currentFilename.replace(currentUnitNumber, newUnitNumber);
-    const currentFilePath = join(selectedFileDir, `${currentFilename}.yml`);
-    const newFilePath = join(selectedFileDir, `${newFilename}.yml`);
-    fse.rename(currentFilePath, newFilePath);
-    const currentIncludePath = join(selectedFileDir, 'includes', `${currentFilename}.md`);
-    const newIncludePath = join(selectedFileDir, 'includes', `${newFilename}.md`);
-    fse.rename(currentIncludePath, newIncludePath);
-    const options = {
-        files: newFilePath,
-        from: currentFilename,
-        to: newFilename,
-    };
-    replace.sync(options);
+    try {
+        const newFilename = currentFilename.replace(currentUnitNumber, newUnitNumber);
+        const currentFilePath = join(selectedFileDir, `${currentFilename}.yml`);
+        const newFilePath = join(selectedFileDir, `${newFilename}.yml`);
+        fse.rename(currentFilePath, newFilePath);
+        const currentIncludePath = join(selectedFileDir, 'includes', `${currentFilename}.md`);
+        const newIncludePath = join(selectedFileDir, 'includes', `${newFilename}.md`);
+        fse.rename(currentIncludePath, newIncludePath);
+        const options = {
+            files: newFilePath,
+            from: currentFilename,
+            to: newFilename,
+        };
+        replace.sync(options);
+    } catch (error) {
+        output.appendLine(error);
+    }
 }
 
 export function addNewUnit(uri: Uri) {
@@ -57,47 +64,61 @@ export function addNewUnit(uri: Uri) {
 }
 
 export async function showUnitSelector(uri: Uri, moduleTypes: any[], contentTemplateDirectory: string) {
-    const opts: QuickPickOptions = { placeHolder: 'Select unit type' };
-    const ymlExtension = '.yml';
-    let unitFilter = [] = moduleTypes.filter(file => file.endsWith(ymlExtension));
-    unitFilter = unitFilter.map(unit => unit.replace(/.yml/g, ''));
-    const selection = await window.showQuickPick(unitFilter, opts);
-    await copyUnitSelection(uri, selection, contentTemplateDirectory);
+    try {
+        const opts: QuickPickOptions = { placeHolder: 'Select unit type' };
+        const ymlExtension = '.yml';
+        let unitFilter = [] = moduleTypes.filter(file => file.endsWith(ymlExtension) && file != 'default-index.yml');
+        unitFilter = unitFilter.map(unit => unit.replace(/.yml/g, ''));
+        const selection = await window.showQuickPick(unitFilter, opts);
+        await copyUnitSelection(uri, selection, contentTemplateDirectory);
+    } catch (error) {
+        output.appendLine(error);
+    }
 }
 
 export function copyUnitSelection(uri: Uri, unitType: string, contentTemplateDirectory: string) {
-    const getUserInput = window.showInputBox({
-        prompt: "Enter unit name.",
-        validateInput: (userInput) =>
-            userInput.length > 0 ? "" : "Please provide a unit name.",
-    });
-    getUserInput.then((unitName) => {
-        if (!unitName) {
-            return;
-        }
-        let formattedUnitName = unitName.replace(/ /g, "-").toLowerCase();
-        let { selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber } = getSelectedFile(uri, true);
-        fse.copySync(join(contentTemplateDirectory, `${unitType}.yml`), join(selectedFileDir, `${currentUnitNumber}-${formattedUnitName}.yml`));
-        renameUnit(selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber);
-        updateIndex(selectedFileDir);
-    });
+    try {
+        const getUserInput = window.showInputBox({
+            prompt: "Enter unit name.",
+            validateInput: (userInput) =>
+                userInput.length > 0 ? "" : "Please provide a unit name.",
+        });
+        getUserInput.then((unitName) => {
+            if (!unitName) {
+                return;
+            }
+            let formattedUnitName = unitName.replace(/ /g, "-").toLowerCase();
+            let { selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber } = getSelectedFile(uri, true);
+            fse.copySync(join(contentTemplateDirectory, `${unitType}.yml`), join(selectedFileDir, `${currentUnitNumber}-${formattedUnitName}.yml`));
+            if (unitType == 'default-unit') {
+                fse.copySync(join(contentTemplateDirectory, `default-exercise-unit.md`), join(selectedFileDir, 'includes', `${currentUnitNumber}-${formattedUnitName}.md`));
+            }
+            renameUnit(selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber);
+            updateIndex(selectedFileDir);
+        });
+    } catch (error) {
+        output.appendLine(error);
+    }
 }
 
 export function updateIndex(moduleDirectory: string) {
-    const moduleIndex = join(moduleDirectory, 'index.yml');
-    const yaml = require('js-yaml');
-    const options = {
-        files: moduleIndex,
-        from: /^(units:)([^]+?)(badge:)$/gm,
-        to: 'units:\n {{units}}\nbadge:',
-    };
-    replace.sync(options);
-    stubUnitReferences(moduleDirectory, true);
+    try {
+        const moduleIndex = join(moduleDirectory, 'index.yml');
+        const options = {
+            files: moduleIndex,
+            from: /^(units:)([^]+?)(badge:)$/gm,
+            to: 'units:\n {{units}}\nbadge:',
+        };
+        replace.sync(options);
+        stubUnitReferences(moduleDirectory, true);
+    } catch (error) {
+        output.appendLine(error);
+    }
 }
 
 export function removeUnit(uri: Uri) {
     try {
-        let { selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber } = getSelectedFile(uri, true);
+        let { selectedFileDir, currentFilename } = getSelectedFile(uri, true);
         const selectedFile = join(selectedFileDir, `${currentFilename}.yml`);
         const includeMarkdown = join(selectedFileDir, 'includes', `${currentFilename}.md`);
         fs.unlinkSync(selectedFile);
@@ -108,32 +129,34 @@ export function removeUnit(uri: Uri) {
     }
 }
 
-export function renameUnitNoSorting(uri: Uri) {
-    const getUserInput = window.showInputBox({
-        prompt: "Enter unit name.",
-        validateInput: (userInput) =>
-            userInput.length > 0 ? "" : "Please provide a unit name.",
-    });
-    getUserInput.then((unitName) => {
-        if (!unitName) {
-            return;
-        }
-        let newFilename = unitName.replace(/ /g, "-").toLowerCase();
-        let { selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber } = getSelectedFile(uri, true);
-        const currentFilePath = join(selectedFileDir, `${currentFilename}.yml`);
-        const newFilePath = join(selectedFileDir, `${newFilename}.yml`);
-        fse.rename(currentFilePath, newFilePath);
-        const currentIncludePath = join(selectedFileDir, 'includes', `${currentFilename}.md`);
-        const newIncludePath = join(selectedFileDir, 'includes', `${newFilename}.md`);
-        fse.rename(currentIncludePath, newIncludePath);
-        const options = {
-            files: newFilePath,
-            from: currentFilename,
-            to: newFilename,
-        };
-        const results = replace.sync(options);
-        renameUnit(selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber);
-        updateIndex(selectedFileDir);
-    });
-
+export function updateUnitName(uri: Uri) {
+    try {
+        const getUserInput = window.showInputBox({
+            prompt: "Enter unit name.",
+            validateInput: (userInput) =>
+                userInput.length > 0 ? "" : "Please provide a unit name.",
+        });
+        getUserInput.then((unitName) => {
+            if (!unitName) {
+                return;
+            }
+            let newFilename = unitName.replace(/ /g, "-").toLowerCase();
+            let { selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber } = getSelectedFile(uri, true);
+            const currentFilePath = join(selectedFileDir, `${currentFilename}.yml`);
+            const newFilePath = join(selectedFileDir, `${currentUnitNumber}-${newFilename}.yml`);
+            fse.rename(currentFilePath, newFilePath);
+            const currentIncludePath = join(selectedFileDir, 'includes', `${currentFilename}.md`);
+            const newIncludePath = join(selectedFileDir, 'includes', `${currentUnitNumber}-${newFilename}.md`);
+            fse.rename(currentIncludePath, newIncludePath);
+            const options = {
+                files: newFilePath,
+                from: currentFilename,
+                to: `${currentUnitNumber}-${newFilename}`,
+            };
+            renameUnit(selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber);
+            updateIndex(selectedFileDir);
+        });
+    } catch (error) {
+        output.appendLine(error);
+    }
 }

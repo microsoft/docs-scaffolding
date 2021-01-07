@@ -5,8 +5,8 @@ import { join, resolve } from "path";
 import { generateBaseUid } from "../helper/module";
 import { readFileSync, existsSync } from "fs";
 import { extensionPath } from '../extension';
-import { cleanupTempDirectory, getSelectedFile, postError, showStatusMessage, sendTelemetryData } from '../helper/common';
-import { addNewUnit, renamePeerAndTargetUnits, removeUnit, renameUnitNoSorting } from "../helper/unit";
+import { cleanupTempDirectory, postError, showStatusMessage, sendTelemetryData } from '../helper/common';
+import { addNewUnit, renamePeerAndTargetUnits, removeUnit, updateUnitName } from "../helper/unit";
 import { localTemplateRepoPath } from './github-controller';
 
 const platformRegex = /\\/g;
@@ -141,17 +141,15 @@ export async function copyTemplates(modifiedModuleName: string, moduleName: stri
       window.showWarningMessage(error);
     }
   });
-  // await cleanupTempDirectory(localTemplateRepoPath);
   generateBaseUid(scaffoldModule, moduleName, moduleType, rawModuleTitle);
 }
 
 export function moveSelectionDown(uri: Uri) {
-  // getSelectedFile(uri, true);
   renamePeerAndTargetUnits(uri, true);
 }
 
 export function moveSelectionUp(uri: Uri) {
-  getSelectedFile(uri, false);
+  renamePeerAndTargetUnits(uri, false);
 } 
 
 export function insertNewUnit(uri: Uri) {
@@ -163,5 +161,5 @@ export function deleteUnit(uri: Uri) {
 }
 
 export function renameUnit(uri: Uri) {
-  renameUnitNoSorting(uri);
+  updateUnitName(uri);
 } 

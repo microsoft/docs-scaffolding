@@ -92,7 +92,7 @@
 					"group": "1_modification"
 				},
 				{
-					"when": "resourceLangId == yaml",
+					"when": "resourceLangId == yaml && resourceFilename != 1-introduction.yml",
 					"command": "insertNewUnit",
 					"group": "1_modification"
 				},
