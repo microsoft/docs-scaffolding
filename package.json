@@ -82,40 +82,28 @@
 					"group": "1_modification"
 				},
 				{
-					"when": "resourceLangId == yaml && resourceFilename != 1-introduction.yml",
+					"when": "resourceLangId == yaml && resourceFilename =~ /[0-9]+.*/",
 					"command": "moveSelectionDown",
 					"group": "1_modification"
 				},
 				{
-					"when": "resourceLangId == yaml && resourceFilename != 1-introduction.yml",
+					"when": "resourceLangId == yaml && resourceFilename =~ /[0-9]+.*/",
 					"command": "moveSelectionUp",
 					"group": "1_modification"
 				},
 				{
-					"when": "resourceLangId == yaml && resourceFilename != 1-introduction.yml",
+					"when": "resourceLangId == yaml && resourceFilename =~ /[0-9]+.*/",
 					"command": "insertNewUnit",
 					"group": "1_modification"
 				},
 				{
-					"when": "resourceLangId == yaml && resourceFilename != 1-introduction.yml",
+					"when": "resourceLangId == yaml && resourceFilename =~ /[0-9]+.*/",
 					"command": "deleteUnit",
 					"group": "1_modification"
 				},
 				{
-					"when": "resourceLangId == yaml && resourceFilename != 1-introduction.yml",
+					"when": "resourceLangId == yaml && resourceFilename =~ /[0-9]+.*/",
 					"command": "renameUnit",
-					"group": "1_modification"
-				}
-			],
-			"editor/context": [
-				{
-					"when": "editorTextFocus && resourceFilename == index.yml",
-					"command": "moveSelectionUp",
-					"group": "1_modification"
-				},
-				{
-					"when": "editorTextFocus && resourceFilename == index.yml",
-					"command": "moveSelectionDown",
 					"group": "1_modification"
 				}
 			]

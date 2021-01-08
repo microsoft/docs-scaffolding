@@ -144,10 +144,10 @@ export function updateUnitName(uri: Uri) {
             let { selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber } = getSelectedFile(uri, true);
             const currentFilePath = join(selectedFileDir, `${currentFilename}.yml`);
             const newFilePath = join(selectedFileDir, `${currentUnitNumber}-${newFilename}.yml`);
-            fse.rename(currentFilePath, newFilePath);
+            fs.renameSync(currentFilePath, newFilePath);
             const currentIncludePath = join(selectedFileDir, 'includes', `${currentFilename}.md`);
             const newIncludePath = join(selectedFileDir, 'includes', `${currentUnitNumber}-${newFilename}.md`);
-            fse.rename(currentIncludePath, newIncludePath);
+            fs.renameSync(currentIncludePath, newIncludePath);
             const options = {
                 files: newFilePath,
                 from: currentFilename,

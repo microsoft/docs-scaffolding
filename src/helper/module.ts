@@ -142,7 +142,7 @@ export function stubUnitReferences(modulePath: string, addPrefix?: boolean) {
       }
         
       if (!["includes", "index", "media"].includes(formattedUnitName)) {
-        unitBlock.push(`- ${unitReplacement}.${formattedUnitName}\n`);
+        unitBlock.push(` - ${unitReplacement}.${formattedUnitName}\n`);
       }
     });
     stubUnitBlock(moduleName, modulePath, unitBlock);
@@ -150,7 +150,7 @@ export function stubUnitReferences(modulePath: string, addPrefix?: boolean) {
 }
 
 export function stubUnitBlock(moduleName: string, modulePath: string, unitBlock: any) {
-  let unitList = unitBlock.join(" ");
+  let unitList = unitBlock.join("");
   let options = {
     files: `${modulePath}/index.yml`,
     from: /\s?{{units}}/g,
