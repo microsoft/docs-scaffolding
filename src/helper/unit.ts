@@ -12,13 +12,24 @@ const fs = require("fs");
 export function renamePeerAndTargetUnits(uri: Uri, moveDown: boolean) {
     let { selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber } = getSelectedFile(uri, moveDown);
     try {
-        const moduleUnits = [] = readdirSync(selectedFileDir);
+        const moduleUnits = [] = readdirSync(selectedFileDir)
+        const totalUnits = moduleUnits.filter((unit) => unit.endsWith('.yml')).length;
         const existingUnit = moduleUnits.filter((unit) => unit.startsWith(newUnitNumber));
         const existingUnitName = existingUnit.toString().split('.')[0];
+        if (newUnitNumber == 0) {
+            postError('First unit cannot be moved up.');
+            showStatusMessage('First unit cannot be moved up.');
+            return;
+        }
+        if (newUnitNumber == totalUnits) {
+            postError('Last unit cannot be moved down.');
+            showStatusMessage('Last unit cannot be moved down.');
+            return;
+        }
         renameUnit(selectedFileDir, existingUnitName, currentUnitNumber, newUnitNumber);
         renameUnit(selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber);
         updateIndex(selectedFileDir);
-        getModuleUid(selectedFileDir);  
+        getModuleUid(selectedFileDir);
     } catch (error) {
         output.appendLine(error);
     }
@@ -153,6 +164,7 @@ export function updateUnitName(uri: Uri) {
                 from: currentFilename,
                 to: `${currentUnitNumber}-${newFilename}`,
             };
+            replace.sync(options);
             renameUnit(selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber);
             updateIndex(selectedFileDir);
         });
