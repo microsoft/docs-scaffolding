@@ -116,9 +116,8 @@ export function getModuleUid(selectedFileDir: string) {
 	const yaml = require('js-yaml');
 	try {
 		let moduleIndex = join(selectedFileDir, 'index.yml');
-		let fileContents = fs.readFileSync(moduleIndex, 'utf8');
-		let data = yaml.loadAll(fileContents);
-		return data[0].uid
+		const doc = yaml.load(fs.readFileSync(moduleIndex, 'utf8'));
+		return doc.uid;
 
 	} catch (error) {
 		output.appendLine(error);

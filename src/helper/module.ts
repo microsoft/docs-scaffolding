@@ -101,12 +101,11 @@ export function stubDateReferences(modulePath: string) {
   stubUnitReferences(modulePath);
 }
 
-export function stubUnitReferences(modulePath: string, addPrefix?: boolean) {
+export function stubUnitReferences(modulePath: string, addPrefix?: boolean, moduleUid?: string) {
   const fs = require("fs");
   let unitBlock: string[] = [];
   let moduleName: string;
   let formattedUnitName: string;
-  const moduleUid = getModuleUid(modulePath);
   fs.readdir(modulePath, function (err: string, files: any[]) {
     if (err) {
       return postError("Unable to scan directory: " + err);

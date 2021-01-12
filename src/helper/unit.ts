@@ -9,8 +9,17 @@ const fse = require("fs-extra");
 const replace = require("replace-in-file");
 const fs = require("fs");
 
+let activeWorkingDirecotry: string;
+let moduleUid: string;
+
 export function renamePeerAndTargetUnits(uri: Uri, moveDown: boolean) {
     let { selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber } = getSelectedFile(uri, moveDown);
+    if (activeWorkingDirecotry === selectedFileDir) {
+        // if values match, uid does not need to be updated
+    } else {
+        activeWorkingDirecotry = selectedFileDir;
+        moduleUid = getModuleUid(selectedFileDir);
+    }
     try {
         const moduleUnits = [] = readdirSync(selectedFileDir)
         const totalUnits = moduleUnits.filter((unit) => unit.endsWith('.yml')).length;
@@ -117,11 +126,11 @@ export function updateIndex(moduleDirectory: string) {
         const moduleIndex = join(moduleDirectory, 'index.yml');
         const options = {
             files: moduleIndex,
-            from: /^(units:)([^]+?)(badge:)$/gm,
+            from: /units:([\s\S]*?)badge:/gm,
             to: 'units:\n {{units}}\nbadge:',
         };
         replace.sync(options);
-        stubUnitReferences(moduleDirectory, true);
+        stubUnitReferences(moduleDirectory, true, moduleUid);
     } catch (error) {
         output.appendLine(error);
     }
