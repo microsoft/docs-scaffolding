@@ -24,7 +24,14 @@ export function renamePeerAndTargetUnits(uri: Uri, moveDown: boolean) {
         const moduleUnits = [] = readdirSync(selectedFileDir)
         const totalUnits = moduleUnits.filter((unit) => unit.endsWith('.yml')).length;
         const existingUnit = moduleUnits.filter((unit) => unit.startsWith(newUnitNumber));
-        const existingUnitName = existingUnit.toString().split('.')[0];
+        let existingUnitName: string;
+        if (existingUnit.length = 1) {
+            existingUnitName = existingUnit.toString().split('.')[0];
+        } else {
+            postError('No unit has been selected');
+            showStatusMessage('No unit has been selected');
+            return;
+        }
         if (newUnitNumber == 0) {
             postError('First unit cannot be moved up.');
             showStatusMessage('First unit cannot be moved up.');
