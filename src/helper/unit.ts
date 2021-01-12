@@ -2,7 +2,7 @@ import { Uri, QuickPickItem, QuickPickOptions, window } from "vscode";
 import { join } from "path";
 import { readdirSync } from "fs";
 import { localTemplateRepoPath } from '../controllers/github-controller';
-import { getModuleUid, getSelectedFile, output, postError, showStatusMessage } from '../helper/common';
+import { checkForUnitNumber, getModuleUid, getSelectedFile, output, postError, showStatusMessage } from '../helper/common';
 import { stubUnitReferences } from './module';
 
 const fse = require("fs-extra");
@@ -122,6 +122,7 @@ export function copyUnitSelection(uri: Uri, unitType: string, contentTemplateDir
 }
 
 export function updateIndex(moduleDirectory: string) {
+    const preserveUnitNumber = checkForUnitNumber(moduleDirectory);
     try {
         const moduleIndex = join(moduleDirectory, 'index.yml');
         const options = {
@@ -130,7 +131,11 @@ export function updateIndex(moduleDirectory: string) {
             to: 'units:\n {{units}}\nbadge:',
         };
         replace.sync(options);
-        stubUnitReferences(moduleDirectory, true, moduleUid);
+        if (preserveUnitNumber) {
+            stubUnitReferences(moduleDirectory, true, moduleUid, true);
+        } else {
+            stubUnitReferences(moduleDirectory, true, moduleUid);
+        }
     } catch (error) {
         output.appendLine(error);
     }

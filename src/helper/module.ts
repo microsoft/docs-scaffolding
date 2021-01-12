@@ -1,6 +1,6 @@
 import { alias, gitHubID, defaultPrefix, defaultProduct } from "../helper/user-settings";
 import { basename, join } from 'path';
-import { getModuleUid, postError, postInformation, showStatusMessage } from '../helper/common';
+import { postError, postInformation, showStatusMessage } from '../helper/common';
 
 const replace = require("replace-in-file");
 let learnRepo: string = defaultPrefix;
@@ -101,7 +101,7 @@ export function stubDateReferences(modulePath: string) {
   stubUnitReferences(modulePath);
 }
 
-export function stubUnitReferences(modulePath: string, addPrefix?: boolean, moduleUid?: string) {
+export function stubUnitReferences(modulePath: string, addPrefix?: boolean, moduleUid?: string, preserveUnitNumbers?: boolean) {
   const fs = require("fs");
   let unitBlock: string[] = [];
   let moduleName: string;
@@ -123,8 +123,12 @@ export function stubUnitReferences(modulePath: string, addPrefix?: boolean, modu
       replace.sync(options);
 
       // remove numbers from uid
-      const regex = /^([0-9]*)-/gm;
-      formattedUnitName = unitName.replace(regex, '');
+      if (preserveUnitNumbers) {
+        formattedUnitName = unitName;
+      } else {
+        const regex = /^([0-9]*)-/gm;
+        formattedUnitName = unitName.replace(regex, '');
+      }
       options = {
         files: `${modulePath}/${unitName}.yml`,
         from: /{{unitName}}/g,

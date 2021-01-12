@@ -123,3 +123,20 @@ export function getModuleUid(selectedFileDir: string) {
 		output.appendLine(error);
 	}
 }
+
+export function checkForUnitNumber(selectedFileDir: string) {
+	const yaml = require('js-yaml');
+	try {
+		let moduleIndex = join(selectedFileDir, 'index.yml');
+		const doc = yaml.load(fs.readFileSync(moduleIndex, 'utf8'));
+		const regex = /\.[0-9]*-.*/gm;
+		if (doc.units) {
+			const introductionUnit = doc.units[0];
+			if (introductionUnit.match(regex)) {
+				return true;
+			}
+		}
+	} catch (error) {
+		output.appendLine(error);
+	}
+}
