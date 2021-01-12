@@ -1,7 +1,7 @@
 import { Uri, QuickPickItem, QuickPickOptions, window } from "vscode";
 import { join } from "path";
 import { readdirSync } from "fs";
-import { localTemplateRepoPath } from '../controllers/github-controller';
+import { localTemplateRepoPath } from '../controllers/template-controller';
 import { checkForUnitNumber, getModuleUid, getSelectedFile, output, postError, showStatusMessage } from '../helper/common';
 import { stubUnitReferences } from './module';
 

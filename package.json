@@ -82,27 +82,27 @@
 					"group": "1_modification"
 				},
 				{
-					"when": "resourceLangId == yaml && resourceFilename =~ /[0-9]+.*/",
+					"when": "resourceLangId == yaml && resourceFilename =~ /[0-9]+.*?-/",
 					"command": "moveSelectionDown",
 					"group": "1_modification"
 				},
 				{
-					"when": "resourceLangId == yaml && resourceFilename =~ /[0-9]+.*/",
+					"when": "resourceLangId == yaml && resourceFilename =~ /[0-9]+.*?-/",
 					"command": "moveSelectionUp",
 					"group": "1_modification"
 				},
 				{
-					"when": "resourceLangId == yaml && resourceFilename =~ /[0-9]+.*/",
+					"when": "resourceLangId == yaml && resourceFilename =~ /[0-9]+.*?-/",
 					"command": "insertNewUnit",
 					"group": "1_modification"
 				},
 				{
-					"when": "resourceLangId == yaml && resourceFilename =~ /[0-9]+.*/",
+					"when": "resourceLangId == yaml && resourceFilename =~ /[0-9]+.*?-/",
 					"command": "deleteUnit",
 					"group": "1_modification"
 				},
 				{
-					"when": "resourceLangId == yaml && resourceFilename =~ /[0-9]+.*/",
+					"when": "resourceLangId == yaml && resourceFilename =~ /[0-9]+.*?-/",
 					"command": "renameUnit",
 					"group": "1_modification"
 				}

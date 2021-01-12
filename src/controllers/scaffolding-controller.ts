@@ -7,7 +7,7 @@ import { readFileSync, existsSync } from "fs";
 import { extensionPath } from '../extension';
 import { cleanupTempDirectory, postError, showStatusMessage, sendTelemetryData } from '../helper/common';
 import { addNewUnit, renamePeerAndTargetUnits, removeUnit, updateUnitName } from "../helper/unit";
-import { localTemplateRepoPath } from './github-controller';
+import { localTemplateRepoPath } from './template-controller';
 
 const platformRegex = /\\/g;
 const telemetryCommand: string = 'create-module';
