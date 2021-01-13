@@ -8,6 +8,7 @@ import { join, parse } from "path";
 export const output = window.createOutputChannel('docs-scaffolding');
 const fileNumberRegex = /(.*?)-.*/;
 const fs = require("fs");
+const yaml = require('js-yaml');
 
 /**
  * Create a posted warning message and applies the message to the log
@@ -113,7 +114,6 @@ export function getSelectedFile(uri: Uri, moveDown?: boolean) {
 }
 
 export function getModuleUid(selectedFileDir: string) {
-	const yaml = require('js-yaml');
 	try {
 		let moduleIndex = join(selectedFileDir, 'index.yml');
 		const doc = yaml.load(fs.readFileSync(moduleIndex, 'utf8'));
@@ -125,7 +125,6 @@ export function getModuleUid(selectedFileDir: string) {
 }
 
 export function checkForUnitNumber(selectedFileDir: string) {
-	const yaml = require('js-yaml');
 	try {
 		let moduleIndex = join(selectedFileDir, 'index.yml');
 		const doc = yaml.load(fs.readFileSync(moduleIndex, 'utf8'));

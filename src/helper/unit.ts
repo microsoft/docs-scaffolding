@@ -130,6 +130,7 @@ export function copyUnitSelection(uri: Uri, unitType: string, contentTemplateDir
 
 export function updateIndex(moduleDirectory: string) {
     const preserveUnitNumber = checkForUnitNumber(moduleDirectory);
+    moduleUid = getModuleUid(moduleDirectory);
     try {
         const moduleIndex = join(moduleDirectory, 'index.yml');
         const options = {
@@ -182,8 +183,8 @@ export function updateUnitName(uri: Uri) {
             fs.renameSync(currentIncludePath, newIncludePath);
             const options = {
                 files: newFilePath,
-                from: currentFilename,
-                to: `${currentUnitNumber}-${newFilename}`,
+                from: /includes\/.*\.md/,
+                to: `includes\\${currentUnitNumber}-${newFilename}.md`,
             };
             replace.sync(options);
             renameUnit(selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber);
