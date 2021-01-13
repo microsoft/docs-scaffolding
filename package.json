@@ -20,27 +20,27 @@
 		"commands": [
 			{
 				"command": "scaffoldModule",
-				"title": "Learn scaffolding: Create new module"
+				"title": "Learn: Create new module"
 			},
 			{
 				"command": "moveSelectionUp",
-				"title": "Learn scaffolding: Move selection up"
+				"title": "Learn: Move unit up"
 			},
 			{
 				"command": "moveSelectionDown",
-				"title": "Learn scaffolding: Move selection down"
+				"title": "Learn: Move unit down"
 			},
 			{
 				"command": "insertNewUnit",
-				"title": "Learn scaffolding: Insert a new unit"
+				"title": "Learn: Insert unit"
 			},
 			{
 				"command": "deleteUnit",
-				"title": "Learn scaffolding: Delete selected unit"
+				"title": "Learn: Delete unit"
 			},
 			{
 				"command": "renameUnit",
-				"title": "Learn scaffolding: Rename selected unit"
+				"title": "Learn: Rename unit"
 			}
 		],
 		"configuration": {
@@ -84,27 +84,27 @@
 				{
 					"when": "resourceLangId == yaml && resourceFilename =~ /[0-9]+.*?-/",
 					"command": "moveSelectionDown",
-					"group": "1_modification"
+					"group": "1_modification@5"
 				},
 				{
 					"when": "resourceLangId == yaml && resourceFilename =~ /[0-9]+.*?-/",
 					"command": "moveSelectionUp",
-					"group": "1_modification"
+					"group": "1_modification@4"
 				},
 				{
 					"when": "resourceLangId == yaml && resourceFilename =~ /[0-9]+.*?-/",
 					"command": "insertNewUnit",
-					"group": "1_modification"
+					"group": "1_modification@1"
 				},
 				{
 					"when": "resourceLangId == yaml && resourceFilename =~ /[0-9]+.*?-/",
 					"command": "deleteUnit",
-					"group": "1_modification"
+					"group": "1_modification@3"
 				},
 				{
 					"when": "resourceLangId == yaml && resourceFilename =~ /[0-9]+.*?-/",
 					"command": "renameUnit",
-					"group": "1_modification"
+					"group": "1_modification@2"
 				}
 			]
 		}
