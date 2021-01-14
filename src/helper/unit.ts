@@ -45,8 +45,8 @@ export function renamePeerAndTargetUnits(uri: Uri, moveDown: boolean) {
         }
         renameUnit(selectedFileDir, existingUnitName, currentUnitNumber, newUnitNumber)
             .then(() => renameUnit(selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber))
-            .then(() => updateIncludes(selectedFileDir))
-            .then(() => updateIndex(selectedFileDir));
+            .then(() => updateIndex(selectedFileDir))
+            .then(() => updateIncludes(selectedFileDir));
     } catch (error) {
         output.appendLine(error);
     }
@@ -61,7 +61,6 @@ export async function renameUnit(selectedFileDir: any, currentFilename: string, 
         const currentIncludePath = join(selectedFileDir, 'includes', `${currentFilename}.md`);
         const newIncludePath = join(selectedFileDir, 'includes', `${newFilename}.md`);
         fse.rename(currentIncludePath, newIncludePath);
-        updateIncludes(selectedFileDir);
     } catch (error) {
         output.appendLine(error);
     }
@@ -142,9 +141,9 @@ export function copyUnitSelection(uri: Uri, unitType: string, contentTemplateDir
                 to: `uid: ${moduleUid}.${currentUnitNumber}-${formattedUnitName}`,
             };
             replace.sync(options);
-            renameUnit(selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber);
-            updateIncludes(selectedFileDir)
-                .then(() => updateIndex(selectedFileDir));
+            renameUnit(selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber)
+                .then(() => updateIndex(selectedFileDir))
+                .then(() => updateIncludes(selectedFileDir));
         });
     } catch (error) {
         output.appendLine(error);
@@ -192,7 +191,7 @@ export function removeUnit(uri: Uri) {
     }
 }
 
-export function updateUnitName(uri: Uri) {
+export async function updateUnitName(uri: Uri) {
     try {
         const getUserInput = window.showInputBox({
             prompt: "Enter unit name.",
@@ -211,8 +210,9 @@ export function updateUnitName(uri: Uri) {
             const currentIncludePath = join(selectedFileDir, 'includes', `${currentFilename}.md`);
             const newIncludePath = join(selectedFileDir, 'includes', `${currentUnitNumber}-${newFilename}.md`);
             fs.renameSync(currentIncludePath, newIncludePath);
-            renameUnit(selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber);
-            updateIndex(selectedFileDir);
+            renameUnit(selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber)
+                .then(() => updateIndex(selectedFileDir))
+                .then(() => updateIncludes(selectedFileDir));
         });
     } catch (error) {
         output.appendLine(error);
