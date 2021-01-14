@@ -8,6 +8,7 @@ const fse = require("fs-extra");
 const replace = require("replace-in-file");
 const fs = require("fs");
 const includeRegex = /includes\/.*\.md/;
+const uidRegex = /^uid.*/gm;
 
 let activeWorkingDirecotry: string;
 let moduleUid: string;
@@ -135,7 +136,6 @@ export function copyUnitSelection(uri: Uri, unitType: string, contentTemplateDir
             }
             const moduleUid = getModuleUid(selectedFileDir);
             const newFilePath = join(selectedFileDir, `${currentUnitNumber}-${formattedUnitName}.yml`);
-            const uidRegex = /^uid.*/gm;
             const options = {
                 files: newFilePath,
                 from: uidRegex,
