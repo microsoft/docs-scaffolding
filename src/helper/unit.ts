@@ -1,5 +1,5 @@
 import { Uri, QuickPickItem, QuickPickOptions, window } from "vscode";
-import { join } from "path";
+import { basename, join } from "path";
 import { readdirSync } from "fs";
 import { localTemplateRepoPath } from '../controllers/template-controller';
 import { getModuleUid, getSelectedFile, output, postError, showStatusMessage } from '../helper/common';
@@ -41,16 +41,16 @@ export function renamePeerAndTargetUnits(uri: Uri, moveDown: boolean) {
             showStatusMessage('Last unit cannot be moved down.');
             return;
         }
-        renameUnit(selectedFileDir, existingUnitName, currentUnitNumber, newUnitNumber);
-        renameUnit(selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber);
-        updateIndex(selectedFileDir);
+        renameUnit(selectedFileDir, existingUnitName, currentUnitNumber, newUnitNumber)
+        .then(() => renameUnit(selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber))
+        .then(() => updateIncludes(selectedFileDir))
+        .then(() => updateIndex(selectedFileDir));
     } catch (error) {
         output.appendLine(error);
     }
 }
 
-export function renameUnit(selectedFileDir: any, currentFilename: string, newUnitNumber: any, currentUnitNumber: any) {
-    const includeRegex = /includes\/.*\.md/
+export async function renameUnit(selectedFileDir: any, currentFilename: string, newUnitNumber: any, currentUnitNumber: any) {
     try {
         const newFilename = currentFilename.replace(currentUnitNumber, newUnitNumber);
         const currentFilePath = join(selectedFileDir, `${currentFilename}.yml`);
@@ -59,15 +59,28 @@ export function renameUnit(selectedFileDir: any, currentFilename: string, newUni
         const currentIncludePath = join(selectedFileDir, 'includes', `${currentFilename}.md`);
         const newIncludePath = join(selectedFileDir, 'includes', `${newFilename}.md`);
         fse.rename(currentIncludePath, newIncludePath);
-        const options = {
-            files: newFilePath,
-            from: includeRegex,
-            to: `includes/${newFilename}.md`,
-        };
-        replace.sync(options);
     } catch (error) {
         output.appendLine(error);
     }
+}
+
+export async function updateIncludes(selectedFileDir: string, ) {
+    const includeRegex = /includes\/.*\.md/
+    fs.readdir(selectedFileDir, function (err: string, files: any[]) {
+        if (err) {
+            return postError("Unable to scan directory: " + err);
+        }
+        files.forEach(function (file) {
+            const filePath = join(selectedFileDir, file);
+            const fileName = basename(filePath, '.yml');
+            const options = {
+                files: filePath,
+                from: includeRegex,
+                to: `includes/${fileName}.md`,
+            };
+            replace.sync(options);
+        });
+    });
 }
 
 export function addNewUnit(uri: Uri) {
@@ -136,7 +149,7 @@ export function copyUnitSelection(uri: Uri, unitType: string, contentTemplateDir
     }
 }
 
-export function updateIndex(moduleDirectory: string) {
+export async function updateIndex(moduleDirectory: string) {
     try {
         const yaml = require('js-yaml');
         moduleUid = getModuleUid(moduleDirectory);
@@ -196,12 +209,6 @@ export function updateUnitName(uri: Uri) {
             const currentIncludePath = join(selectedFileDir, 'includes', `${currentFilename}.md`);
             const newIncludePath = join(selectedFileDir, 'includes', `${currentUnitNumber}-${newFilename}.md`);
             fs.renameSync(currentIncludePath, newIncludePath);
-            const options = {
-                files: newFilePath,
-                from: /includes\/.*\.md/,
-                to: `includes\\${currentUnitNumber}-${newFilename}.md`,
-            };
-            replace.sync(options);
             renameUnit(selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber);
             updateIndex(selectedFileDir);
         });
