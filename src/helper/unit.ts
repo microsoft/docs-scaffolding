@@ -7,6 +7,7 @@ import { getModuleUid, getSelectedFile, output, postError, showStatusMessage } f
 const fse = require("fs-extra");
 const replace = require("replace-in-file");
 const fs = require("fs");
+const includeRegex = /includes\/.*\.md/;
 
 let activeWorkingDirecotry: string;
 let moduleUid: string;
@@ -42,9 +43,9 @@ export function renamePeerAndTargetUnits(uri: Uri, moveDown: boolean) {
             return;
         }
         renameUnit(selectedFileDir, existingUnitName, currentUnitNumber, newUnitNumber)
-        .then(() => renameUnit(selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber))
-        .then(() => updateIncludes(selectedFileDir))
-        .then(() => updateIndex(selectedFileDir));
+            .then(() => renameUnit(selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber))
+            .then(() => updateIncludes(selectedFileDir))
+            .then(() => updateIndex(selectedFileDir));
     } catch (error) {
         output.appendLine(error);
     }
@@ -59,13 +60,13 @@ export async function renameUnit(selectedFileDir: any, currentFilename: string, 
         const currentIncludePath = join(selectedFileDir, 'includes', `${currentFilename}.md`);
         const newIncludePath = join(selectedFileDir, 'includes', `${newFilename}.md`);
         fse.rename(currentIncludePath, newIncludePath);
+        updateIncludes(selectedFileDir);
     } catch (error) {
         output.appendLine(error);
     }
 }
 
-export async function updateIncludes(selectedFileDir: string, ) {
-    const includeRegex = /includes\/.*\.md/
+export async function updateIncludes(selectedFileDir: string,) {
     fs.readdir(selectedFileDir, function (err: string, files: any[]) {
         if (err) {
             return postError("Unable to scan directory: " + err);
@@ -142,7 +143,8 @@ export function copyUnitSelection(uri: Uri, unitType: string, contentTemplateDir
             };
             replace.sync(options);
             renameUnit(selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber);
-            updateIndex(selectedFileDir);
+            updateIncludes(selectedFileDir)
+                .then(() => updateIndex(selectedFileDir));
         });
     } catch (error) {
         output.appendLine(error);
