@@ -1,6 +1,6 @@
 import { alias, gitHubID, defaultPrefix, defaultProduct } from "../helper/user-settings";
 import { basename, join } from 'path';
-import { postError, postInformation, showStatusMessage } from '../helper/common';
+import { getModuleUid, postError, postInformation, showStatusMessage } from '../helper/common';
 
 const replace = require("replace-in-file");
 let learnRepo: string = defaultPrefix;
@@ -101,7 +101,7 @@ export function stubDateReferences(modulePath: string) {
   stubUnitReferences(modulePath);
 }
 
-export function stubUnitReferences(modulePath: string, addPrefix?: boolean, moduleUid?: string, preserveUnitNumbers?: boolean) {
+export function stubUnitReferences(modulePath: string) {
   const fs = require("fs");
   let unitBlock: string[] = [];
   let moduleName: string;
@@ -123,29 +123,17 @@ export function stubUnitReferences(modulePath: string, addPrefix?: boolean, modu
       replace.sync(options);
 
       // remove numbers from uid
-      if (preserveUnitNumbers) {
-        formattedUnitName = unitName;
-      } else {
-        const regex = /^([0-9]*)-/gm;
-        formattedUnitName = unitName.replace(regex, '');
-      }
+      const regex = /^([0-9]*)-/gm;
+      formattedUnitName = unitName.replace(regex, '');
       options = {
         files: `${modulePath}/${unitName}.yml`,
         from: /{{unitName}}/g,
         to: formattedUnitName,
       };
       replace.sync(options);
-
-      moduleName = basename(modulePath);
-      let unitReplacement: string;
-      if (addPrefix) {
-        unitReplacement = `${moduleUid}`;
-      } else {
-        unitReplacement = formattedUnitName;
-      }
-        
+      const uid = getModuleUid(modulePath);
       if (!["includes", "index", "media"].includes(formattedUnitName)) {
-        unitBlock.push(` - ${unitReplacement}.${formattedUnitName}\n`);
+        unitBlock.push(`  - ${uid}.${formattedUnitName}\n`);
       }
     });
     stubUnitBlock(moduleName, modulePath, unitBlock);
@@ -186,7 +174,7 @@ export function moduleCleanup(moduleName: string, modulePath: string) {
     to: ` `,
   };
   replace.sync(options);
-  
+
   // remove any blank lines created during scaffolding
   options = {
     files: `${modulePath}/index.yml`,

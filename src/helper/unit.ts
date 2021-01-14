@@ -2,8 +2,7 @@ import { Uri, QuickPickItem, QuickPickOptions, window } from "vscode";
 import { join } from "path";
 import { readdirSync } from "fs";
 import { localTemplateRepoPath } from '../controllers/template-controller';
-import { checkForUnitNumber, getModuleUid, getSelectedFile, output, postError, showStatusMessage } from '../helper/common';
-import { stubUnitReferences } from './module';
+import { getModuleUid, getSelectedFile, output, postError, showStatusMessage } from '../helper/common';
 
 const fse = require("fs-extra");
 const replace = require("replace-in-file");
@@ -45,13 +44,13 @@ export function renamePeerAndTargetUnits(uri: Uri, moveDown: boolean) {
         renameUnit(selectedFileDir, existingUnitName, currentUnitNumber, newUnitNumber);
         renameUnit(selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber);
         updateIndex(selectedFileDir);
-        getModuleUid(selectedFileDir);
     } catch (error) {
         output.appendLine(error);
     }
 }
 
 export function renameUnit(selectedFileDir: any, currentFilename: string, newUnitNumber: any, currentUnitNumber: any) {
+    const includeRegex = /includes\/.*\.md/
     try {
         const newFilename = currentFilename.replace(currentUnitNumber, newUnitNumber);
         const currentFilePath = join(selectedFileDir, `${currentFilename}.yml`);
@@ -62,8 +61,8 @@ export function renameUnit(selectedFileDir: any, currentFilename: string, newUni
         fse.rename(currentIncludePath, newIncludePath);
         const options = {
             files: newFilePath,
-            from: currentFilename,
-            to: newFilename,
+            from: includeRegex,
+            to: `includes/${newFilename}.md`,
         };
         replace.sync(options);
     } catch (error) {
@@ -120,6 +119,15 @@ export function copyUnitSelection(uri: Uri, unitType: string, contentTemplateDir
             if (unitType == 'default-unit') {
                 fse.copySync(join(contentTemplateDirectory, `default-exercise-unit.md`), join(selectedFileDir, 'includes', `${currentUnitNumber}-${formattedUnitName}.md`));
             }
+            const moduleUid = getModuleUid(selectedFileDir);
+            const newFilePath = join(selectedFileDir, `${currentUnitNumber}-${formattedUnitName}.yml`);
+            const uidRegex = /^uid.*/gm;
+            const options = {
+                files: newFilePath,
+                from: uidRegex,
+                to: `uid: ${moduleUid}.${currentUnitNumber}-${formattedUnitName}`,
+            };
+            replace.sync(options);
             renameUnit(selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber);
             updateIndex(selectedFileDir);
         });
@@ -129,21 +137,28 @@ export function copyUnitSelection(uri: Uri, unitType: string, contentTemplateDir
 }
 
 export function updateIndex(moduleDirectory: string) {
-    const preserveUnitNumber = checkForUnitNumber(moduleDirectory);
-    moduleUid = getModuleUid(moduleDirectory);
     try {
-        const moduleIndex = join(moduleDirectory, 'index.yml');
-        const options = {
-            files: moduleIndex,
-            from: /units:([\s\S]*?)badge:/gm,
-            to: 'units:\n {{units}}\nbadge:',
-        };
-        replace.sync(options);
-        if (preserveUnitNumber) {
-            stubUnitReferences(moduleDirectory, true, moduleUid, true);
-        } else {
-            stubUnitReferences(moduleDirectory, true, moduleUid);
-        }
+        const yaml = require('js-yaml');
+        moduleUid = getModuleUid(moduleDirectory);
+        let unitBlock: any = [];
+        fs.readdir(moduleDirectory, function (err: string, files: any[]) {
+            if (err) {
+                return postError("Unable to scan directory: " + err);
+            }
+            files.forEach(function (file) {
+                if (file.endsWith('.yml') && file != 'index.yml') {
+                    let doc = yaml.load(fs.readFileSync(join(moduleDirectory, file), 'utf8'));
+                    unitBlock.push(`- ${doc.uid}`);
+                }
+            });
+            const moduleIndex = join(moduleDirectory, 'index.yml');
+            let options = {
+                files: moduleIndex,
+                from: /units:([\s\S]*?)badge:/gm,
+                to: `units:\n${unitBlock.join("\n")}\nbadge:`,
+            };
+            replace.sync(options);
+        });
     } catch (error) {
         output.appendLine(error);
     }
