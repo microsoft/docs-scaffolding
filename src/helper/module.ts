@@ -1,6 +1,6 @@
 import { alias, gitHubID, defaultPrefix, defaultProduct } from "../helper/user-settings";
 import { basename, join } from 'path';
-import { postError, postInformation, showStatusMessage } from '../helper/common';
+import { getModuleUid, postError, postInformation, showStatusMessage } from '../helper/common';
 
 const replace = require("replace-in-file");
 let learnRepo: string = defaultPrefix;
@@ -131,10 +131,9 @@ export function stubUnitReferences(modulePath: string) {
         to: formattedUnitName,
       };
       replace.sync(options);
-
-      moduleName = basename(modulePath);
+      const uid = getModuleUid(modulePath);
       if (!["includes", "index", "media"].includes(formattedUnitName)) {
-        unitBlock.push(`  - ${moduleName}.${formattedUnitName}\n`);
+        unitBlock.push(`  - ${uid}.${formattedUnitName}\n`);
       }
     });
     stubUnitBlock(moduleName, modulePath, unitBlock);
@@ -142,7 +141,7 @@ export function stubUnitReferences(modulePath: string) {
 }
 
 export function stubUnitBlock(moduleName: string, modulePath: string, unitBlock: any) {
-  let unitList = unitBlock.join(" ");
+  let unitList = unitBlock.join("");
   let options = {
     files: `${modulePath}/index.yml`,
     from: /\s?{{units}}/g,
@@ -175,7 +174,7 @@ export function moduleCleanup(moduleName: string, modulePath: string) {
     to: ` `,
   };
   replace.sync(options);
-  
+
   // remove any blank lines created during scaffolding
   options = {
     files: `${modulePath}/index.yml`,
@@ -183,5 +182,5 @@ export function moduleCleanup(moduleName: string, modulePath: string) {
     to: ` `,
   };
   replace.sync(options);
-  postInformation(`Successfully created : ${moduleName}`);
+  postInformation(`Operation successful: ${moduleName}`);
 }

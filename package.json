@@ -20,7 +20,27 @@
 		"commands": [
 			{
 				"command": "scaffoldModule",
-				"title": "Learn scaffolding: Create new module"
+				"title": "Learn: Create new module"
+			},
+			{
+				"command": "moveSelectionUp",
+				"title": "Learn: Move unit up"
+			},
+			{
+				"command": "moveSelectionDown",
+				"title": "Learn: Move unit down"
+			},
+			{
+				"command": "insertNewUnit",
+				"title": "Learn: Insert unit"
+			},
+			{
+				"command": "deleteUnit",
+				"title": "Learn: Delete unit"
+			},
+			{
+				"command": "renameUnit",
+				"title": "Learn: Rename unit"
 			}
 		],
 		"configuration": {
@@ -57,8 +77,34 @@
 		"menus": {
 			"explorer/context": [
 				{
+					"when": "explorerResourceIsFolder",
 					"command": "scaffoldModule",
 					"group": "1_modification"
+				},
+				{
+					"when": "resourceLangId == yaml && resourceFilename =~ /[0-9]+.*?-/",
+					"command": "moveSelectionDown",
+					"group": "1_modification@5"
+				},
+				{
+					"when": "resourceLangId == yaml && resourceFilename =~ /[0-9]+.*?-/",
+					"command": "moveSelectionUp",
+					"group": "1_modification@4"
+				},
+				{
+					"when": "resourceLangId == yaml && resourceFilename =~ /[0-9]+.*?-/",
+					"command": "insertNewUnit",
+					"group": "1_modification@1"
+				},
+				{
+					"when": "resourceLangId == yaml && resourceFilename =~ /[0-9]+.*?-/",
+					"command": "deleteUnit",
+					"group": "1_modification@3"
+				},
+				{
+					"when": "resourceLangId == yaml && resourceFilename =~ /[0-9]+.*?-/",
+					"command": "renameUnit",
+					"group": "1_modification@2"
 				}
 			]
 		}
@@ -97,6 +143,7 @@
 		"download-git-repo": "^1.0.2",
 		"extract-zip": "^2.0.1",
 		"fs-extra": "^9.0.1",
+		"js-yaml": "^4.0.0",
 		"open": "^7.3.0",
 		"replace-in-file": "^6.1.0",
 		"sinon": "^9.0.1",

@@ -6,54 +6,30 @@ import { generateBaseUid } from "../helper/module";
 import { readFileSync, existsSync } from "fs";
 import { extensionPath } from '../extension';
 import { cleanupTempDirectory, postError, showStatusMessage, sendTelemetryData } from '../helper/common';
-import { templateRepo } from '../helper/user-settings';
-
-export let localTemplateRepoPath: string;
+import { addNewUnit, renamePeerAndTargetUnits, removeUnit, updateUnitName } from "../helper/unit";
+import { localTemplateRepoPath } from './template-controller';
 
 const platformRegex = /\\/g;
 const telemetryCommand: string = 'create-module';
 const fse = require("fs-extra");
 const fs = require("fs");
 
-let templateZip: string;
 let rawModuleTitle: string;
 let typeDefinitionJsonDirectory: string;
 
 export function scaffoldingCommand() {
-  const commands = [{ command: scaffoldModule.name, callback: scaffoldModule }];
+  const commands = [{ command: scaffoldModule.name, callback: scaffoldModule },
+  { command: moveSelectionDown.name, callback: moveSelectionDown },
+  { command: moveSelectionUp.name, callback: moveSelectionUp },
+  { command: insertNewUnit.name, callback: insertNewUnit },
+  { command: deleteUnit.name, callback: deleteUnit },
+  { command: renameUnit.name, callback: renameUnit }];
   return commands;
 }
 
-/* temp solution until template repo is made public. 
-check for repo zip file and download if it doesn't exist. */
 export async function scaffoldModule(uri: Uri) {
-  const download = require('download');
-  const tmp = require('tmp');
-  localTemplateRepoPath = tmp.dirSync({unsafeCleanup: true}).name;
-  showStatusMessage(`Temp working directory ${localTemplateRepoPath} has been created.`);
-  try {
-    await download(templateRepo, localTemplateRepoPath);
-    templateZip = join(localTemplateRepoPath, 'learn-scaffolding-main.zip');
-  } catch (error) {
-    templateZip = join(extensionPath, 'offline-template-zip', 'learn-scaffolding-main.zip');
-    postError(error);
-    showStatusMessage(`Error downloading templates from ${templateRepo}. Loading local templates.`);
-  }
-    typeDefinitionJsonDirectory = join(localTemplateRepoPath, "learn-scaffolding-main", "module-type-definitions");
-    unzipTemplates(uri);
-}
-
-/* temp code until template repo is public 
-unzip template package*/
-async function unzipTemplates(uri: Uri) {
-  const extract = require('extract-zip');
-  try {
-    await extract(templateZip, { dir: localTemplateRepoPath });
-    moduleSelectionQuickPick(uri);
-  } catch (error) {
-    postError(error);
-    showStatusMessage(error);
-  }
+  typeDefinitionJsonDirectory = join(localTemplateRepoPath, "learn-scaffolding-main", "module-type-definitions");
+  moduleSelectionQuickPick(uri);
 }
 
 /* loop through module type definitions directory and store each module type */
@@ -118,8 +94,8 @@ export function getSelectedFolder(uri: Uri, moduleType: string) {
 }
 
 function formatModuleName(moduleName: any, filteredTerm: any, replacementTerm: any) {
-  let re = new RegExp("\\b(" + filteredTerm + ")\\b","g");
-  return moduleName.replace(re,replacementTerm).replace(/ /g, "-").replace(/--/g, "-").toLowerCase();
+  let re = new RegExp("\\b(" + filteredTerm + ")\\b", "g");
+  return moduleName.replace(re, replacementTerm).replace(/ /g, "-").replace(/--/g, "-").toLowerCase();
 }
 
 export async function copyTemplates(modifiedModuleName: string, moduleName: string, moduleType: string, selectedFolder: string) {
@@ -165,7 +141,25 @@ export async function copyTemplates(modifiedModuleName: string, moduleName: stri
       window.showWarningMessage(error);
     }
   });
-  await cleanupTempDirectory(localTemplateRepoPath);
   generateBaseUid(scaffoldModule, moduleName, moduleType, rawModuleTitle);
 }
 
+export function moveSelectionDown(uri: Uri) {
+  renamePeerAndTargetUnits(uri, true);
+}
+
+export function moveSelectionUp(uri: Uri) {
+  renamePeerAndTargetUnits(uri, false);
+} 
+
+export function insertNewUnit(uri: Uri) {
+  addNewUnit(uri);
+} 
+
+export function deleteUnit(uri: Uri) {
+  removeUnit(uri);
+}
+
+export function renameUnit(uri: Uri) {
+  updateUnitName(uri);
+} 
