@@ -12,7 +12,6 @@ const includeRegex = /includes\/.*\.md/;
 const uidRegex = /^uid.*/gm;
 
 let activeWorkingDirecotry: string;
-let moduleUid: string;
 let author: string = gitHubID;
 let msAuthor: string = alias;
 
@@ -22,7 +21,6 @@ export function renamePeerAndTargetUnits(uri: Uri, moveDown: boolean) {
         // if values match, uid does not need to be updated
     } else {
         activeWorkingDirecotry = selectedFileDir;
-        moduleUid = getModuleUid(selectedFileDir);
     }
     try {
         const moduleUnits = [] = readdirSync(selectedFileDir)
@@ -156,14 +154,16 @@ export function copyUnitSelection(uri: Uri, unitType: string, contentTemplateDir
             replace.sync(options);
             let date: any = new Date(Date.now());
             date = date.toLocaleDateString();
+
             renameUnit(selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber)
+                .then(() => bulkUpdateFileNamePrefix(selectedFileDir, newUnitNumber, true))
                 .then(() => updateIndex(selectedFileDir))
-                .then(() => updateIncludes(selectedFileDir))
                 .then(() => replaceStubTokens(newFilePath, '{{unitName}}', unitName))
                 .then(() => replaceStubTokens(newFilePath, '{{msDate}}', date))
                 .then(() => replaceStubTokens(newFilePath, '{{githubUsername}}', author))
                 .then(() => replaceStubTokens(newFilePath, '{{msUser}}', msAuthor))
-                .then(() => removeStubComments(newFilePath));
+                .then(() => removeStubComments(newFilePath))
+                .then(() => updateIncludes(selectedFileDir));
         });
     } catch (error) {
         output.appendLine(error);
@@ -173,7 +173,6 @@ export function copyUnitSelection(uri: Uri, unitType: string, contentTemplateDir
 export async function updateIndex(moduleDirectory: string) {
     try {
         const yaml = require('js-yaml');
-        moduleUid = getModuleUid(moduleDirectory);
         let unitBlock: any = [];
         fs.readdir(moduleDirectory, function (err: string, files: any[]) {
             if (err) {
@@ -202,12 +201,13 @@ export async function updateIndex(moduleDirectory: string) {
 
 export function removeUnit(uri: Uri) {
     try {
-        let { selectedFileDir, currentFilename } = getSelectedFile(uri, true);
+        let { selectedFileDir, currentFilename, currentUnitNumber } = getSelectedFile(uri, true);
         const selectedFile = join(selectedFileDir, `${currentFilename}.yml`);
         const includeMarkdown = join(selectedFileDir, 'includes', `${currentFilename}.md`);
         fs.unlinkSync(selectedFile);
         fs.unlinkSync(includeMarkdown);
         updateIndex(selectedFileDir);
+        bulkUpdateFileNamePrefix(selectedFileDir, currentUnitNumber, false);
     } catch (error) {
         output.appendLine(error);
     }
@@ -256,10 +256,44 @@ export function replaceStubTokens(sourceFile: string, sourceString: string, repl
 }
 
 export function removeStubComments(sourceFile: string) {
-  const options = {
-    files: sourceFile,
-    from: /#\s?stub.*/g,
-    to: '',
-  };
-  replace.sync(options);
+    const options = {
+        files: sourceFile,
+        from: /#\s?stub.*/g,
+        to: '',
+    };
+    replace.sync(options);
+}
+
+export function bulkUpdateFileNamePrefix(selectedFileDir: string, startingPrefix: number, incrementPrefix: boolean) {
+    const regex = new RegExp("(?:[" + startingPrefix + "-9]|\d\d\d*)", "gm");
+    const fileNumberRegex = /(.*?)-.*/;
+    try {
+        fs.readdir(selectedFileDir, function (err: string, files: any[]) {
+            if (err) {
+                return postError("Unable to scan directory: " + err);
+            }
+            files.forEach(function (file) {
+                if (file.match(regex)) {
+                    let currentPrefix = file.match(fileNumberRegex);
+                    currentPrefix = parseInt(currentPrefix);
+                    let newPrefix: number;
+                    if (incrementPrefix) {
+                        newPrefix = currentPrefix + 1;
+                    } else {
+                        newPrefix = currentPrefix - 1;
+                    }
+                    let fileName = file.replace(/^[0-9]-/, '').replace('.yml', '');
+                    const currentFilePath = join(selectedFileDir, `${file}`);
+                    const newFilePath = join(selectedFileDir, `${newPrefix}-${fileName}.yml`);
+                    fs.renameSync(currentFilePath, newFilePath);
+                    const currentIncludePath = join(selectedFileDir, 'includes', file.replace('.yml', '.md'));
+                    const newIncludePath = join(selectedFileDir, 'includes', `${newPrefix}-${fileName}.md`);
+                    fs.renameSync(currentIncludePath, newIncludePath);
+                    updateIncludes(selectedFileDir);
+                }
+            });
+        });
+    } catch (error) {
+        showStatusMessage(error);
+    }
 }
