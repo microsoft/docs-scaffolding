@@ -69,11 +69,8 @@ export async function renameUnit(selectedFileDir: any, currentFilename: string, 
 
 export async function updateIncludes(selectedFileDir: string) {
     try {
-        fs.readdir(selectedFileDir, function (err: string, files: any[]) {
-            if (err) {
-                return postError("Unable to scan directory: " + err);
-            }
-            files.forEach(function (file) {
+        let filenames = fs.readdirSync(selectedFileDir);
+        filenames.forEach((file: any) => {
                 const filePath = join(selectedFileDir, file);
                 const fileName = basename(filePath, '.yml');
                 const options = {
@@ -83,7 +80,6 @@ export async function updateIncludes(selectedFileDir: string) {
                 };
                 replace.sync(options);
             });
-        });
     } catch (error) {
         showStatusMessage(error);
     }
@@ -174,26 +170,22 @@ export async function updateIndex(moduleDirectory: string) {
     try {
         const yaml = require('js-yaml');
         let unitBlock: any = [];
-        fs.readdir(moduleDirectory, function (err: string, files: any[]) {
-            if (err) {
-                return postError("Unable to scan directory: " + err);
-            }
-            files.forEach(function (file) {
-                if (file.endsWith('.yml') && file != 'index.yml') {
-                    let doc = yaml.load(fs.readFileSync(join(moduleDirectory, file), 'utf8'));
-                    if (doc.uid) {
-                        unitBlock.push(`- ${doc.uid}`);
-                    }
+        const filenames = fs.readdirSync(moduleDirectory);
+        filenames.forEach((file: any) => {
+            if (file.endsWith('.yml') && file != 'index.yml') {
+                let doc = yaml.load(fs.readFileSync(join(moduleDirectory, file), 'utf8'));
+                if (doc.uid) {
+                    unitBlock.push(`- ${doc.uid}`);
                 }
-            });
-            const moduleIndex = join(moduleDirectory, 'index.yml');
-            let options = {
-                files: moduleIndex,
-                from: /units:([\s\S]*?)badge:/gm,
-                to: `units:\n${unitBlock.join("\n")}\nbadge:`,
-            };
-            replace.sync(options);
+            }
         });
+        const moduleIndex = join(moduleDirectory, 'index.yml');
+        let options = {
+            files: moduleIndex,
+            from: /units:([\s\S]*?)badge:/gm,
+            to: `units:\n${unitBlock.join("\n")}\nbadge:`,
+        };
+        replace.sync(options);
     } catch (error) {
         output.appendLine(error);
     }
@@ -268,30 +260,26 @@ export function bulkUpdateFileNamePrefix(selectedFileDir: string, startingPrefix
     const regex = new RegExp("(?:[" + startingPrefix + "-9]|\d\d\d*)", "gm");
     const fileNumberRegex = /(.*?)-.*/;
     try {
-        fs.readdir(selectedFileDir, function (err: string, files: any[]) {
-            if (err) {
-                return postError("Unable to scan directory: " + err);
-            }
-            files.forEach(function (file) {
-                if (file.match(regex)) {
-                    let currentPrefix = file.match(fileNumberRegex);
-                    currentPrefix = parseInt(currentPrefix);
-                    let newPrefix: number;
-                    if (incrementPrefix) {
-                        newPrefix = currentPrefix + 1;
-                    } else {
-                        newPrefix = currentPrefix - 1;
-                    }
-                    let fileName = file.replace(/^[0-9]-/, '').replace('.yml', '');
-                    const currentFilePath = join(selectedFileDir, `${file}`);
-                    const newFilePath = join(selectedFileDir, `${newPrefix}-${fileName}.yml`);
-                    fs.renameSync(currentFilePath, newFilePath);
-                    const currentIncludePath = join(selectedFileDir, 'includes', file.replace('.yml', '.md'));
-                    const newIncludePath = join(selectedFileDir, 'includes', `${newPrefix}-${fileName}.md`);
-                    fs.renameSync(currentIncludePath, newIncludePath);
-                    updateIncludes(selectedFileDir);
+        let filenames = fs.readdirSync(selectedFileDir);
+        filenames.forEach((file: any) => {
+            if (file.match(regex)) {
+                let currentPrefix = file.match(fileNumberRegex);
+                currentPrefix = parseInt(currentPrefix);
+                let newPrefix: number;
+                if (incrementPrefix) {
+                    newPrefix = currentPrefix + 1;
+                } else {
+                    newPrefix = currentPrefix - 1;
                 }
-            });
+                let fileName = file.replace(/^[0-9]-/, '').replace('.yml', '');
+                const currentFilePath = join(selectedFileDir, `${file}`);
+                const newFilePath = join(selectedFileDir, `${newPrefix}-${fileName}.yml`);
+                fs.renameSync(currentFilePath, newFilePath);
+                const currentIncludePath = join(selectedFileDir, 'includes', file.replace('.yml', '.md'));
+                const newIncludePath = join(selectedFileDir, 'includes', `${newPrefix}-${fileName}.md`);
+                fs.renameSync(currentIncludePath, newIncludePath);
+                updateIncludes(selectedFileDir);
+            }
         });
     } catch (error) {
         showStatusMessage(error);
