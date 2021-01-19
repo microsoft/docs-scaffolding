@@ -2,7 +2,7 @@ import { Uri, QuickPickItem, QuickPickOptions, window } from "vscode";
 import { basename, join } from "path";
 import { readdirSync } from "fs";
 import { localTemplateRepoPath } from '../controllers/template-controller';
-import { getModuleUid, getSelectedFile, output, postError, showStatusMessage } from '../helper/common';
+import { getModuleUid, getSelectedFile, output, postError, showStatusMessage, sleep, sleepTime} from '../helper/common';
 import { alias, gitHubID } from "../helper/user-settings";
 
 const fse = require("fs-extra");
@@ -168,6 +168,7 @@ export function copyUnitSelection(uri: Uri, unitType: string, contentTemplateDir
 
 export async function updateIndex(moduleDirectory: string) {
     try {
+        await sleep(sleepTime);
         const yaml = require('js-yaml');
         let unitBlock: any = [];
         const filenames = fs.readdirSync(moduleDirectory);
