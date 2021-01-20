@@ -146,3 +146,7 @@ export function sleep(ms: number): Promise<void> {
 		setTimeout(r, ms);
 	});
 }
+
+export const naturalLanguageCompare = (a: string, b: string) => {
+	return !!a && !!b ? a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }) : 0;
+};

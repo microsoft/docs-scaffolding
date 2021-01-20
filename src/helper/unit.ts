@@ -2,7 +2,7 @@ import { Uri, QuickPickItem, QuickPickOptions, window } from "vscode";
 import { basename, join } from "path";
 import { readdirSync } from "fs";
 import { localTemplateRepoPath } from '../controllers/template-controller';
-import { getModuleUid, getSelectedFile, output, postError, showStatusMessage, sleep, sleepTime} from '../helper/common';
+import { getModuleUid, getSelectedFile, naturalLanguageCompare, output, postError, showStatusMessage, sleep, sleepTime} from '../helper/common';
 import { alias, gitHubID } from "../helper/user-settings";
 
 const fse = require("fs-extra");
@@ -171,7 +171,8 @@ export async function updateIndex(moduleDirectory: string) {
         await sleep(sleepTime);
         const yaml = require('js-yaml');
         let unitBlock: any = [];
-        const filenames = fs.readdirSync(moduleDirectory);
+        let filenames = fs.readdirSync(moduleDirectory);
+        filenames = filenames.sort(naturalLanguageCompare);
         filenames.forEach((file: any) => {
             if (file.endsWith('.yml') && file != 'index.yml') {
                 let doc = yaml.load(fs.readFileSync(join(moduleDirectory, file), 'utf8'));
@@ -258,8 +259,8 @@ export function removeStubComments(sourceFile: string) {
 }
 
 export function bulkUpdateFileNamePrefix(selectedFileDir: string, startingPrefix: number, incrementPrefix: boolean) {
-    const regex = new RegExp("(?:[" + startingPrefix + "-9]|\d\d\d*)", "gm");
-    const fileNumberRegex = /(.*?)-.*/;
+    const regex = new RegExp("^["+startingPrefix+"-9]|\\d\\d\\d*-", "gm");
+    const fileNumberRegex = /^(?:[0-9]|\d\d\d*)./gm;
     try {
         let filenames = fs.readdirSync(selectedFileDir);
         filenames.forEach((file: any) => {
@@ -272,7 +273,7 @@ export function bulkUpdateFileNamePrefix(selectedFileDir: string, startingPrefix
                 } else {
                     newPrefix = currentPrefix - 1;
                 }
-                let fileName = file.replace(/^[0-9]-/, '').replace('.yml', '');
+                let fileName = file.replace(/^(?:[0-9]|\d\d\d*)-/, '').replace('.yml', '');
                 const currentFilePath = join(selectedFileDir, `${file}`);
                 const newFilePath = join(selectedFileDir, `${newPrefix}-${fileName}.yml`);
                 fs.renameSync(currentFilePath, newFilePath);
