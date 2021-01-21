@@ -6,6 +6,7 @@ import { rmdir } from 'fs';
 import { join, parse } from "path";
 
 export const output = window.createOutputChannel('docs-scaffolding');
+export const sleepTime = 50;
 const fileNumberRegex = /(.*?)-.*/;
 const fs = require("fs");
 const yaml = require('js-yaml');
@@ -139,3 +140,13 @@ export function checkForUnitNumber(selectedFileDir: string) {
 		output.appendLine(error);
 	}
 }
+
+export function sleep(ms: number): Promise<void> {
+	return new Promise(r => {
+		setTimeout(r, ms);
+	});
+}
+
+export const naturalLanguageCompare = (a: string, b: string) => {
+	return !!a && !!b ? a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }) : 0;
+};
