@@ -72,7 +72,7 @@ export function getRepoName(workspacePath: Uri) {
 }
 
 export function sendTelemetryData(telemetryCommand: string, commandOption: string, moduleName: string) {
-	const telemetryProperties = { module_pattern: commandOption, module_name: moduleName };
+	const telemetryProperties = { pattern: commandOption, name: moduleName };
 	reporter.sendTelemetryEvent(telemetryCommand, telemetryProperties);
 }
 
