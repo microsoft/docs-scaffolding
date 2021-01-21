@@ -2,7 +2,7 @@ import { Uri, QuickPickItem, QuickPickOptions, window } from "vscode";
 import { basename, join } from "path";
 import { readdirSync } from "fs";
 import { localTemplateRepoPath } from '../controllers/template-controller';
-import { getModuleUid, getSelectedFile, naturalLanguageCompare, output, postError, showStatusMessage, sleep, sleepTime} from '../helper/common';
+import { getModuleUid, getSelectedFile, naturalLanguageCompare, output, postError, sendTelemetryData, showStatusMessage, sleep, sleepTime } from '../helper/common';
 import { alias, gitHubID } from "../helper/user-settings";
 
 const fse = require("fs-extra");
@@ -16,6 +16,7 @@ let author: string = gitHubID;
 let msAuthor: string = alias;
 
 export function renamePeerAndTargetUnits(uri: Uri, moveDown: boolean) {
+    const telemetryCommand: string = 'reorder-unit';
     let { selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber } = getSelectedFile(uri, moveDown);
     if (activeWorkingDirecotry === selectedFileDir) {
         // if values match, uid does not need to be updated
@@ -44,6 +45,7 @@ export function renamePeerAndTargetUnits(uri: Uri, moveDown: boolean) {
             showStatusMessage('Last unit cannot be moved down.');
             return;
         }
+        sendTelemetryData(telemetryCommand, '', currentFilename);
         renameUnit(selectedFileDir, existingUnitName, currentUnitNumber, newUnitNumber)
             .then(() => renameUnit(selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber))
             .then(() => updateIndex(selectedFileDir))
@@ -71,15 +73,15 @@ export async function updateIncludes(selectedFileDir: string) {
     try {
         let filenames = fs.readdirSync(selectedFileDir);
         filenames.forEach((file: any) => {
-                const filePath = join(selectedFileDir, file);
-                const fileName = basename(filePath, '.yml');
-                const options = {
-                    files: filePath,
-                    from: includeRegex,
-                    to: `includes/${fileName}.md`,
-                };
-                replace.sync(options);
-            });
+            const filePath = join(selectedFileDir, file);
+            const fileName = basename(filePath, '.yml');
+            const options = {
+                files: filePath,
+                from: includeRegex,
+                to: `includes/${fileName}.md`,
+            };
+            replace.sync(options);
+        });
     } catch (error) {
         showStatusMessage(error);
     }
@@ -118,6 +120,7 @@ export async function showUnitSelector(uri: Uri, moduleTypes: any[], contentTemp
 }
 
 export function copyUnitSelection(uri: Uri, unitType: string, contentTemplateDirectory: string) {
+    const telemetryCommand: string = 'add-unit';
     try {
         const getUserInput = window.showInputBox({
             prompt: "Enter unit name.",
@@ -151,6 +154,7 @@ export function copyUnitSelection(uri: Uri, unitType: string, contentTemplateDir
             let date: any = new Date(Date.now());
             date = date.toLocaleDateString();
 
+            sendTelemetryData(telemetryCommand, unitType, formattedUnitName);
             renameUnit(selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber)
                 .then(() => bulkUpdateFileNamePrefix(selectedFileDir, newUnitNumber, true))
                 .then(() => updateIndex(selectedFileDir))
@@ -194,6 +198,7 @@ export async function updateIndex(moduleDirectory: string) {
 }
 
 export function removeUnit(uri: Uri) {
+    const telemetryCommand: string = 'delete-unit';
     try {
         let { selectedFileDir, currentFilename, currentUnitNumber } = getSelectedFile(uri, true);
         const selectedFile = join(selectedFileDir, `${currentFilename}.yml`);
@@ -202,12 +207,14 @@ export function removeUnit(uri: Uri) {
         fs.unlinkSync(includeMarkdown);
         updateIndex(selectedFileDir);
         bulkUpdateFileNamePrefix(selectedFileDir, currentUnitNumber, false);
+        sendTelemetryData(telemetryCommand, '', currentFilename);
     } catch (error) {
         output.appendLine(error);
     }
 }
 
 export async function updateUnitName(uri: Uri) {
+    const telemetryCommand: string = 'rename-unit';
     try {
         const getUserInput = window.showInputBox({
             prompt: "Enter unit name.",
@@ -226,6 +233,7 @@ export async function updateUnitName(uri: Uri) {
             const currentIncludePath = join(selectedFileDir, 'includes', `${currentFilename}.md`);
             const newIncludePath = join(selectedFileDir, 'includes', `${currentUnitNumber}-${newFilename}.md`);
             fs.renameSync(currentIncludePath, newIncludePath);
+            sendTelemetryData(telemetryCommand, '', currentFilename);
             renameUnit(selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber)
                 .then(() => updateIndex(selectedFileDir))
                 .then(() => updateIncludes(selectedFileDir));
@@ -259,7 +267,7 @@ export function removeStubComments(sourceFile: string) {
 }
 
 export function bulkUpdateFileNamePrefix(selectedFileDir: string, startingPrefix: number, incrementPrefix: boolean) {
-    const regex = new RegExp("^["+startingPrefix+"-9]|\\d\\d\\d*-", "gm");
+    const regex = new RegExp("^[" + startingPrefix + "-9]|\\d\\d\\d*-", "gm");
     const fileNumberRegex = /^(?:[0-9]|\d\d\d*)./gm;
     try {
         let filenames = fs.readdirSync(selectedFileDir);
