@@ -117,10 +117,9 @@ export async function copyTemplates(modifiedModuleName: string, moduleName: stri
   const moduleYMLTarget = join(scaffoldModule, "index.yml");
   fse.copySync(moduleYMLSource, moduleYMLTarget);
 
-  // copy media placeholder
-  const mediaPlaceholderSource = join(extensionPath, "media", "docs-logo-ms.png");
-  const mediaPlaceholderTarget = join(scaffoldModule, "media", "placeholder.png");
-  fse.copySync(mediaPlaceholderSource, mediaPlaceholderTarget);
+  // create media directory
+  const mediaFolder = join(scaffoldModule, 'media');
+  fs.mkdirSync(mediaFolder);
 
   let templateFile: any;
   let scaffoldFilename: any;
