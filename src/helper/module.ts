@@ -182,5 +182,5 @@ export function moduleCleanup(moduleName: string, modulePath: string) {
     to: ` `,
   };
   replace.sync(options);
-  postInformation(`Operation successful: ${moduleName}`);
+  postInformation(`Operation successful`);
 }
