@@ -133,7 +133,7 @@ export function stubUnitReferences(modulePath: string) {
       replace.sync(options);
       const uid = getModuleUid(modulePath);
       if (!["includes", "index", "media"].includes(formattedUnitName)) {
-        unitBlock.push(`  - ${uid}.${formattedUnitName}\n`);
+        unitBlock.push(`- ${uid}.${formattedUnitName}\n`);
       }
     });
     stubUnitBlock(moduleName, modulePath, unitBlock);
@@ -144,8 +144,15 @@ export function stubUnitBlock(moduleName: string, modulePath: string, unitBlock:
   let unitList = unitBlock.join("");
   let options = {
     files: `${modulePath}/index.yml`,
-    from: /\s?{{units}}/g,
+    from: /^\s*?{{units}}/gm,
     to: unitList,
+  };
+  replace.sync(options);
+  // fix badge indentation
+  options = {
+    files: `${modulePath}/index.yml`,
+    from: /^\s*?badge/gm,
+    to: 'badge',
   };
   replace.sync(options);
   stubProductBlock(moduleName, modulePath);
@@ -158,8 +165,8 @@ export function stubProductBlock(moduleName: string, modulePath: string) {
   } else {
     let options = {
       files: `${modulePath}/index.yml`,
-      from: /\s?{{products}}/g,
-      to: `  - ${product}`,
+      from: /^\s*?{{products}}/gm,
+      to: `- ${product}`,
     };
     replace.sync(options);
   }
