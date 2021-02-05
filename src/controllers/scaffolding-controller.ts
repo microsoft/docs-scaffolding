@@ -10,7 +10,8 @@ import {
   showStatusMessage,
   sendTelemetryData,
   getModuleTitleTemplate,
-  returnJsonData
+  returnJsonData,
+  replaceUnitPlaceholderWithTitle
 } from "../helper/common";
 import {
   addNewUnit,
@@ -190,6 +191,11 @@ export async function copyTemplates(
         templateFile,
         join(scaffoldModule, `${scaffoldFilename}.yml`)
       );
+      if (obj.unitTitleTemplate) {
+        const unitPath = join(scaffoldModule, `${scaffoldFilename}.yml`);
+        const unitTitle = obj.unitTitleTemplate;
+        replaceUnitPlaceholderWithTitle(unitPath, unitTitle);
+      }
       if (obj.contentTemplatePath) {
         templateFile = resolve(
           typeDefinitionJsonDirectory,

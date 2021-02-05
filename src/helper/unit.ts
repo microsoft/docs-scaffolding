@@ -24,7 +24,7 @@ export function renamePeerAndTargetUnits(uri: Uri, moveDown: boolean) {
         activeWorkingDirecotry = selectedFileDir;
     }
     try {
-        const moduleUnits = [] = readdirSync(selectedFileDir)
+        const moduleUnits = [] = readdirSync(selectedFileDir);
         const totalUnits = moduleUnits.filter((unit) => unit.endsWith('.yml')).length;
         const existingUnit = moduleUnits.filter((unit) => unit.startsWith(newUnitNumber));
         let existingUnitName: string;
@@ -35,12 +35,12 @@ export function renamePeerAndTargetUnits(uri: Uri, moveDown: boolean) {
             showStatusMessage('No unit has been selected');
             return;
         }
-        if (newUnitNumber == 0) {
+        if (newUnitNumber === 0) {
             postError('First unit cannot be moved up.');
             showStatusMessage('First unit cannot be moved up.');
             return;
         }
-        if (newUnitNumber == totalUnits) {
+        if (newUnitNumber === totalUnits) {
             postError('Last unit cannot be moved down.');
             showStatusMessage('Last unit cannot be moved down.');
             return;
@@ -110,7 +110,7 @@ export async function showUnitSelector(uri: Uri, moduleTypes: any[], contentTemp
     try {
         const opts: QuickPickOptions = { placeHolder: 'Select unit type' };
         const ymlExtension = '.yml';
-        let unitFilter = [] = moduleTypes.filter(file => file.endsWith(ymlExtension) && file != 'default-index.yml');
+        let unitFilter = [] = moduleTypes.filter(file => file.endsWith(ymlExtension) && file !== 'default-index.yml');
         unitFilter = unitFilter.map(unit => unit.replace(/.yml/g, ''));
         const selection = await window.showQuickPick(unitFilter, opts);
         await copyUnitSelection(uri, selection, contentTemplateDirectory);
@@ -134,7 +134,7 @@ export function copyUnitSelection(uri: Uri, unitType: string, contentTemplateDir
             let formattedUnitName = unitName.replace(/ /g, "-").toLowerCase();
             let { selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber } = getSelectedFile(uri, true);
             fse.copySync(join(contentTemplateDirectory, `${unitType}.yml`), join(selectedFileDir, `${currentUnitNumber}-${formattedUnitName}.yml`));
-            if (unitType == 'default-unit') {
+            if (unitType === 'default-unit') {
                 fse.copySync(join(contentTemplateDirectory, `default-exercise-unit.md`), join(selectedFileDir, 'includes', `${currentUnitNumber}-${formattedUnitName}.md`));
             }
             const moduleUid = getModuleUid(selectedFileDir);
@@ -178,7 +178,7 @@ export async function updateIndex(moduleDirectory: string) {
         let filenames = fs.readdirSync(moduleDirectory);
         filenames = filenames.sort(naturalLanguageCompare);
         filenames.forEach((file: any) => {
-            if (file.endsWith('.yml') && file != 'index.yml') {
+            if (file.endsWith('.yml') && file !== 'index.yml') {
                 let doc = yaml.load(fs.readFileSync(join(moduleDirectory, file), 'utf8'));
                 if (doc.uid) {
                     unitBlock.push(`- ${doc.uid}`);
@@ -245,7 +245,7 @@ export async function updateUnitName(uri: Uri) {
 
 export function replaceStubTokens(sourceFile: string, sourceString: string, replacementString: string) {
     if (!replacementString || replacementString.length === 0) {
-        showStatusMessage(`No replacement value for ${sourceString}. Leaving placeholder.`)
+        showStatusMessage(`No replacement value for ${sourceString}. Leaving placeholder.`);
     } else {
         const regex = new RegExp(sourceString, "g");
         const options = {

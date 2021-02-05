@@ -10,6 +10,7 @@ export const sleepTime = 50;
 const fileNumberRegex = /(.*?)-.*/;
 const fs = require("fs");
 const yaml = require('js-yaml');
+const replace = require("replace-in-file");
 
 /**
  * Create a posted warning message and applies the message to the log
@@ -171,4 +172,14 @@ export function returnJsonData(jsonPath: string) {
 		postError(error);
 		showStatusMessage(error);
 	}
+}
+
+export function replaceUnitPlaceholderWithTitle(unitPath: string, unitTitle: string) {
+	const regex = /^([0-9]*)-/gm;
+      const options = {
+        files: unitPath,
+        from: /^title:\s{{unitName}}/gm,
+        to: `title: ${unitTitle}`,
+      };
+      replace.sync(options);
 }
