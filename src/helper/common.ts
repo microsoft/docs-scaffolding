@@ -2,7 +2,7 @@
 
 import { Uri, window, workspace } from 'vscode';
 import { reporter } from './telemetry';
-import { rmdir } from 'fs';
+import { readFileSync, rmdir } from 'fs';
 import { join, parse } from "path";
 
 export const output = window.createOutputChannel('docs-scaffolding');
@@ -150,3 +150,15 @@ export function sleep(ms: number): Promise<void> {
 export const naturalLanguageCompare = (a: string, b: string) => {
 	return !!a && !!b ? a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }) : 0;
 };
+
+export function getModuleTitleTemplate(localTemplateRepoPath: string, moduleType: string) {
+	try {
+		const moduleTypeDefinitionJson = join(localTemplateRepoPath, "learn-scaffolding-main", "module-type-definitions", `${moduleType}.json`);
+		const moduleJson = readFileSync(moduleTypeDefinitionJson, "utf8");
+		let data = JSON.parse(moduleJson);
+		return data.moduleTitleTemplate;
+	} catch (error) {
+		postError(error);
+		showStatusMessage(error);
+	}
+}
