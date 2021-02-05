@@ -2,7 +2,7 @@ import { Uri, QuickPickItem, QuickPickOptions, window } from "vscode";
 import { basename, join } from "path";
 import { readdirSync } from "fs";
 import { localTemplateRepoPath } from '../controllers/template-controller';
-import { getModuleUid, getSelectedFile, naturalLanguageCompare, output, postError, sendTelemetryData, showStatusMessage, sleep, sleepTime } from '../helper/common';
+import { getModuleUid, getSelectedFile, getUnitTitle, naturalLanguageCompare, output, postError, sendTelemetryData, showStatusMessage, sleep, sleepTime } from '../helper/common';
 import { alias, gitHubID } from "../helper/user-settings";
 
 const fse = require("fs-extra");
@@ -216,7 +216,11 @@ export function removeUnit(uri: Uri) {
 export async function updateUnitName(uri: Uri) {
     const telemetryCommand: string = 'rename-unit';
     try {
+        let { selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber } = getSelectedFile(uri, true);
+        const currentFilePath = join(selectedFileDir, `${currentFilename}.yml`);
+        const unitTitlePlaceholder: string = getUnitTitle(currentFilePath);
         const getUserInput = window.showInputBox({
+            placeHolder: unitTitlePlaceholder,
             prompt: "Enter unit name.",
             validateInput: (userInput) =>
                 userInput.length > 0 ? "" : "Please provide a unit name.",
@@ -226,8 +230,6 @@ export async function updateUnitName(uri: Uri) {
                 return;
             }
             let newFilename = unitName.replace(/ /g, "-").toLowerCase();
-            let { selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber } = getSelectedFile(uri, true);
-            const currentFilePath = join(selectedFileDir, `${currentFilename}.yml`);
             const newFilePath = join(selectedFileDir, `${currentUnitNumber}-${newFilename}.yml`);
             fs.renameSync(currentFilePath, newFilePath);
             const currentIncludePath = join(selectedFileDir, 'includes', `${currentFilename}.md`);

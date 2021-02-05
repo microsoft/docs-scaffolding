@@ -175,11 +175,24 @@ export function returnJsonData(jsonPath: string) {
 }
 
 export function replaceUnitPlaceholderWithTitle(unitPath: string, unitTitle: string) {
-	const regex = /^([0-9]*)-/gm;
-      const options = {
-        files: unitPath,
-        from: /^title:\s{{unitName}}/gm,
-        to: `title: ${unitTitle}`,
-      };
-      replace.sync(options);
+	try {
+		const options = {
+			files: unitPath,
+			from: /^title:\s{{unitName}}/gm,
+			to: `title: ${unitTitle}`,
+		  };
+		  replace.sync(options);	
+	} catch (error) {
+		postError(error);
+		showStatusMessage(error);
+	}
+}
+
+export function getUnitTitle(unitPath: string) {
+	try {
+		const doc = yaml.load(fs.readFileSync(unitPath, 'utf8'));
+		return doc.title;
+	} catch (error) {
+		output.appendLine(error);
+	}
 }
