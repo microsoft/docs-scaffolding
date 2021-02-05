@@ -2,7 +2,7 @@ import { Uri, QuickPickItem, QuickPickOptions, window } from "vscode";
 import { basename, join } from "path";
 import { readdirSync } from "fs";
 import { localTemplateRepoPath } from '../controllers/template-controller';
-import { getModuleUid, getSelectedFile, getUnitTitle, naturalLanguageCompare, output, postError, sendTelemetryData, showStatusMessage, sleep, sleepTime } from '../helper/common';
+import { getModuleUid, getSelectedFile, getUnitTitle, naturalLanguageCompare, output, postError, replaceExistingUnitTitle, sendTelemetryData, showStatusMessage, sleep, sleepTime } from '../helper/common';
 import { alias, gitHubID } from "../helper/user-settings";
 
 const fse = require("fs-extra");
@@ -221,7 +221,7 @@ export async function updateUnitName(uri: Uri) {
         const unitTitlePlaceholder: string = getUnitTitle(currentFilePath);
         const getUserInput = window.showInputBox({
             placeHolder: unitTitlePlaceholder,
-            prompt: "Enter unit name.",
+            prompt: "Enter new unit title.",
             validateInput: (userInput) =>
                 userInput.length > 0 ? "" : "Please provide a unit name.",
         });
@@ -235,6 +235,7 @@ export async function updateUnitName(uri: Uri) {
             const currentIncludePath = join(selectedFileDir, 'includes', `${currentFilename}.md`);
             const newIncludePath = join(selectedFileDir, 'includes', `${currentUnitNumber}-${newFilename}.md`);
             fs.renameSync(currentIncludePath, newIncludePath);
+            replaceExistingUnitTitle(newFilePath, unitName);
             sendTelemetryData(telemetryCommand, '', currentFilename);
             renameUnit(selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber)
                 .then(() => updateIndex(selectedFileDir))

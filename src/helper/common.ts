@@ -196,3 +196,17 @@ export function getUnitTitle(unitPath: string) {
 		output.appendLine(error);
 	}
 }
+
+export function replaceExistingUnitTitle(unitPath: string, newUnitTitle: string) {
+	try {
+		const options = {
+			files: unitPath,
+			from: /^title:\s.*/gm,
+			to: `title: ${newUnitTitle}`,
+		  };
+		  replace.sync(options);	
+	} catch (error) {
+		postError(error);
+		showStatusMessage(error);
+	}
+}
