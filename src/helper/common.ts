@@ -162,3 +162,13 @@ export function getModuleTitleTemplate(localTemplateRepoPath: string, moduleType
 		showStatusMessage(error);
 	}
 }
+
+export function returnJsonData(jsonPath: string) {
+	try {
+		const moduleJson = readFileSync(jsonPath, "utf8");
+		return JSON.parse(moduleJson);	
+	} catch (error) {
+		postError(error);
+		showStatusMessage(error);
+	}
+}

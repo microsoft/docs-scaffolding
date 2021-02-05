@@ -10,6 +10,7 @@ import {
   showStatusMessage,
   sendTelemetryData,
   getModuleTitleTemplate,
+  returnJsonData
 } from "../helper/common";
 import {
   addNewUnit,
@@ -60,8 +61,7 @@ export async function moduleSelectionQuickPick(uri: Uri) {
         }
         files.forEach(function (file) {
           const jsonPath = join(typeDefinitionJsonDirectory, file);
-          const moduleJson = readFileSync(jsonPath, "utf8");
-          let data = JSON.parse(moduleJson);
+          const data = returnJsonData(jsonPath);
           let patterns =
             data.moduleType.charAt(0).toUpperCase() + data.moduleType.slice(1);
           moduleTypes.push(patterns);
@@ -104,8 +104,8 @@ export function getSelectedFolder(uri: Uri, moduleType: string) {
       "learn-scaffolding-main",
       "terms.json"
     );
-    const termsJson = readFileSync(termsJsonPath, "utf8");
-    let data = JSON.parse(termsJson);
+
+    const data = returnJsonData(termsJsonPath);
 
     let modifiedModuleName: string = moduleName;
 
@@ -146,8 +146,7 @@ export async function copyTemplates(
   selectedFolder: string
 ) {
   const jsonPath = join(typeDefinitionJsonDirectory, `${moduleType}.json`);
-  const moduleJson = readFileSync(jsonPath, "utf8");
-  const data = JSON.parse(moduleJson);
+  const data = returnJsonData(jsonPath);
   const scaffoldModule = join(selectedFolder, modifiedModuleName);
 
   /* to-do: update error workflow */
