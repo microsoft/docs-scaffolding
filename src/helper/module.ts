@@ -159,13 +159,11 @@ export function stubUnitBlock(moduleName: string, modulePath: string, unitBlock:
 }
 
 export function stubProductBlock(moduleName: string, modulePath: string) {
-  let productBlock: string[] = [];
-  let productGroup: any;
   if (!product) {
     showStatusMessage('No value for product setting so placeholder value will be used.');
-    product = "{{products}}";
   } else {
-    productGroup = product.split(/[ ,]+/);
+    let productBlock: string[] = [];
+    let productGroup = product.split(/[ ,]+/);
     productGroup.forEach((element: any) => productBlock.push(`- ${element}`));
     let productList = productBlock.join('\r');
     let options = {
@@ -175,7 +173,6 @@ export function stubProductBlock(moduleName: string, modulePath: string) {
     };
     replace.sync(options);
   }
-  
   moduleCleanup(moduleName, modulePath);
 }
 
