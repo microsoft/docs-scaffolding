@@ -2,7 +2,7 @@
 
 import { Uri, window, workspace } from 'vscode';
 import { reporter } from './telemetry';
-import { rmdir } from 'fs';
+import { readFileSync, rmdir } from 'fs';
 import { join, parse } from "path";
 
 export const output = window.createOutputChannel('docs-scaffolding');
@@ -10,6 +10,7 @@ export const sleepTime = 50;
 const fileNumberRegex = /(.*?)-.*/;
 const fs = require("fs");
 const yaml = require('js-yaml');
+const replace = require("replace-in-file");
 
 /**
  * Create a posted warning message and applies the message to the log
@@ -150,3 +151,62 @@ export function sleep(ms: number): Promise<void> {
 export const naturalLanguageCompare = (a: string, b: string) => {
 	return !!a && !!b ? a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }) : 0;
 };
+
+export function getModuleTitleTemplate(localTemplateRepoPath: string, moduleType: string) {
+	try {
+		const moduleTypeDefinitionJson = join(localTemplateRepoPath, "learn-scaffolding-main", "module-type-definitions", `${moduleType}.json`);
+		const moduleJson = readFileSync(moduleTypeDefinitionJson, "utf8");
+		let data = JSON.parse(moduleJson);
+		return data.moduleTitleTemplate;
+	} catch (error) {
+		postError(error);
+		showStatusMessage(error);
+	}
+}
+
+export function returnJsonData(jsonPath: string) {
+	try {
+		const moduleJson = readFileSync(jsonPath, "utf8");
+		return JSON.parse(moduleJson);	
+	} catch (error) {
+		postError(error);
+		showStatusMessage(error);
+	}
+}
+
+export function replaceUnitPlaceholderWithTitle(unitPath: string, unitTitle: string) {
+	try {
+		const options = {
+			files: unitPath,
+			from: /^title:\s{{unitName}}/gm,
+			to: `title: ${unitTitle}`,
+		  };
+		  replace.sync(options);	
+	} catch (error) {
+		postError(error);
+		showStatusMessage(error);
+	}
+}
+
+export function getUnitTitle(unitPath: string) {
+	try {
+		const doc = yaml.load(fs.readFileSync(unitPath, 'utf8'));
+		return doc.title;
+	} catch (error) {
+		output.appendLine(error);
+	}
+}
+
+export function replaceExistingUnitTitle(unitPath: string, newUnitTitle: string) {
+	try {
+		const options = {
+			files: unitPath,
+			from: /^title:\s.*/gm,
+			to: `title: ${newUnitTitle}`,
+		  };
+		  replace.sync(options);	
+	} catch (error) {
+		postError(error);
+		showStatusMessage(error);
+	}
+}
