@@ -1,7 +1,6 @@
 import { alias, gitHubID, defaultPrefix, defaultProduct } from "../helper/user-settings";
 import { basename, join } from 'path';
 import { getModuleUid, postError, postInformation, showStatusMessage } from '../helper/common';
-import { EOL } from 'os';
 
 const replace = require("replace-in-file");
 let learnRepo: string = defaultPrefix;
@@ -142,7 +141,7 @@ export function stubUnitReferences(modulePath: string) {
 }
 
 export function stubUnitBlock(moduleName: string, modulePath: string, unitBlock: any) {
-  let unitList = unitBlock.join(EOL);
+  let unitList = unitBlock.join('\r\n');
   let options = {
     files: `${modulePath}/index.yml`,
     from: /^\s*?{{units}}/gm,
@@ -166,7 +165,7 @@ export function stubProductBlock(moduleName: string, modulePath: string) {
     let productBlock: string[] = [];
     let productGroup = product.split(/[ ,]+/);
     productGroup.forEach((element: any) => productBlock.push(`- ${element}`));
-    let productList = productBlock.join(EOL);
+    let productList = productBlock.join('\r\n');
     let options = {
       files: `${modulePath}/index.yml`,
       from: /^\s*?{{products}}/gm,
