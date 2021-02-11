@@ -133,7 +133,7 @@ export function stubUnitReferences(modulePath: string) {
       replace.sync(options);
       const uid = getModuleUid(modulePath);
       if (!["includes", "index", "media"].includes(formattedUnitName)) {
-        unitBlock.push(`- ${uid}.${formattedUnitName}\n`);
+        unitBlock.push(`- ${uid}.${formattedUnitName}`);
       }
     });
     stubUnitBlock(moduleName, modulePath, unitBlock);
@@ -141,7 +141,7 @@ export function stubUnitReferences(modulePath: string) {
 }
 
 export function stubUnitBlock(moduleName: string, modulePath: string, unitBlock: any) {
-  let unitList = unitBlock.join("");
+  let unitList = unitBlock.join('\r\n');
   let options = {
     files: `${modulePath}/index.yml`,
     from: /^\s*?{{units}}/gm,
@@ -161,12 +161,15 @@ export function stubUnitBlock(moduleName: string, modulePath: string, unitBlock:
 export function stubProductBlock(moduleName: string, modulePath: string) {
   if (!product) {
     showStatusMessage('No value for product setting so placeholder value will be used.');
-    product = "{{products}}";
   } else {
+    let productBlock: string[] = [];
+    let productGroup = product.split(/[ ,]+/);
+    productGroup.forEach((element: any) => productBlock.push(`- ${element}`));
+    let productList = productBlock.join('\r\n');
     let options = {
       files: `${modulePath}/index.yml`,
       from: /^\s*?{{products}}/gm,
-      to: `- ${product}`,
+      to: productList,
     };
     replace.sync(options);
   }
@@ -187,6 +190,14 @@ export function moduleCleanup(moduleName: string, modulePath: string) {
     files: `${modulePath}/index.yml`,
     from: /^\s*\n/gm,
     to: ` `,
+  };
+  replace.sync(options);
+
+  // fix unit and product indentation
+  options = {
+    files: `${modulePath}/index.yml`,
+    from: /^\s-/gm,
+    to: '-',
   };
   replace.sync(options);
   postInformation(`Operation successful`);
