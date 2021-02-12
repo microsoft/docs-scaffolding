@@ -8,6 +8,7 @@ import { alias, gitHubID } from "../helper/user-settings";
 const fse = require("fs-extra");
 const replace = require("replace-in-file");
 const fs = require("fs");
+const yaml = require('js-yaml');
 const includeRegex = /includes\/.*\.md/;
 const uidRegex = /^uid.*/gm;
 

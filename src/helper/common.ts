@@ -4,6 +4,7 @@ import { Uri, window, workspace } from 'vscode';
 import { reporter } from './telemetry';
 import { readFileSync, rmdir } from 'fs';
 import { join, parse } from "path";
+import { default as Axios } from 'axios';
 
 export const output = window.createOutputChannel('docs-scaffolding');
 export const sleepTime = 50;
@@ -167,7 +168,7 @@ export function getModuleTitleTemplate(localTemplateRepoPath: string, moduleType
 export function returnJsonData(jsonPath: string) {
 	try {
 		const moduleJson = readFileSync(jsonPath, "utf8");
-		return JSON.parse(moduleJson);	
+		return JSON.parse(moduleJson);
 	} catch (error) {
 		postError(error);
 		showStatusMessage(error);
@@ -180,8 +181,8 @@ export function replaceUnitPlaceholderWithTitle(unitPath: string, unitTitle: str
 			files: unitPath,
 			from: /^title:\s{{unitName}}/gm,
 			to: `title: ${unitTitle}`,
-		  };
-		  replace.sync(options);	
+		};
+		replace.sync(options);
 	} catch (error) {
 		postError(error);
 		showStatusMessage(error);
@@ -199,14 +200,37 @@ export function getUnitTitle(unitPath: string) {
 
 export function replaceExistingUnitTitle(unitPath: string, newUnitTitle: string) {
 	try {
+		const unitUid = getUnitUid(unitPath);
+		console.log('unitUid ' + unitUid);
+		publishedUidCheck(unitUid);
 		const options = {
 			files: unitPath,
 			from: /^title:\s.*/gm,
 			to: `title: ${newUnitTitle}`,
-		  };
-		  replace.sync(options);	
+		};
+		replace.sync(options);
 	} catch (error) {
 		postError(error);
 		showStatusMessage(error);
+	}
+}
+
+export async function publishedUidCheck(unitId: string) {
+	const hierarchyServiceApi = `https://docs.microsoft.com/api/hierarchy/modules?unitId=${unitId}`;
+	try {
+		const response = await Axios.get(hierarchyServiceApi);
+		console.log(`unitUrl: ${hierarchyServiceApi}\nresponse: ${response.status}`);
+	} catch (error) {
+		console.log(`unitUrl: ${hierarchyServiceApi}`);
+		console.log(`${error}`);
+	}
+}
+
+export function getUnitUid(selectedUnit: string) {
+	try {
+		const doc = yaml.load(fs.readFileSync(selectedUnit, 'utf8'));
+		return doc.uid;
+	} catch (error) {
+		output.appendLine(error);
 	}
 }
