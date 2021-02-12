@@ -226,7 +226,7 @@ export async function updateUnitName(uri: Uri) {
             validateInput: (userInput) =>
                 userInput.length > 0 ? "" : "Please provide a unit name.",
         });
-        getUserInput.then((unitName) => {
+        getUserInput.then(async (unitName) => {
             if (!unitName) {
                 return;
             }
@@ -238,7 +238,7 @@ export async function updateUnitName(uri: Uri) {
             fs.renameSync(currentIncludePath, newIncludePath);
             replaceExistingUnitTitle(newFilePath, unitName);
             const unitUid = getUnitUid(newFilePath);
-		    publishedUidCheck(unitUid, newFilename, newFilePath, selectedFileDir);
+		    await publishedUidCheck(unitUid, newFilename, newFilePath, selectedFileDir);
             sendTelemetryData(telemetryCommand, '', currentFilename);
             renameUnit(selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber)
                 .then(() => updateIndex(selectedFileDir))

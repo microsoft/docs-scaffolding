@@ -215,9 +215,9 @@ export function replaceExistingUnitTitle(unitPath: string, newUnitTitle: string)
 export async function publishedUidCheck(unitId: string, unitName: string, unitPath: string, modulePath: string) {
 	const hierarchyServiceApi = `https://docs.microsoft.com/api/hierarchy/modules?unitId=${unitId}`;
 	await Axios.get(hierarchyServiceApi).then(function () {
-		showStatusMessage(`Published UID :${hierarchyServiceApi}. Unit UID will not be changed.`);
+		showStatusMessage(`Live UID :${hierarchyServiceApi}. Yml UID will not be changed.`);
 	}).catch(function () {
-		showStatusMessage(`UID ${hierarchyServiceApi} has not been published. Unit UID will be updated.`);
+		showStatusMessage(`UID ${hierarchyServiceApi} is not published. Yml UID will be updated.`);
 		updateUnitUid(unitName, unitPath, modulePath);
 	});
 }
