@@ -200,9 +200,6 @@ export function getUnitTitle(unitPath: string) {
 
 export function replaceExistingUnitTitle(unitPath: string, newUnitTitle: string) {
 	try {
-		const unitUid = getUnitUid(unitPath);
-		console.log('unitUid ' + unitUid);
-		publishedUidCheck(unitUid);
 		const options = {
 			files: unitPath,
 			from: /^title:\s.*/gm,
@@ -215,15 +212,14 @@ export function replaceExistingUnitTitle(unitPath: string, newUnitTitle: string)
 	}
 }
 
-export async function publishedUidCheck(unitId: string) {
+export async function publishedUidCheck(unitId: string, unitName: string, unitPath: string, modulePath: string) {
 	const hierarchyServiceApi = `https://docs.microsoft.com/api/hierarchy/modules?unitId=${unitId}`;
-	try {
-		const response = await Axios.get(hierarchyServiceApi);
-		console.log(`unitUrl: ${hierarchyServiceApi}\nresponse: ${response.status}`);
-	} catch (error) {
-		console.log(`unitUrl: ${hierarchyServiceApi}`);
-		console.log(`${error}`);
-	}
+	await Axios.get(hierarchyServiceApi).then(function () {
+		showStatusMessage(`Published UID :${hierarchyServiceApi}. Unit UID will not be changed.`);
+	}).catch(function () {
+		showStatusMessage(`UID ${hierarchyServiceApi} has not been published. Unit UID will be updated.`);
+		updateUnitUid(unitName, unitPath, modulePath);
+	});
 }
 
 export function getUnitUid(selectedUnit: string) {
@@ -232,5 +228,21 @@ export function getUnitUid(selectedUnit: string) {
 		return doc.uid;
 	} catch (error) {
 		output.appendLine(error);
+	}
+}
+
+export function updateUnitUid(unitName: string, unitPath: string, modulePath: string) {
+	try {
+		let newUnitUid = getModuleUid(modulePath);
+		newUnitUid = `uid: ${newUnitUid}.${unitName}`;
+		const options = {
+			files: unitPath,
+			from: /^uid:\s.*/gm,
+			to: newUnitUid,
+		};
+		replace.sync(options);
+	} catch (error) {
+		postError(error);
+		showStatusMessage(error);
 	}
 }
