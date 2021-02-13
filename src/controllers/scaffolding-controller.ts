@@ -11,7 +11,8 @@ import {
   sendTelemetryData,
   getModuleTitleTemplate,
   returnJsonData,
-  replaceUnitPlaceholderWithTitle
+  replaceUnitPlaceholderWithTitle,
+  replaceUnitPatternPlaceholder
 } from "../helper/common";
 import {
   addNewUnit,
@@ -195,6 +196,11 @@ export async function copyTemplates(
         const unitPath = join(scaffoldModule, `${scaffoldFilename}.yml`);
         const unitTitle = obj.unitTitleTemplate;
         replaceUnitPlaceholderWithTitle(unitPath, unitTitle);
+      }
+      if (obj.type) {
+        const unitPath = join(scaffoldModule, `${scaffoldFilename}.yml`);
+        const unitType = obj.type;
+        replaceUnitPatternPlaceholder(unitPath, unitType);
       }
       if (obj.contentTemplatePath) {
         templateFile = resolve(

@@ -246,3 +246,17 @@ export function updateUnitUid(unitName: string, unitPath: string, modulePath: st
 		showStatusMessage(error);
 	}
 }
+
+export function replaceUnitPatternPlaceholder(unitPath: string, patternType: string) {
+	try {
+		const options = {
+			files: unitPath,
+			from: /{{patternType}}/gm,
+			to: patternType,
+		};
+		replace.sync(options);
+	} catch (error) {
+		postError(error);
+		showStatusMessage(error);
+	}
+}
