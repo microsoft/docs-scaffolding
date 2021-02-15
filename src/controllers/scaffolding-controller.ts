@@ -128,7 +128,7 @@ export function getSelectedFolder(uri: Uri, moduleType: string) {
   });
 }
 
-function formatModuleName(
+export function formatModuleName(
   moduleName: any,
   filteredTerm: any,
   replacementTerm: any

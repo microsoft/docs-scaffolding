@@ -11,7 +11,7 @@ import { sleep, sleepTime } from '../../test.common/common';
 import sinon = require('sinon');
 import * as scaffoldingController from './../../../controllers/scaffolding-controller';
 import {
-	moduleSelectionQuickPick, scaffoldingCommand, scaffoldModule, copyTemplates, moveSelectionUp, moveSelectionDown, insertNewUnit, deleteUnit, renameUnit
+	moduleSelectionQuickPick, scaffoldingCommand, scaffoldModule, copyTemplates, moveSelectionUp, moveSelectionDown, insertNewUnit, deleteUnit, renameUnit, getSelectedFolder, formatModuleName
 } from '../../../controllers/scaffolding-controller';
 
 chai.use(spies);
@@ -53,6 +53,47 @@ suite('Scaffolding Controller', () => {
 	test('Copy templates', async () => {
 		const spy = chai.spy.on(scaffoldingController, 'copyTemplates');
 		copyTemplates('modified title', 'test module', 'choose', contextSelectedFolder);
+		await sleep(sleepTime);
+		expect(spy).to.have.been.called();
+	});
+	test('Get selected folder', async () => {
+		const spy = chai.spy.on(scaffoldingController, 'getSelectedFolder');
+		getSelectedFolder(uri, 'standard');
+		await sleep(sleepTime);
+		expect(spy).to.have.been.called();
+	});
+	test('Format module name', async () => {
+		const output = formatModuleName('Create a service', 'a', '');
+		await sleep(sleepTime);
+		expect(output).to.equal('create-service');
+	});
+	test('Move selection down', async () => {
+		const spy = chai.spy.on(scaffoldingController, 'moveSelectionDown');
+		moveSelectionDown(uri);
+		await sleep(sleepTime);
+		expect(spy).to.have.been.called();
+	});
+	test('Move selection up', async () => {
+		const spy = chai.spy.on(scaffoldingController, 'moveSelectionUp');
+		moveSelectionUp(uri);
+		await sleep(sleepTime);
+		expect(spy).to.have.been.called();
+	});
+	test('Insert new unit', async () => {
+		const spy = chai.spy.on(scaffoldingController, 'insertNewUnit');
+		insertNewUnit(uri);
+		await sleep(sleepTime);
+		expect(spy).to.have.been.called();
+	});
+	test('Delete unit', async () => {
+		const spy = chai.spy.on(scaffoldingController, 'deleteUnit');
+		deleteUnit(uri);
+		await sleep(sleepTime);
+		expect(spy).to.have.been.called();
+	});
+	test('Rename unit', async () => {
+		const spy = chai.spy.on(scaffoldingController, 'renameUnit');
+		renameUnit(uri);
 		await sleep(sleepTime);
 		expect(spy).to.have.been.called();
 	});
