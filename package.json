@@ -149,5 +149,14 @@
 		"sinon": "^9.0.1",
 		"tmp": "^0.2.1",
 		"vscode-extension-telemetry": "^0.1.1"
-	}
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/microsoft/docs-scaffolding"
+	},
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/microsoft/docs-scaffolding/issues"
+	},
+	"homepage": "https://github.com/microsoft/docs-scaffolding/blob/main/README.md"
 }

@@ -5,12 +5,13 @@ import { resolve } from 'path';
 import {
 	commands,
 	workspace,
-	Uri} from 'vscode';
+	Uri
+} from 'vscode';
 import { sleep, sleepTime } from '../../test.common/common';
 import sinon = require('sinon');
 import * as scaffoldingController from './../../../controllers/scaffolding-controller';
 import {
-	moduleSelectionQuickPick, scaffoldingCommand, scaffoldModule, copyTemplates
+	moduleSelectionQuickPick, scaffoldingCommand, scaffoldModule, copyTemplates, moveSelectionUp, moveSelectionDown, insertNewUnit, deleteUnit, renameUnit
 } from '../../../controllers/scaffolding-controller';
 
 chai.use(spies);
@@ -35,7 +36,12 @@ suite('Scaffolding Controller', () => {
 		sinon.restore();
 	});
 	test('Scaffolding Command', () => {
-		const controllerCommands = [{ command: scaffoldModule.name, callback: scaffoldModule }];
+		const controllerCommands = [{ command: scaffoldModule.name, callback: scaffoldModule },
+		{ command: moveSelectionDown.name, callback: moveSelectionDown },
+		{ command: moveSelectionUp.name, callback: moveSelectionUp },
+		{ command: insertNewUnit.name, callback: insertNewUnit },
+		{ command: deleteUnit.name, callback: deleteUnit },
+		{ command: renameUnit.name, callback: renameUnit },];
 		expect(scaffoldingCommand()).to.deep.equal(controllerCommands);
 	});
 	test('Module selector', async () => {
