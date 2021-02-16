@@ -238,7 +238,7 @@ export async function updateUnitName(uri: Uri) {
             fs.renameSync(currentIncludePath, newIncludePath);
             replaceExistingUnitTitle(newFilePath, unitName);
             const unitUid = getUnitUid(newFilePath);
-		    await publishedUidCheck(unitUid, newFilename, newFilePath, selectedFileDir);
+            await publishedUidCheck(unitUid, newFilename, newFilePath, selectedFileDir);
             sendTelemetryData(telemetryCommand, '', currentFilename);
             renameUnit(selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber)
                 .then(() => updateIndex(selectedFileDir))
