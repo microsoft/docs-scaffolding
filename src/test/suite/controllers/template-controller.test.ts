@@ -3,7 +3,8 @@ import * as chai from 'chai';
 import * as spies from 'chai-spies';
 import {
 	commands,
-	workspace} from 'vscode';
+	workspace
+} from 'vscode';
 import { sleep, sleepTime } from '../../test.common/common';
 import sinon = require('sinon');
 import * as templateController from '../../../controllers/template-controller';

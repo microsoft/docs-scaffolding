@@ -1,0 +1,33 @@
+### YamlMime:Module
+uid: {{learnRepo}}.{{moduleName}}:
+metadata:
+  type: {{patternType}} # stub based on user selection: standard | introduction | choose | custom
+  title: # user input: module title for browser tab and search results
+  description: # user input: a description for site search and SEO
+  ms.date: {{msDate}} # stub with today's date
+  author: {{githubUsername}} # stub with GitHub ID from user settings
+  ms.author: {{msUser}} # stub with Microsoft alias from user settings
+  ms.topic: interactive-tutorial # do we need ms.topic?
+title: {{moduleTitle}} # stubbed from user input in VS Code
+summary: # user input: describe the module contents
+abstract: | # user input: list the learning objectives
+  In this module, you will: 
+    - # objective 1
+    - # objective 2
+    - # objective 3
+prerequisites: | # user input: list the prerequisites
+  - # prerequisite 1
+  - # prerequisite 2
+  - # prerequisite 3
+iconUrl: https://docs.microsoft.com/media/learn/module.svg
+levels: # user input: add levels from level taxonomy (https://review.docs.microsoft.com/en-us/help/contribute/metadata-taxonomies?branch=master#level)
+  - # level
+roles: # user input: add roles from role taxonomy (https://review.docs.microsoft.com/en-us/help/contribute/metadata-taxonomies?branch=master#role)
+  - # role 1
+  - # role 2
+products: # stub default from user settings; user input: add product from product taxonomy (https://review.docs.microsoft.com/en-us/help/contribute/metadata-taxonomies?branch=master#product)
+  {{products}}
+units: # stub based on prefix, module folder, and unit names
+  {{units}}
+badge: # stub based on prefix and module folder
+  uid: {{learnRepo}}.{{moduleName}}.badge:
