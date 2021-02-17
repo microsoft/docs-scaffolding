@@ -4,6 +4,7 @@ import { Uri, window, workspace } from 'vscode';
 import { reporter } from './telemetry';
 import { readFileSync, rmdir } from 'fs';
 import { join, parse } from "path";
+import { default as Axios } from 'axios';
 
 export const output = window.createOutputChannel('docs-scaffolding');
 export const sleepTime = 50;
@@ -167,7 +168,7 @@ export function getModuleTitleTemplate(localTemplateRepoPath: string, moduleType
 export function returnJsonData(jsonPath: string) {
 	try {
 		const moduleJson = readFileSync(jsonPath, "utf8");
-		return JSON.parse(moduleJson);	
+		return JSON.parse(moduleJson);
 	} catch (error) {
 		postError(error);
 		showStatusMessage(error);
@@ -180,8 +181,8 @@ export function replaceUnitPlaceholderWithTitle(unitPath: string, unitTitle: str
 			files: unitPath,
 			from: /^title:\s{{unitName}}/gm,
 			to: `title: ${unitTitle}`,
-		  };
-		  replace.sync(options);	
+		};
+		replace.sync(options);
 	} catch (error) {
 		postError(error);
 		showStatusMessage(error);
@@ -203,8 +204,57 @@ export function replaceExistingUnitTitle(unitPath: string, newUnitTitle: string)
 			files: unitPath,
 			from: /^title:\s.*/gm,
 			to: `title: ${newUnitTitle}`,
-		  };
-		  replace.sync(options);	
+		};
+		replace.sync(options);
+	} catch (error) {
+		postError(error);
+		showStatusMessage(error);
+	}
+}
+
+export async function publishedUidCheck(unitId: string, unitName: string, unitPath: string, modulePath: string) {
+	const hierarchyServiceApi = `https://docs.microsoft.com/api/hierarchy/modules?unitId=${unitId}`;
+	await Axios.get(hierarchyServiceApi).then(function () {
+		// not needed because this is the expected behaviour; remove comment for debugging. showStatusMessage(`Live UID :${unitId}. Yml UID will not be changed.`);
+	}).catch(function () {
+		showStatusMessage(`UID ${unitId} is not published. Yml UID will be updated.`);
+		updateUnitUid(unitName, unitPath, modulePath);
+	});
+}
+
+export function getUnitUid(selectedUnit: string) {
+	try {
+		const doc = yaml.load(fs.readFileSync(selectedUnit, 'utf8'));
+		return doc.uid;
+	} catch (error) {
+		output.appendLine(error);
+	}
+}
+
+export function updateUnitUid(unitName: string, unitPath: string, modulePath: string) {
+	try {
+		let newUnitUid = getModuleUid(modulePath);
+		newUnitUid = `uid: ${newUnitUid}.${unitName}`;
+		const options = {
+			files: unitPath,
+			from: /^uid:\s.*/gm,
+			to: newUnitUid,
+		};
+		replace.sync(options);
+	} catch (error) {
+		postError(error);
+		showStatusMessage(error);
+	}
+}
+
+export function replaceUnitPatternPlaceholder(unitPath: string, patternType: string) {
+	try {
+		const options = {
+			files: unitPath,
+			from: /{{patternType}}/gm,
+			to: patternType,
+		};
+		replace.sync(options);
 	} catch (error) {
 		postError(error);
 		showStatusMessage(error);

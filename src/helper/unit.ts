@@ -2,12 +2,13 @@ import { Uri, QuickPickItem, QuickPickOptions, window } from "vscode";
 import { basename, join } from "path";
 import { readdirSync } from "fs";
 import { localTemplateRepoPath } from '../controllers/template-controller';
-import { getModuleUid, getSelectedFile, getUnitTitle, naturalLanguageCompare, output, postError, replaceExistingUnitTitle, sendTelemetryData, showStatusMessage, sleep, sleepTime } from '../helper/common';
+import { getModuleUid, getSelectedFile, getUnitTitle, getUnitUid, naturalLanguageCompare, output, postError, publishedUidCheck, replaceExistingUnitTitle, sendTelemetryData, showStatusMessage, sleep, sleepTime } from '../helper/common';
 import { alias, gitHubID } from "../helper/user-settings";
 
 const fse = require("fs-extra");
 const replace = require("replace-in-file");
 const fs = require("fs");
+const yaml = require('js-yaml');
 const includeRegex = /includes\/.*\.md/;
 const uidRegex = /^uid.*/gm;
 
@@ -225,7 +226,7 @@ export async function updateUnitName(uri: Uri) {
             validateInput: (userInput) =>
                 userInput.length > 0 ? "" : "Please provide a unit name.",
         });
-        getUserInput.then((unitName) => {
+        getUserInput.then(async (unitName) => {
             if (!unitName) {
                 return;
             }
@@ -236,6 +237,8 @@ export async function updateUnitName(uri: Uri) {
             const newIncludePath = join(selectedFileDir, 'includes', `${currentUnitNumber}-${newFilename}.md`);
             fs.renameSync(currentIncludePath, newIncludePath);
             replaceExistingUnitTitle(newFilePath, unitName);
+            const unitUid = getUnitUid(newFilePath);
+            await publishedUidCheck(unitUid, newFilename, newFilePath, selectedFileDir);
             sendTelemetryData(telemetryCommand, '', currentFilename);
             renameUnit(selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber)
                 .then(() => updateIndex(selectedFileDir))
