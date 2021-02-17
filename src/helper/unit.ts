@@ -220,7 +220,6 @@ export async function updateUnitName(uri: Uri) {
         let { selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber } = getSelectedFile(uri, true);
         const baseUnitFileName = currentFilename.replace(/[0-9]+.*?-/gm, '');
         const currentFilePath = join(selectedFileDir, `${currentFilename}.yml`);
-        const unitTitlePlaceholder: string = getUnitTitle(currentFilePath);
         const getUserInput = window.showInputBox({
             placeHolder: baseUnitFileName,
             prompt: "Enter a new file name (with no prefix or extension).",
