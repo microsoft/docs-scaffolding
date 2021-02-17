@@ -198,18 +198,29 @@ export function getUnitTitle(unitPath: string) {
 	}
 }
 
-export function replaceExistingUnitTitle(unitPath: string, newUnitTitle: string) {
-	try {
-		const options = {
-			files: unitPath,
-			from: /^title:\s.*/gm,
-			to: `title: ${newUnitTitle}`,
-		};
-		replace.sync(options);
-	} catch (error) {
-		postError(error);
-		showStatusMessage(error);
-	}
+export function replaceExistingUnitTitle(unitPath: string) {
+	const unitTitlePlaceholder: string = getUnitTitle(unitPath);
+	const getUserInput = window.showInputBox({
+		placeHolder: unitTitlePlaceholder,
+		prompt: "Enter new unit title.",
+		validateInput: (userInput) =>
+			userInput.length > 0 ? "" : "Please provide a unit title.",
+	});
+	getUserInput.then(async (unitTitle) => {
+		if (unitTitle) {
+			try {
+				const options = {
+					files: unitPath,
+					from: /^title:\s.*/gm,
+					to: `title: ${unitTitle}`,
+				};
+				replace.sync(options);
+			} catch (error) {
+				postError(error);
+				showStatusMessage(error);
+			}
+		}
+	});
 }
 
 export async function publishedUidCheck(unitId: string, unitName: string, unitPath: string, modulePath: string) {
