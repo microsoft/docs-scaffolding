@@ -217,7 +217,7 @@ export async function publishedUidCheck(unitId: string, unitName: string, unitPa
 	await Axios.get(hierarchyServiceApi).then(function () {
 		// not needed because this is the expected behaviour; remove comment for debugging. showStatusMessage(`Live UID :${unitId}. Yml UID will not be changed.`);
 	}).catch(function () {
-		showStatusMessage(`UID ${hierarchyServiceApi} is not published. Yml UID will be updated.`);
+		showStatusMessage(`UID ${unitId} is not published. Yml UID will be updated.`);
 		updateUnitUid(unitName, unitPath, modulePath);
 	});
 }
