@@ -2,14 +2,16 @@
 
 import { Uri, window, workspace } from 'vscode';
 import { reporter } from './telemetry';
-import { rmdir } from 'fs';
+import { readFileSync, rmdir } from 'fs';
 import { join, parse } from "path";
+import { default as Axios } from 'axios';
 
 export const output = window.createOutputChannel('docs-scaffolding');
 export const sleepTime = 50;
 const fileNumberRegex = /(.*?)-.*/;
 const fs = require("fs");
 const yaml = require('js-yaml');
+const replace = require("replace-in-file");
 
 /**
  * Create a posted warning message and applies the message to the log
@@ -150,3 +152,122 @@ export function sleep(ms: number): Promise<void> {
 export const naturalLanguageCompare = (a: string, b: string) => {
 	return !!a && !!b ? a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }) : 0;
 };
+
+export function getModuleTitleTemplate(localTemplateRepoPath: string, moduleType: string) {
+	try {
+		const moduleTypeDefinitionJson = join(localTemplateRepoPath, "learn-scaffolding-main", "module-type-definitions", `${moduleType}.json`);
+		const moduleJson = readFileSync(moduleTypeDefinitionJson, "utf8");
+		let data = JSON.parse(moduleJson);
+		return data.moduleTitleTemplate;
+	} catch (error) {
+		postError(error);
+		showStatusMessage(error);
+	}
+}
+
+export function returnJsonData(jsonPath: string) {
+	try {
+		const moduleJson = readFileSync(jsonPath, "utf8");
+		return JSON.parse(moduleJson);
+	} catch (error) {
+		postError(error);
+		showStatusMessage(error);
+	}
+}
+
+export function replaceUnitPlaceholderWithTitle(unitPath: string, unitTitle: string) {
+	try {
+		const options = {
+			files: unitPath,
+			from: /^title:\s{{unitName}}/gm,
+			to: `title: ${unitTitle}`,
+		};
+		replace.sync(options);
+	} catch (error) {
+		postError(error);
+		showStatusMessage(error);
+	}
+}
+
+export function getUnitTitle(unitPath: string) {
+	try {
+		const doc = yaml.load(fs.readFileSync(unitPath, 'utf8'));
+		return doc.title;
+	} catch (error) {
+		output.appendLine(error);
+	}
+}
+
+export function replaceExistingUnitTitle(unitPath: string) {
+	const unitTitlePlaceholder: string = getUnitTitle(unitPath);
+	const getUserInput = window.showInputBox({
+		placeHolder: unitTitlePlaceholder,
+		prompt: "Enter new unit title.",
+		validateInput: (userInput) =>
+			userInput.length > 0 ? "" : "Please provide a unit title.",
+	});
+	getUserInput.then(async (unitTitle) => {
+		if (unitTitle) {
+			try {
+				const options = {
+					files: unitPath,
+					from: /^title:\s.*/gm,
+					to: `title: ${unitTitle}`,
+				};
+				replace.sync(options);
+			} catch (error) {
+				postError(error);
+				showStatusMessage(error);
+			}
+		}
+	});
+}
+
+export async function publishedUidCheck(unitId: string, unitName: string, unitPath: string, modulePath: string) {
+	const hierarchyServiceApi = `https://docs.microsoft.com/api/hierarchy/modules?unitId=${unitId}`;
+	await Axios.get(hierarchyServiceApi).then(function () {
+		// not needed because this is the expected behaviour; remove comment for debugging. showStatusMessage(`Live UID :${unitId}. Yml UID will not be changed.`);
+	}).catch(function () {
+		showStatusMessage(`UID ${unitId} is not published. Yml UID will be updated.`);
+		updateUnitUid(unitName, unitPath, modulePath);
+	});
+}
+
+export function getUnitUid(selectedUnit: string) {
+	try {
+		const doc = yaml.load(fs.readFileSync(selectedUnit, 'utf8'));
+		return doc.uid;
+	} catch (error) {
+		output.appendLine(error);
+	}
+}
+
+export function updateUnitUid(unitName: string, unitPath: string, modulePath: string) {
+	try {
+		let newUnitUid = getModuleUid(modulePath);
+		newUnitUid = `uid: ${newUnitUid}.${unitName}`;
+		const options = {
+			files: unitPath,
+			from: /^uid:\s.*/gm,
+			to: newUnitUid,
+		};
+		replace.sync(options);
+	} catch (error) {
+		postError(error);
+		showStatusMessage(error);
+	}
+}
+
+export function replaceUnitPatternPlaceholder(unitPath: string, patternType: string) {
+	try {
+		const options = {
+			files: unitPath,
+			from: /{{patternType}}/gm,
+			to: patternType,
+		};
+		replace.sync(options);
+	} catch (error) {
+		postError(error);
+		showStatusMessage(error);
+	}
+}

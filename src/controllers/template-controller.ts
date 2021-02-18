@@ -22,7 +22,7 @@ export async function downloadTemplateZip() {
   unzipTemplates();
 }
 
-async function unzipTemplates() {
+export async function unzipTemplates() {
     const extract = require('extract-zip');
     try {
       await extract(templateZip, { dir: localTemplateRepoPath });
