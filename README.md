@@ -52,29 +52,45 @@ Now, when you scaffold a module, the following will be auto-populated based on y
 
 After you scaffold a new module, you'll need to rename the units to replace the placeholders. For example, in our "Choose the best module pattern for my module" module, we'd update the unit file "2-identify-{product}-options.yml" as follows:
 
-1. Right-click the unit YAML file in VS Code file explorer and select **Learn: rename unit**.
+1. Right-click the unit YAML file in VS Code file explorer and select **Learn: Rename unit**.
 
    **Important:** All module structure updates must be initiated from the unit YAML files, not the corresponding Markdown files or the index.yml file.
 1. In the pop-up text box, you'll see the current file name, minus the numeric prefix and file name extension.
 
    ![Screenshot of the rename unit text box showing the placeholder file name minus the prefix and extension.](media/rename-unit-text-box.png)
-1. Type in the new unit file name. For example, "identify-{product}-options" might become "identify-module-pattern-options". Press enter.
+1. Type in the new unit file name. For example, "identify-{product}-options" might become "identify-module-pattern-options". Press Enter.
 1. Next, you'll be prompted to update the module title. This is the value of the `title` YAML field in the unit YAML file. You can optionally type a new title, or you can cancel out. You can update the `title` field within the YAML file at any time.
 1. The following changes are made automatically based on your input:
    - The name of the YAML file is updated. For example, if you typed "identify-module-pattern-options" as the new file name for "2-identify-{product}-options.yml", the new file name will be "2-identify-module-pattern-options.yml".
    - The corresponding Markdown file in the `includes` folder is renamed. For example, "2-identify-{product}-options.md" is updated to "2-identify-module-pattern-options.md".
    - The reference to the included Markdown file is updated in the parent YAML file, such as `[!include[](includes/2-identify-module-pattern-options.md)]`.
-   - If the module has not yet been published live, the UID in index.yml is also updated, such as `learn.choose-the-best-module-pattern-for-my-module.identify-module-pattern-options`. If the module has already been published live, placeholders should already have been removed, and UIDs won't be updated because that would break live content relationships.
+   - If the module has not yet been published live, the UID under `units` in index.yml is also updated, such as `learn.choose-the-best-module-pattern-for-my-module.identify-module-pattern-options`. If the module has already been published live, placeholders should already have been removed, and UIDs won't be updated because that would break live content relationships.
    - If you updated the unit title, the `title` field in the YAML file is updated.
+
+You can use the rename functionality to update unit file names and titles at any time. Again, once the module has been published live the UIDs won't be updated, but other references will be.
 
 ## Add a unit
 
 You can add a new unit to a module. For example, the default number of choices in a Choose module is four, but what if you have five choices?
 
 1. Right-click the unit YAML file where you want to add a new unit. For example, if you want to add a new unit at the fifth position in the module, right-click the unit with the prefix "5".
-1. From the pop-up menu, choose the appropriate unit type:
-   - 
+1. From the pop-up menu, choose the appropriate unit type.
+1. Type the file name for the new unit, minus prefix and extension. Press Enter.
+1. Optionally type the unit title. Press Enter.
+1. The new unit YAML file is added with the appropriate numeric prefix based on where you inserted it. A corresponding Markdown file is added in the `includes` folder and referenced from the unit YAML, and a UID is added in the appropriate order under `units` in index.yml.
+
+## Delete a unit
+
+Similarly, what if your Choose module only needs three choices? You can delete a unit as follows:
+
+1. Right-click the unit YAML file you want to delete in file explorer.
+1. Select **Learn: Delete unit**.
+1. The unit YAML file and its corresponding Markdown file are deleted, and the UID is removed from `units` in index.yml.
 
 ## Reorder units
 
-## Delete a unit
+You can change the order of units in a module:
+
+1. Right-click the unit YAML file you want to move in file explorer.
+1. Select **Learn: Move unit up** or **Learn: Move unit down** as appropriate.
+1. 
