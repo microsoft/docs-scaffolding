@@ -93,4 +93,5 @@ You can change the order of units in a module:
 
 1. Right-click the unit YAML file you want to move in file explorer.
 1. Select **Learn: Move unit up** or **Learn: Move unit down** as appropriate.
-1. 
+1. The numeric prefix of the moved file and any files below it are updated to reflect the new file order. The corresponding Markdown files and inclusions are updated to match, and the UID list under `units` in index.yml is reordered.
+1. Repeat the operation as many times as necessary until your units are in the right order.
