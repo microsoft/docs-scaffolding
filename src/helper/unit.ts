@@ -134,7 +134,7 @@ export function copyUnitSelection(uri: Uri, unitType: string, contentTemplateDir
             }
             let formattedUnitName = unitName.replace(/ /g, "-").toLowerCase();
             let { selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber } = getSelectedFile(uri, true);
-            await bulkUpdateFileNamePrefix(selectedFileDir, newUnitNumber, true)
+            await bulkUpdateFileNamePrefix(selectedFileDir, newUnitNumber, true);
             fse.copySync(join(contentTemplateDirectory, `${unitType}.yml`), join(selectedFileDir, `${currentUnitNumber}-${formattedUnitName}.yml`));
             if (unitType === 'default-unit') {
                 fse.copySync(join(contentTemplateDirectory, `default-exercise-unit.md`), join(selectedFileDir, 'includes', `${currentUnitNumber}-${formattedUnitName}.md`));
@@ -273,7 +273,13 @@ export function removeStubComments(sourceFile: string) {
 }
 
 export function bulkUpdateFileNamePrefix(selectedFileDir: string, startingPrefix: number, incrementPrefix: boolean) {
-    const regex = new RegExp("^[" + startingPrefix + "-9]|\\d\\d\\d*-", "gm");
+    let regex: RegExp;
+    if (startingPrefix < 10) {
+        regex = new RegExp("^[" + startingPrefix + "-9]|\\d\\d\\d*-", "gm");
+    } else {
+        regex = new RegExp("^[" + startingPrefix + "][0-9]|\\d\\d\\d*-", "gm");
+    }
+    
     const fileNumberRegex = /^(?:[0-9]|\d\d\d*)./gm;
     try {
         let filenames = fs.readdirSync(selectedFileDir);
