@@ -209,8 +209,6 @@ export function replaceExistingUnitTitle(unitPath: string) {
 	const getUserInput = window.showInputBox({
 		placeHolder: inputBoxPlaceholder,
 		prompt: "Enter new unit title.",
-		validateInput: (userInput) =>
-			userInput.length > 0 ? "" : "Please provide a unit title.",
 	});
 	getUserInput.then(async (unitTitle) => {
 		if (unitTitle) {
