@@ -128,12 +128,13 @@ export function copyUnitSelection(uri: Uri, unitType: string, contentTemplateDir
             validateInput: (userInput) =>
                 userInput.length > 0 ? "" : "Please provide a unit name.",
         });
-        getUserInput.then((unitName) => {
+        getUserInput.then(async (unitName) => {
             if (!unitName) {
                 return;
             }
             let formattedUnitName = unitName.replace(/ /g, "-").toLowerCase();
             let { selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber } = getSelectedFile(uri, true);
+            await bulkUpdateFileNamePrefix(selectedFileDir, newUnitNumber, true);
             fse.copySync(join(contentTemplateDirectory, `${unitType}.yml`), join(selectedFileDir, `${currentUnitNumber}-${formattedUnitName}.yml`));
             if (unitType === 'default-unit') {
                 fse.copySync(join(contentTemplateDirectory, `default-exercise-unit.md`), join(selectedFileDir, 'includes', `${currentUnitNumber}-${formattedUnitName}.md`));
@@ -157,7 +158,6 @@ export function copyUnitSelection(uri: Uri, unitType: string, contentTemplateDir
 
             sendTelemetryData(telemetryCommand, unitType, formattedUnitName);
             renameUnit(selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber)
-                .then(() => bulkUpdateFileNamePrefix(selectedFileDir, newUnitNumber, true))
                 .then(() => updateIndex(selectedFileDir))
                 .then(() => replaceStubTokens(newFilePath, '{{unitName}}', unitName))
                 .then(() => replaceStubTokens(newFilePath, '{{msDate}}', date))
@@ -273,7 +273,13 @@ export function removeStubComments(sourceFile: string) {
 }
 
 export function bulkUpdateFileNamePrefix(selectedFileDir: string, startingPrefix: number, incrementPrefix: boolean) {
-    const regex = new RegExp("^[" + startingPrefix + "-9]|\\d\\d\\d*-", "gm");
+    let regex: RegExp;
+    if (startingPrefix < 10) {
+        regex = new RegExp("^[" + startingPrefix + "-9]|\\d\\d\\d*-", "gm");
+    } else {
+        regex = new RegExp("^[" + startingPrefix + "][0-9]|\\d\\d\\d*-", "gm");
+    }
+    
     const fileNumberRegex = /^(?:[0-9]|\d\d\d*)./gm;
     try {
         let filenames = fs.readdirSync(selectedFileDir);
@@ -289,11 +295,15 @@ export function bulkUpdateFileNamePrefix(selectedFileDir: string, startingPrefix
                 }
                 let fileName = file.replace(/^(?:[0-9]|\d\d\d*)-/, '').replace('.yml', '');
                 const currentFilePath = join(selectedFileDir, `${file}`);
-                const newFilePath = join(selectedFileDir, `${newPrefix}-${fileName}.yml`);
-                fs.renameSync(currentFilePath, newFilePath);
+                if (fs.existsSync(currentFilePath)) {
+                    const newFilePath = join(selectedFileDir, `${newPrefix}-${fileName}.yml`);
+                    fs.renameSync(currentFilePath, newFilePath);
+                }
                 const currentIncludePath = join(selectedFileDir, 'includes', file.replace('.yml', '.md'));
-                const newIncludePath = join(selectedFileDir, 'includes', `${newPrefix}-${fileName}.md`);
-                fs.renameSync(currentIncludePath, newIncludePath);
+                if (fs.existsSync(currentIncludePath)) {
+                    const newIncludePath = join(selectedFileDir, 'includes', `${newPrefix}-${fileName}.md`);
+                    fs.renameSync(currentIncludePath, newIncludePath);
+                }
                 updateIncludes(selectedFileDir);
             }
         });
