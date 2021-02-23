@@ -199,9 +199,15 @@ export function getUnitTitle(unitPath: string) {
 }
 
 export function replaceExistingUnitTitle(unitPath: string) {
-	const unitTitlePlaceholder: string = getUnitTitle(unitPath);
+	const unitTitlePlaceholder: string | undefined = getUnitTitle(unitPath);
+	let inputBoxPlaceholder: string;
+	if (unitTitlePlaceholder) {
+		inputBoxPlaceholder = unitTitlePlaceholder;
+	} else {
+		inputBoxPlaceholder = 'New unit title';
+	}
 	const getUserInput = window.showInputBox({
-		placeHolder: unitTitlePlaceholder,
+		placeHolder: inputBoxPlaceholder,
 		prompt: "Enter new unit title.",
 		validateInput: (userInput) =>
 			userInput.length > 0 ? "" : "Please provide a unit title.",

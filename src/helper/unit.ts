@@ -141,6 +141,7 @@ export function copyUnitSelection(uri: Uri, unitType: string, contentTemplateDir
             }
             const moduleUid = getModuleUid(selectedFileDir);
             const newFilePath = join(selectedFileDir, `${currentUnitNumber}-${formattedUnitName}.yml`);
+            await replaceExistingUnitTitle(newFilePath);
             let options = {
                 files: newFilePath,
                 from: uidRegex,
@@ -234,8 +235,10 @@ export async function updateUnitName(uri: Uri) {
             const newFilePath = join(selectedFileDir, `${currentUnitNumber}-${newFilename}.yml`);
             fs.renameSync(currentFilePath, newFilePath);
             const currentIncludePath = join(selectedFileDir, 'includes', `${currentFilename}.md`);
-            const newIncludePath = join(selectedFileDir, 'includes', `${currentUnitNumber}-${newFilename}.md`);
-            fs.renameSync(currentIncludePath, newIncludePath);
+            if (fs.existsSync(currentIncludePath)) {
+                const newIncludePath = join(selectedFileDir, 'includes', `${currentUnitNumber}-${newFilename}.md`);
+                fs.renameSync(currentIncludePath, newIncludePath);
+            }
             await replaceExistingUnitTitle(newFilePath);
             const unitUid = getUnitUid(newFilePath);
             await publishedUidCheck(unitUid, newFilename, newFilePath, selectedFileDir);
