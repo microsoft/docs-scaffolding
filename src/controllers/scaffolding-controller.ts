@@ -59,7 +59,7 @@ export async function moduleSelectionQuickPick(uri: Uri) {
       typeDefinitionJsonDirectory,
       function (err: string, files: any[]) {
         if (err) {
-          return postError("Unable to scan directory: " + err);
+          return postError(`Unable to scan local template directory: ${typeDefinitionJsonDirectory}. Please try again.`);
         }
         files.forEach(function (file) {
           const jsonPath = join(typeDefinitionJsonDirectory, file);
@@ -207,8 +207,10 @@ export async function copyTemplates(
           typeDefinitionJsonDirectory,
           obj.contentTemplatePath.replace(platformRegex, "/")
         );
-        if (!existsSync(templateFile))
+        if (!existsSync(templateFile)) {
+          showStatusMessage(`${templateFile} does not exist and will be omitted from the scaffolding process.`);
           throw `${templateFile} does not exist and will be omitted from the scaffolding process.`;
+        }
         fse.copySync(
           templateFile,
           join(scaffoldModule, "includes", `${scaffoldFilename}.md`)
