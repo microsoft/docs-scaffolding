@@ -9,6 +9,7 @@ export async function activate(context: ExtensionContext) {
 	extensionPath = context.extensionPath;
 	context.subscriptions.push(new Reporter(context));
 	downloadTemplateZip();
+	setInterval(downloadTemplateZip, 14400000);
 	const ScaffoldingCommands: any = [];
 	scaffoldingCommand().forEach(cmd => ScaffoldingCommands.push(cmd));
 	try {
