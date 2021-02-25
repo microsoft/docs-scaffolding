@@ -1,9 +1,5 @@
 # Change Log
 
-All notable changes to the "scaffolding-context-proto" extension will be documented in this file.
-
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
-
-## [Unreleased]
+## 0.0.1 (February 25th, 2021)
 
 - Initial release
