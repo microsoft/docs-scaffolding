@@ -10,6 +10,10 @@ The Learn team has defined several standard patterns for Learn modules, each ser
 
 The Scaffolding extension lets content developers create a module in one of these patterns in just a few clicks, instead of having to manually create the series of folders, YAML files, and Markdown files that make up a module. Each generated unit contains required metadata, templatized content, and guidance to help users craft modules that follow Learn best practices. Finally, the extension provides automation to easily update module structure, such as adding, renaming, reordering, and deleting units.
 
+Here's a brief demo of the basic functionality:
+
+![Animated GIF of scaffolding a new module, renaming a file, and deleting a file.](https://raw.githubusercontent.com/microsoft/docs-scaffolding/main/media/scaffolding-demo.gif)
+
 ## Update your Settings to auto-populate metadata
 
 You can set some metadata in your VS Code extension settings so it's auto-populated when you scaffold a new module.
