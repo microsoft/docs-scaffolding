@@ -67,7 +67,7 @@ After you scaffold a new module, you'll need to rename the units to replace the 
 1. The following changes are made automatically based on your input:
    - The name of the YAML file is updated. For example, if you typed "identify-module-pattern-options" as the new file name for "2-identify-{product}-options.yml", the new file name will be "2-identify-module-pattern-options.yml".
    - The corresponding Markdown file in the `includes` folder is renamed. For example, "2-identify-{product}-options.md" is updated to "2-identify-module-pattern-options.md".
-   - The reference to the included Markdown file is updated in the parent YAML file, such as `[!include[](includes/2-identify-module-pattern-options.md)]`.
+   - The reference to the included Markdown file is updated in the parent YAML file.
    - If the module has not yet been published live, the UID under `units` in index.yml is also updated, such as `learn.choose-the-best-module-pattern-for-my-module.identify-module-pattern-options`. If the module has already been published live, placeholders should already have been removed, and UIDs won't be updated because that would break live content relationships.
    - If you updated the unit title, the `title` field in the YAML file is updated.
 
@@ -81,7 +81,7 @@ You can add a new unit to a module. For example, the default number of choices i
 1. From the pop-up menu, choose the appropriate unit type.
 1. Type the file name for the new unit, minus prefix and extension. Press Enter.
 1. Optionally type the unit title. Press Enter.
-1. The new unit YAML file is added with the appropriate numeric prefix based on where you inserted it. A corresponding Markdown file is added in the `includes` folder and referenced from the unit YAML, and a UID is added in the appropriate order under `units` in index.yml.
+1. The new unit YAML file is added with the appropriate numeric prefix based on where you inserted it. A corresponding Markdown file is added in the `includes` folder and referenced from the unit YAML, and a UID is added in the appropriate order under `units` in index.yml. The numeric prefixes of other files are updated as needed to reflect the new order.
 
 ## Delete a unit
 
@@ -89,7 +89,7 @@ Similarly, what if your Choose module only needs three choices? You can delete a
 
 1. Right-click the unit YAML file you want to delete in file explorer.
 1. Select **Learn: Delete unit**.
-1. The unit YAML file and its corresponding Markdown file are deleted, and the UID is removed from `units` in index.yml.
+1. The unit YAML file and its corresponding Markdown file are deleted, the UID is removed from `units` in index.yml, and numeric prefixes are updated to reflect the new order.
 
 ## Reorder units
 
