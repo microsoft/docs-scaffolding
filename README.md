@@ -36,7 +36,7 @@ Now, when you scaffold a module, the following will be auto-populated based on y
 1. In the pop-up menu, select the appropriate module pattern depending on the intent of your module.
 1. In the text box, specify a title for you module, using the placeholder text (such as "Choose the best {product category} for {your purpose}") as a guide.
 
-   ![Screenshot of the module title input box.](media/module-title-input-box.png)
+   ![Screenshot of the module title input box.](https://raw.githubusercontent.com/microsoft/docs-scaffolding/main/media/module-title-input-box.png)
 1. Press Enter. Now you'll se a child folder for your module with the following characteristics:
    - The folder name is the module title with certain words omitted (such as "the") or shortened (such as "application" to "app").
    - The folder contains a `media` sub-folder for storing images.
@@ -46,7 +46,7 @@ Now, when you scaffold a module, the following will be auto-populated based on y
 
    For example, here's a newly scaffolded **Choose** module with the title "Choose the best module pattern for my module":
   
-   ![Screenshot of a newly scaffolded module in the VS Code file explorer, structured as described above.](media/newly-scaffolded-choose-module.png)
+   ![Screenshot of a newly scaffolded module in the VS Code file explorer, structured as described above.](https://raw.githubusercontent.com/microsoft/docs-scaffolding/main/media/newly-scaffolded-choose-module.png)
 
 ## Rename a unit
 
@@ -57,7 +57,7 @@ After you scaffold a new module, you'll need to rename the units to replace the 
    **Important:** All module structure updates must be initiated from the unit YAML files, not the corresponding Markdown files or the index.yml file.
 1. In the pop-up text box, you'll see the current file name, minus the numeric prefix and file name extension.
 
-   ![Screenshot of the rename unit text box showing the placeholder file name minus the prefix and extension.](media/rename-unit-text-box.png)
+   ![Screenshot of the rename unit text box showing the placeholder file name minus the prefix and extension.](https://raw.githubusercontent.com/microsoft/docs-scaffolding/main/media/rename-unit-text-box.png)
 1. Type in the new unit file name. For example, "identify-{product}-options" might become "identify-module-pattern-options". Press Enter.
 1. Next, you'll be prompted to update the module title. This is the value of the `title` YAML field in the unit YAML file. You can optionally type a new title, or you can cancel out. You can update the `title` field within the YAML file at any time.
 1. The following changes are made automatically based on your input:
