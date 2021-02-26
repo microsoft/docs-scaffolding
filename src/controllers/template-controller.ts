@@ -17,7 +17,7 @@ export async function downloadTemplateZip() {
   } catch (error) {
     templateZip = join(extensionPath, 'offline-template-zip', 'learn-scaffolding-main.zip');
     postError(error);
-    showStatusMessage(`Error downloading templates from ${templateRepo}. Loading local templates.`);
+    // showStatusMessage(`Error downloading templates from ${templateRepo}. Loading local templates.`);
   }
   unzipTemplates();
 }
@@ -28,6 +28,6 @@ export async function unzipTemplates() {
       await extract(templateZip, { dir: localTemplateRepoPath });
     } catch (error) {
       postError(error);
-      showStatusMessage(error);
+      // showStatusMessage(error);
     }
   }
