@@ -41,14 +41,14 @@ suite("Common", () => {
     showStatusMessage("message");
     expect(spy).to.be.have.been.called;
   });
-  test("Get module uid", async () => {
+/*   test("Get module uid", async () => {
     const filePath = resolve(
       __dirname,
       "../../../../src/test/data/repo/modules"
     );
     const uid = getModuleUid(filePath);
     expect(uid).to.equal("learn-wwl.responsible-conversational-ai");
-  });
+  }); */
   test("Get module title template", async () => {
     const filePath = resolve(__dirname, "../../../../src/test/data/repo");
     const templateTitle = getModuleTitleTemplate(filePath, "introduction");
