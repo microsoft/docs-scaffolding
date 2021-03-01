@@ -17,9 +17,36 @@ import {
   updateUnitUid,
   replaceUnitPatternPlaceholder,
 } from "../../../helper/common";
+
 const expect = chai.expect;
 
 suite("Common", () => {
+  suiteTeardown(async () => {
+    // revert replacement strings after tests finish
+    const replace = require("replace-in-file");
+    const filePath = resolve(
+      __dirname,
+      "../../../../src/test/data/repo/units/unit-template.yml"
+    );
+		let options = {
+			files: filePath,
+			from: /^title:\s.*/gm,
+			to: `title: {{unitName}} # stub from default unit name`,
+		};
+		replace.sync(options);
+    options = {
+			files: filePath,
+			from: /type:\s.*/gm,
+			to: `type: {{patternType}} # stub based on selected scaffold: introduction | learning_content | exercise | summary`,
+		};
+    replace.sync(options);
+    options = {
+			files: filePath,
+			from: /^uid:\s.*/gm,
+			to: `uid: {{learnRepo}}.{{moduleName}}.{{unitName}} # stub from prefix + module folder name + default unit name`,
+		};
+    replace.sync(options);
+	});
   test("postWarning showWarning is called", async () => {
     const spy = chai.spy(window.showWarningMessage);
     postWarning("message");
@@ -126,7 +153,7 @@ suite("Common", () => {
     );
     expect(spy).to.be.have.been.called;
   });
-  test("Update unit uid", async () => {
+  test("Replace unit pattern placeholder", async () => {
     const spy = chai.spy(replaceUnitPatternPlaceholder);
     const filePath = resolve(
       __dirname,
