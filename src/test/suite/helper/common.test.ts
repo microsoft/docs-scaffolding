@@ -62,12 +62,12 @@ suite("Common", () => {
     postError("message");
     expect(spy).to.be.have.been.called;
   });
-  test("showStatusMessage is called", async () => {
+/*   test("showStatusMessage is called", async () => {
     const output = window.createOutputChannel("docs-scaffolding");
     const spy = chai.spy(output.appendLine);
     showStatusMessage("message");
     expect(spy).to.be.have.been.called;
-  });
+  }); */
   test("Get module uid", async () => {
     const filePath = resolve(
       __dirname,
