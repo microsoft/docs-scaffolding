@@ -16,12 +16,6 @@ suite('Module Helper', () => {
 		await sleep(sleepTime);
 		expect(spy).to.have.been.called();
     });
-    test('Stub module references', async () => {
-		const spy = chai.spy.on(moduleHelper, 'stubModuleReferences');
-		stubModuleReferences(modulePath, 'test-module');
-		await sleep(sleepTime);
-		expect(spy).to.have.been.called();
-    });
     test('Stub repo references', async () => {
 		const spy = chai.spy.on(moduleHelper, 'stubRepoReferences');
 		stubRepoReferences(modulePath);
