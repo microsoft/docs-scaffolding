@@ -1,5 +1,4 @@
 import { join } from "path";
-import { extensionPath } from '../extension';
 import { postError, showStatusMessage } from '../helper/common';
 import { templateRepo } from '../helper/user-settings';
 import { homedir } from 'os';
@@ -7,7 +6,6 @@ import { copyFileSync, existsSync, mkdirSync } from "fs";
 
 export let localTemplateRepoPath: string;
 let templateZip: string;
-const fs = require("fs");
 
 export async function downloadTemplateZip() {
   const download = require('download');
