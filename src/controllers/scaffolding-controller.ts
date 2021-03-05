@@ -3,7 +3,7 @@
 import { Uri, window, QuickPickItem, QuickPickOptions } from "vscode";
 import { join, resolve } from "path";
 import { generateBaseUid } from "../helper/module";
-import { readFileSync, existsSync } from "fs";
+import { existsSync } from "fs";
 import {
   cleanupTempDirectory,
   postError,
@@ -12,7 +12,8 @@ import {
   getModuleTitleTemplate,
   returnJsonData,
   replaceUnitPlaceholderWithTitle,
-  replaceUnitPatternPlaceholder
+  replaceUnitPatternPlaceholder,
+  updateTemplatePrompt
 } from "../helper/common";
 import {
   addNewUnit,
@@ -26,6 +27,7 @@ const platformRegex = /\\/g;
 const telemetryCommand: string = "create-module";
 const fse = require("fs-extra");
 const fs = require("fs");
+const Duration = require("duration");
 
 let rawModuleTitle: string;
 let typeDefinitionJsonDirectory: string;
@@ -43,12 +45,26 @@ export function scaffoldingCommand() {
 }
 
 export async function scaffoldModule(uri: Uri) {
-  typeDefinitionJsonDirectory = join(
-    localTemplateRepoPath,
-    "learn-scaffolding-main",
-    "module-type-definitions"
-  );
-  moduleSelectionQuickPick(uri);
+  try {
+    typeDefinitionJsonDirectory = join(
+      localTemplateRepoPath,
+      "learn-scaffolding-main",
+      "module-type-definitions"
+    );
+    const stats = fs.statSync(join(localTemplateRepoPath, 'learn-scaffolding-main.zip'));
+    const zipDownloadDate = new Date(stats.mtime);
+    const currentDate = new Date(Date.now());
+    const promptAfterTime: number = 12;
+    const duration = new Duration(zipDownloadDate, currentDate);
+    const elapsedTime: number = duration.hours;
+    if (elapsedTime > promptAfterTime ) {
+      updateTemplatePrompt(promptAfterTime, uri);
+    } else {
+      moduleSelectionQuickPick(uri);
+    }
+  } catch (error) {
+    showStatusMessage(error);
+  } 
 }
 
 /* loop through module type definitions directory and store each module type */

@@ -5,6 +5,8 @@ import { reporter } from './telemetry';
 import { readFileSync, rmdir } from 'fs';
 import { join, parse } from "path";
 import { default as Axios } from 'axios';
+import { downloadTemplateZip } from '../controllers/template-controller';
+import { moduleSelectionQuickPick } from '../controllers/scaffolding-controller';
 
 export const output = window.createOutputChannel('docs-scaffolding');
 export const sleepTime = 50;
@@ -274,4 +276,20 @@ export function replaceUnitPatternPlaceholder(unitPath: string, patternType: str
 		postError(error);
 		showStatusMessage(error);
 	}
+}
+
+export async function updateTemplatePrompt(promptAfterTime: number, uri: Uri) {
+	showStatusMessage(`Local templates have not been updated in ${promptAfterTime} hours.`);
+	await window
+		.showInformationMessage(
+			`Local templates have not been updated in ${promptAfterTime} hours. Would you like downlad the latest templates?`, 'Yes', 'No'
+		)
+		.then(async result => {
+			if (result === 'Yes') {
+				await downloadTemplateZip();
+				moduleSelectionQuickPick(uri);
+			} else {
+				moduleSelectionQuickPick(uri);
+			}
+		});
 }

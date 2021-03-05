@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import * as chai from "chai";
 import { resolve } from "path";
-import { window } from "vscode";
+import { Uri, window } from "vscode";
 import {
   postWarning,
   postInformation,
@@ -16,6 +16,7 @@ import {
   getUnitUid,
   updateUnitUid,
   replaceUnitPatternPlaceholder,
+  updateTemplatePrompt
 } from "../../../helper/common";
 
 const expect = chai.expect;
@@ -28,25 +29,25 @@ suite("Common", () => {
       __dirname,
       "../../../../src/test/data/repo/units/unit-template.yml"
     );
-		let options = {
-			files: filePath,
-			from: /^title:\s.*/gm,
-			to: `title: {{unitName}} # stub from default unit name`,
-		};
-		replace.sync(options);
-    options = {
-			files: filePath,
-			from: /type:\s.*/gm,
-			to: `type: {{patternType}} # stub based on selected scaffold: introduction | learning_content | exercise | summary`,
-		};
+    let options = {
+      files: filePath,
+      from: /^title:\s.*/gm,
+      to: `title: {{unitName}} # stub from default unit name`,
+    };
     replace.sync(options);
     options = {
-			files: filePath,
-			from: /^uid:\s.*/gm,
-			to: `uid: {{learnRepo}}.{{moduleName}}.{{unitName}} # stub from prefix + module folder name + default unit name`,
-		};
+      files: filePath,
+      from: /type:\s.*/gm,
+      to: `type: {{patternType}} # stub based on selected scaffold: introduction | learning_content | exercise | summary`,
+    };
     replace.sync(options);
-	});
+    options = {
+      files: filePath,
+      from: /^uid:\s.*/gm,
+      to: `uid: {{learnRepo}}.{{moduleName}}.{{unitName}} # stub from prefix + module folder name + default unit name`,
+    };
+    replace.sync(options);
+  });
   test("postWarning showWarning is called", async () => {
     const spy = chai.spy(window.showWarningMessage);
     postWarning("message");
@@ -160,6 +161,16 @@ suite("Common", () => {
       "../../../../src/test/data/repo/units/unit-template.yml"
     );
     replaceUnitPatternPlaceholder(filePath, "excercise");
+    expect(spy).to.be.have.been.called;
+  });
+  test("Stale template prompt", async () => {
+    const spy = chai.spy(updateTemplatePrompt);
+    const filePath = resolve(
+      __dirname,
+      "../../../../src/test/data/repo/units/unit-template.yml"
+    );
+    const uri = Uri.parse(filePath);
+    updateTemplatePrompt(2, uri);
     expect(spy).to.be.have.been.called;
   });
 });
