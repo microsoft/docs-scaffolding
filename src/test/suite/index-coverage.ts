@@ -8,7 +8,7 @@ function setupNyc() {
 	// create an nyc instance, config here is the same as your package.json
 	const nyc = new NYC({
 		cache: false,
-		cwd: path.join(__dirname, '..', '..', '..'),
+		cwd: path.join(__dirname, '..', '..'),
 		exclude: ['**/**.test.js'],
 		extension: ['.ts', '.tsx'],
 		hookRequire: true,
