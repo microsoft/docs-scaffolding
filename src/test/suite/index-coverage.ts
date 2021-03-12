@@ -7,6 +7,7 @@ function setupNyc() {
 	const NYC = require('nyc');
 	// create an nyc instance, config here is the same as your package.json
 	const nyc = new NYC({
+		all: true,
 		cache: false,
 		cwd: path.join(__dirname, '..', '..'),
 		exclude: ['**/**.test.js'],
