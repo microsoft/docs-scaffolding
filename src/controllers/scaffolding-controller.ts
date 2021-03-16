@@ -220,7 +220,7 @@ export async function copyTemplates(
       window.showWarningMessage(error);
     }
   });
-  generateBaseUid(scaffoldModule, moduleName, moduleType, rawModuleTitle);
+  generateBaseUid(scaffoldModule, modifiedModuleName, moduleType, rawModuleTitle);
 }
 
 export function moveSelectionDown(uri: Uri) {
