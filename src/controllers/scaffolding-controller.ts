@@ -1,7 +1,7 @@
 /* eslint-disable no-throw-literal, curly */
 
 import { Uri, window, QuickPickItem, QuickPickOptions } from "vscode";
-import { join, resolve } from "path";
+import { basename, join, resolve } from "path";
 import { generateBaseUid } from "../helper/module";
 import { readFileSync, existsSync } from "fs";
 import {
@@ -12,7 +12,7 @@ import {
   getModuleTitleTemplate,
   returnJsonData,
   replaceUnitPlaceholderWithTitle,
-  replaceUnitPatternPlaceholder
+  replaceUnitPatternPlaceholder,
 } from "../helper/common";
 import {
   addNewUnit,
@@ -33,6 +33,10 @@ let typeDefinitionJsonDirectory: string;
 export function scaffoldingCommand() {
   const commands = [
     { command: scaffoldModule.name, callback: scaffoldModule },
+    {
+      command: scaffoldModuleInCurrentDirectory.name,
+      callback: scaffoldModuleInCurrentDirectory,
+    },
     { command: moveSelectionDown.name, callback: moveSelectionDown },
     { command: moveSelectionUp.name, callback: moveSelectionUp },
     { command: insertNewUnit.name, callback: insertNewUnit },
@@ -51,15 +55,29 @@ export async function scaffoldModule(uri: Uri) {
   moduleSelectionQuickPick(uri);
 }
 
+export async function scaffoldModuleInCurrentDirectory(uri: Uri) {
+  typeDefinitionJsonDirectory = join(
+    localTemplateRepoPath,
+    "learn-scaffolding-main",
+    "module-type-definitions"
+  );
+  moduleSelectionQuickPick(uri, true);
+}
+
 /* loop through module type definitions directory and store each module type */
-export async function moduleSelectionQuickPick(uri: Uri) {
+export async function moduleSelectionQuickPick(
+  uri: Uri,
+  currentFolder?: boolean
+) {
   try {
     let moduleTypes: QuickPickItem[] = [];
     fs.readdir(
       typeDefinitionJsonDirectory,
       function (err: string, files: any[]) {
         if (err) {
-          return postError(`Unable to scan local template directory: ${typeDefinitionJsonDirectory}. Please try again.`);
+          return postError(
+            `Unable to scan local template directory: ${typeDefinitionJsonDirectory}. Please try again.`
+          );
         }
         files.forEach(function (file) {
           const jsonPath = join(typeDefinitionJsonDirectory, file);
@@ -68,7 +86,11 @@ export async function moduleSelectionQuickPick(uri: Uri) {
             data.moduleType.charAt(0).toUpperCase() + data.moduleType.slice(1);
           moduleTypes.push(patterns);
         });
-        return showModuleSelector(uri, moduleTypes);
+        if (currentFolder) {
+          return showModuleSelector(uri, moduleTypes, true);
+        } else {
+          return showModuleSelector(uri, moduleTypes);
+        }
       }
     );
   } catch (error) {
@@ -78,14 +100,26 @@ export async function moduleSelectionQuickPick(uri: Uri) {
 }
 
 /* display each module type to the user in a quickpick */
-export async function showModuleSelector(uri: Uri, moduleTypes: any[]) {
+export async function showModuleSelector(
+  uri: Uri,
+  moduleTypes: any[],
+  currentFolder?: boolean
+) {
   const opts: QuickPickOptions = { placeHolder: "Select module pattern" };
   const selection = await window.showQuickPick(moduleTypes, opts);
-  await getSelectedFolder(uri, selection.toLowerCase());
+  if (currentFolder) {
+    await getSelectedFolder(uri, selection.toLowerCase(), true);
+  } else {
+    await getSelectedFolder(uri, selection.toLowerCase());
+  }
 }
 
 /* get module destination path and get module name */
-export function getSelectedFolder(uri: Uri, moduleType: string) {
+export function getSelectedFolder(
+  uri: Uri,
+  moduleType: string,
+  currentFolder?: boolean
+) {
   const moduleTitlePlaceholder = getModuleTitleTemplate(
     localTemplateRepoPath,
     moduleType
@@ -124,7 +158,17 @@ export function getSelectedFolder(uri: Uri, moduleType: string) {
     rawModuleTitle = moduleName;
     moduleName = moduleName.replace(/ /g, "-").toLowerCase();
     sendTelemetryData(telemetryCommand, moduleType, moduleName);
-    copyTemplates(modifiedModuleName, moduleName, moduleType, selectedFolder);
+    if (currentFolder) {
+      copyTemplates(
+        modifiedModuleName,
+        moduleName,
+        moduleType,
+        selectedFolder,
+        true
+      );
+    } else {
+      copyTemplates(modifiedModuleName, moduleName, moduleType, selectedFolder);
+    }
   });
 }
 
@@ -145,22 +189,28 @@ export async function copyTemplates(
   modifiedModuleName: string,
   moduleName: string,
   moduleType: string,
-  selectedFolder: string
+  selectedFolder: string,
+  currentFolder?: boolean
 ) {
   const jsonPath = join(typeDefinitionJsonDirectory, `${moduleType}.json`);
   const data = returnJsonData(jsonPath);
-  const scaffoldModule = join(selectedFolder, modifiedModuleName);
-
-  /* to-do: update error workflow */
-  if (existsSync(scaffoldModule)) {
-    window.showWarningMessage(
-      `${scaffoldModule} already exists. Please provide a new module name.`
-    );
-    showStatusMessage(
-      `${scaffoldModule} already exists. Please provide a new module name.`
-    );
-    await cleanupTempDirectory(localTemplateRepoPath);
-    return;
+  let scaffoldModule: any;
+  console.log(`selectedFolder: ${selectedFolder}`);
+  if (currentFolder) {
+    scaffoldModule = selectedFolder;
+  } else {
+    scaffoldModule = join(selectedFolder, modifiedModuleName);
+    /* to-do: update error workflow */
+    if (existsSync(scaffoldModule)) {
+      window.showWarningMessage(
+        `${scaffoldModule} already exists. Please provide a new module name.`
+      );
+      showStatusMessage(
+        `${scaffoldModule} already exists. Please provide a new module name.`
+      );
+      await cleanupTempDirectory(localTemplateRepoPath);
+      return;
+    }
   }
 
   // copy index.yml
@@ -208,7 +258,9 @@ export async function copyTemplates(
           obj.contentTemplatePath.replace(platformRegex, "/")
         );
         if (!existsSync(templateFile)) {
-          showStatusMessage(`${templateFile} does not exist and will be omitted from the scaffolding process.`);
+          showStatusMessage(
+            `${templateFile} does not exist and will be omitted from the scaffolding process.`
+          );
           throw `${templateFile} does not exist and will be omitted from the scaffolding process.`;
         }
         fse.copySync(
@@ -220,7 +272,16 @@ export async function copyTemplates(
       window.showWarningMessage(error);
     }
   });
-  generateBaseUid(scaffoldModule, modifiedModuleName, moduleType, rawModuleTitle);
+  if (currentFolder) {
+    generateBaseUid(scaffoldModule, basename(scaffoldModule), moduleType, rawModuleTitle);
+  } else {
+    generateBaseUid(
+      scaffoldModule,
+      modifiedModuleName,
+      moduleType,
+      rawModuleTitle
+    );
+  }
 }
 
 export function moveSelectionDown(uri: Uri) {
