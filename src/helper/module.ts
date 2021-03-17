@@ -180,7 +180,7 @@ export function moduleCleanup(moduleName: string, modulePath: string) {
   // remove stub comments
   let options = {
     files: `${modulePath}/*.yml`,
-    from: /\s#\s?stub.*/g,
+    from: /\s#\s?stub.*/gm,
     to: ``,
   };
   replace.sync(options);
