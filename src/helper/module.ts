@@ -185,6 +185,7 @@ export function moduleCleanup(moduleName: string, modulePath: string) {
   };
   replace.sync(options);
 
+  // fix CRLF warnings
   options = {
     files: `${modulePath}/*.yml`,
     from: /\s+$/gm,
