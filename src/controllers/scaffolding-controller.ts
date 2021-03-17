@@ -195,7 +195,6 @@ export async function copyTemplates(
   const jsonPath = join(typeDefinitionJsonDirectory, `${moduleType}.json`);
   const data = returnJsonData(jsonPath);
   let scaffoldModule: any;
-  console.log(`selectedFolder: ${selectedFolder}`);
   if (currentFolder) {
     scaffoldModule = selectedFolder;
   } else {

@@ -20,11 +20,11 @@
 		"commands": [
 			{
 				"command": "scaffoldModule",
-				"title": "Learn: Create module in new folder"
+				"title": "Learn: Create module in NEW folder"
 			},
 			{
 				"command": "scaffoldModuleInCurrentDirectory",
-				"title": "Learn: Create module in this folder"
+				"title": "Learn: Create module in CURRENT folder"
 			},
 			{
 				"command": "moveSelectionUp",
