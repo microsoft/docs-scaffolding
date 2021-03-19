@@ -311,26 +311,26 @@ export function replaceUnitPatternPlaceholder(
   }
 }
 
-export function formatModuleName(moduleName: any) {
-  let formattedModuleName = moduleName;
-  const termsJsonPath = join(
-    localTemplateRepoPath,
-    "learn-scaffolding-main",
-    "terms.json"
-  );
-  const data = returnJsonData(termsJsonPath);
-  let replace: any;
-  let targetString: string | unknown;
-  let replacementRegex: any;
-  Object.entries(data.titleReplacements).forEach(function ([key, value]) {
-    replace = key;
-    targetString = value;
-    replacementRegex = new RegExp("\\b(" + replace + ")\\b", "g");
-    formattedModuleName = formattedModuleName
-      .replace(replacementRegex, targetString)
-      .replace(/ /g, "-")
-      .replace(/--/g, "-")
-      .toLowerCase();
-  });
-  return formattedModuleName;
+export function formatModuleName(moduleName: any, termsJsonPath: any) {
+  try {
+    let formattedModuleName = moduleName;
+    const data = returnJsonData(termsJsonPath);
+    let replace: any;
+    let targetString: string | unknown;
+    let replacementRegex: any;
+
+    Object.entries(data.titleReplacements).forEach(function ([key, value]) {
+      replace = key;
+      targetString = value;
+      replacementRegex = new RegExp("\\b(" + replace + ")\\b", "g");
+      formattedModuleName = formattedModuleName
+        .replace(replacementRegex, targetString)
+        .replace(/ /g, "-")
+        .replace(/--/g, "-")
+        .toLowerCase();
+    });
+    return formattedModuleName;
+  } catch (error) {
+    showStatusMessage(error);
+  }
 }

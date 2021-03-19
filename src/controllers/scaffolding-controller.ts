@@ -101,8 +101,13 @@ export function getSelectedFolder(uri: Uri, moduleType: string) {
   getUserInput.then((moduleName) => {
     if (!moduleName) {
       return;
-    }
-    const moduleFolderName = formatModuleName(moduleName);
+    } 
+    const termsJsonPath = join(
+      localTemplateRepoPath,
+      "learn-scaffolding-main",
+      "terms.json"
+    );
+    const moduleFolderName = formatModuleName(moduleName, termsJsonPath);
     rawModuleTitle = moduleName;
     moduleName = moduleName.replace(/ /g, "-").toLowerCase();
     sendTelemetryData(telemetryCommand, moduleType, moduleName);

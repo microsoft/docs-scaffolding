@@ -18,7 +18,6 @@ import {
   replaceUnitPatternPlaceholder,
   formatModuleName
 } from "../../../helper/common";
-import { sleep, sleepTime } from "../../test.common/common";
 
 const expect = chai.expect;
 
@@ -165,8 +164,12 @@ suite("Common", () => {
     expect(spy).to.be.have.been.called;
   });
   test("Format module name", async () => {
-    const output = formatModuleName("Choose the best Solution For Your Application");
-    await sleep(sleepTime);
-    expect(output).to.equal("choose-best-solution-for-your-app");
+    const filePath = resolve(
+      __dirname,
+      "../../../../src/test/data/repo/learn-scaffolding-main/terms.json"
+    );
+    const moduleName = "Choose the best Service For Your Application";
+    const moduleFolderName = formatModuleName(moduleName, filePath);
+    expect(moduleFolderName).to.equal("choose-best-service-for-your-app");
   });
 });
