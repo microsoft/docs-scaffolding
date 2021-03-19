@@ -12,7 +12,7 @@ import {
   getModuleTitleTemplate,
   returnJsonData,
   replaceUnitPlaceholderWithTitle,
-  replaceUnitPatternPlaceholder,
+  replaceUnitPatternPlaceholder
 } from "../helper/common";
 import {
   addNewUnit,
@@ -59,9 +59,7 @@ export async function moduleSelectionQuickPick(uri: Uri) {
       typeDefinitionJsonDirectory,
       function (err: string, files: any[]) {
         if (err) {
-          return postError(
-            `Unable to scan local template directory: ${typeDefinitionJsonDirectory}. Please try again.`
-          );
+          return postError(`Unable to scan local template directory: ${typeDefinitionJsonDirectory}. Please try again.`);
         }
         files.forEach(function (file) {
           const jsonPath = join(typeDefinitionJsonDirectory, file);
@@ -99,7 +97,7 @@ export function getSelectedFolder(uri: Uri, moduleType: string) {
     validateInput: (userInput) =>
       userInput.length > 0 ? "" : "Please provide a module name.",
   });
-  getUserInput.then(async (moduleName) => {
+  getUserInput.then((moduleName) => {
     if (!moduleName) {
       return;
     }
@@ -126,7 +124,6 @@ export function getSelectedFolder(uri: Uri, moduleType: string) {
     rawModuleTitle = moduleName;
     moduleName = moduleName.replace(/ /g, "-").toLowerCase();
     sendTelemetryData(telemetryCommand, moduleType, moduleName);
-    await promptForModuleFolderName(moduleName)
     copyTemplates(modifiedModuleName, moduleName, moduleType, selectedFolder);
   });
 }
@@ -136,51 +133,12 @@ export function formatModuleName(
   filteredTerm: any,
   replacementTerm: any
 ) {
-  const termsJsonPath = join(
-    localTemplateRepoPath,
-    "learn-scaffolding-main",
-    "terms.json"
-  );
-
-  const data = returnJsonData(termsJsonPath);
-
-  let modifiedModuleName: string = moduleName;
-
-    Object.entries(data.titleReplacements).forEach(function ([key, value]) {
-      var replace = key;
-      let targetString: string | unknown = value;
-      modifiedModuleName = formatModuleName(
-        modifiedModuleName,
-        replace,
-        targetString
-      );
-    });
-
   let re = new RegExp("\\b(" + filteredTerm + ")\\b", "g");
   return moduleName
     .replace(re, replacementTerm)
     .replace(/ /g, "-")
     .replace(/--/g, "-")
     .toLowerCase();
-}
-
-export function promptForModuleFolderName(defaultModuleName: string) {
-  let moduleFolderName: string;
-  try {
-    const getUserInput = window.showInputBox({
-      prompt: "Optional folder name.",
-      placeHolder: defaultModuleName
-    });
-    getUserInput.then(async (folderName) => {
-      if (!folderName) {
-        return;
-      }
-      moduleFolderName = formatModuleName(folderName)
-      return moduleFolderName;
-    });
-  } catch (error) {
-    showStatusMessage(error);
-  }
 }
 
 export async function copyTemplates(
@@ -250,9 +208,7 @@ export async function copyTemplates(
           obj.contentTemplatePath.replace(platformRegex, "/")
         );
         if (!existsSync(templateFile)) {
-          showStatusMessage(
-            `${templateFile} does not exist and will be omitted from the scaffolding process.`
-          );
+          showStatusMessage(`${templateFile} does not exist and will be omitted from the scaffolding process.`);
           throw `${templateFile} does not exist and will be omitted from the scaffolding process.`;
         }
         fse.copySync(
@@ -264,12 +220,7 @@ export async function copyTemplates(
       window.showWarningMessage(error);
     }
   });
-  generateBaseUid(
-    scaffoldModule,
-    modifiedModuleName,
-    moduleType,
-    rawModuleTitle
-  );
+  generateBaseUid(scaffoldModule, modifiedModuleName, moduleType, rawModuleTitle);
 }
 
 export function moveSelectionDown(uri: Uri) {
