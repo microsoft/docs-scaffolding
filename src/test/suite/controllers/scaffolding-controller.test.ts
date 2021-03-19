@@ -17,7 +17,6 @@ import {
   deleteUnit,
   renameUnit,
   getSelectedFolder,
-  formatModuleName,
 } from "../../../controllers/scaffolding-controller";
 
 chai.use(spies);
@@ -83,11 +82,11 @@ suite("Scaffolding Controller", () => {
     await sleep(sleepTime);
     expect(spy).to.have.been.called();
   });
-  test("Format module name", async () => {
+/*   test("Format module name", async () => {
     const output = formatModuleName("Create a service", "a", "");
     await sleep(sleepTime);
     expect(output).to.equal("create-service");
-  });
+  }); */
   test("Move selection down", async () => {
     const spy = chai.spy.on(scaffoldingController, "moveSelectionDown");
     moveSelectionDown(uri);

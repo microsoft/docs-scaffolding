@@ -12,7 +12,8 @@ import {
   getModuleTitleTemplate,
   returnJsonData,
   replaceUnitPlaceholderWithTitle,
-  replaceUnitPatternPlaceholder
+  replaceUnitPatternPlaceholder,
+  formatModuleName
 } from "../helper/common";
 import {
   addNewUnit,
@@ -101,44 +102,12 @@ export function getSelectedFolder(uri: Uri, moduleType: string) {
     if (!moduleName) {
       return;
     }
-    const termsJsonPath = join(
-      localTemplateRepoPath,
-      "learn-scaffolding-main",
-      "terms.json"
-    );
-
-    const data = returnJsonData(termsJsonPath);
-
-    let modifiedModuleName: string = moduleName;
-
-    Object.entries(data.titleReplacements).forEach(function ([key, value]) {
-      var replace = key;
-      let targetString: string | unknown = value;
-      modifiedModuleName = formatModuleName(
-        modifiedModuleName,
-        replace,
-        targetString
-      );
-    });
-
+    const moduleFolderName = formatModuleName(moduleName);
     rawModuleTitle = moduleName;
     moduleName = moduleName.replace(/ /g, "-").toLowerCase();
     sendTelemetryData(telemetryCommand, moduleType, moduleName);
-    copyTemplates(modifiedModuleName, moduleName, moduleType, selectedFolder);
+    copyTemplates(moduleFolderName, moduleName, moduleType, selectedFolder);
   });
-}
-
-export function formatModuleName(
-  moduleName: any,
-  filteredTerm: any,
-  replacementTerm: any
-) {
-  let re = new RegExp("\\b(" + filteredTerm + ")\\b", "g");
-  return moduleName
-    .replace(re, replacementTerm)
-    .replace(/ /g, "-")
-    .replace(/--/g, "-")
-    .toLowerCase();
 }
 
 export async function copyTemplates(

@@ -312,29 +312,25 @@ export function replaceUnitPatternPlaceholder(
 }
 
 export function formatModuleName(moduleName: any) {
-	const termsJsonPath = join(
-		localTemplateRepoPath,
-		"learn-scaffolding-main",
-		"terms.json"
-	  );
-  
-	  const data = returnJsonData(termsJsonPath);
-  
-	  let modifiedModuleName: string = moduleName;
-  
-	  Object.entries(data.titleReplacements).forEach(function ([key, value]) {
-		var replace = key;
-		let targetString: string | unknown = value;
-		/* modifiedModuleName = formatModuleName(
-		  modifiedModuleName,
-		  replace,
-		  targetString
-		); */
-	  });
-  let re = new RegExp("\\b(" + filteredTerm + ")\\b", "g");
-  return moduleName
-    .replace(re, replacementTerm)
-    .replace(/ /g, "-")
-    .replace(/--/g, "-")
-    .toLowerCase();
+  let formattedModuleName = moduleName;
+  const termsJsonPath = join(
+    localTemplateRepoPath,
+    "learn-scaffolding-main",
+    "terms.json"
+  );
+  const data = returnJsonData(termsJsonPath);
+  let replace: any;
+  let targetString: string | unknown;
+  let replacementRegex: any;
+  Object.entries(data.titleReplacements).forEach(function ([key, value]) {
+    replace = key;
+    targetString = value;
+    replacementRegex = new RegExp("\\b(" + replace + ")\\b", "g");
+    formattedModuleName = formattedModuleName
+      .replace(replacementRegex, targetString)
+      .replace(/ /g, "-")
+      .replace(/--/g, "-")
+      .toLowerCase();
+  });
+  return formattedModuleName;
 }
