@@ -16,7 +16,9 @@ import {
   getUnitUid,
   updateUnitUid,
   replaceUnitPatternPlaceholder,
+  formatModuleName
 } from "../../../helper/common";
+import { sleep, sleepTime } from "../../test.common/common";
 
 const expect = chai.expect;
 
@@ -161,5 +163,10 @@ suite("Common", () => {
     );
     replaceUnitPatternPlaceholder(filePath, "excercise");
     expect(spy).to.be.have.been.called;
+  });
+  test("Format module name", async () => {
+    const output = formatModuleName("Choose the best Solution For Your Application");
+    await sleep(sleepTime);
+    expect(output).to.equal("choose-best-solution-for-your-app");
   });
 });
