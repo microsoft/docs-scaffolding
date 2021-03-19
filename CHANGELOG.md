@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.0.4 (March 19th, 2021)
+
+- Improved offline support
+
 ## 0.0.3 (March 16th, 2021)
 
 - Remove unit prefix filter
