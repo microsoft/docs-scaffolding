@@ -20,6 +20,8 @@ export async function downloadTemplateZip() {
     mkdirSync(docsAuthoringHomeDirectory);
   }
   localTemplateRepoPath = tmp.dirSync({ unsafeCleanup: true }).name;
+  // cleanup temp folder on exit or reload
+  tmp.setGracefulCleanup();
   showStatusMessage(
     `Temp working directory ${localTemplateRepoPath} has been created.`
   );
