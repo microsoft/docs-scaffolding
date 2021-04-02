@@ -59,13 +59,13 @@
 				},
 				"docs.scaffolding.prefix": {
 					"type": "string",
-					"default": "",
+					"default": "learn",
 					"description": "Default prefix e.g. learn"
 				},
 				"docs.scaffolding.product": {
 					"type": "string",
 					"default": "",
-					"description": "Default product e.g. azure"
+					"description": "Default products. use comma to separate multiples. e.g. azure, sql, m365"
 				},
 				"docs.scaffolding.template_repo": {
 					"type": "string",
