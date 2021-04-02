@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.0.6 (April 2nd, 2021)
+
+- Set prefix default to "Learn"
+
 ## 0.0.5 (March 29th, 2021)
 
 - Add graceful cleanup for temp files [Issue 41](https://github.com/microsoft/docs-scaffolding/issues/41)
