@@ -10,6 +10,7 @@ import {
   moduleSelectionQuickPick,
   scaffoldingCommand,
   scaffoldModule,
+  scaffoldModuleInCurrentDirectory,
   copyTemplates,
   moveSelectionUp,
   moveSelectionDown,
@@ -51,6 +52,10 @@ suite("Scaffolding Controller", () => {
   test("Scaffolding Command", () => {
     const controllerCommands = [
       { command: scaffoldModule.name, callback: scaffoldModule },
+      {
+        command: scaffoldModuleInCurrentDirectory.name,
+        callback: scaffoldModuleInCurrentDirectory,
+      },
       { command: moveSelectionDown.name, callback: moveSelectionDown },
       { command: moveSelectionUp.name, callback: moveSelectionUp },
       { command: insertNewUnit.name, callback: insertNewUnit },
