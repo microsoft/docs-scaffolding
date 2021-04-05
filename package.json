@@ -60,12 +60,12 @@
 				"docs.scaffolding.prefix": {
 					"type": "string",
 					"default": "learn",
-					"description": "Default prefix e.g. learn"
+					"description": "Default prefix, such as 'learn'"
 				},
 				"docs.scaffolding.product": {
 					"type": "string",
 					"default": "",
-					"description": "Default products. Use comma to separate multiples. e.g. azure, sql, m365"
+					"description": "Default product(s); use commas to separate multiples, such as 'azure, sql-server, m365'"
 				},
 				"docs.scaffolding.template_repo": {
 					"type": "string",
