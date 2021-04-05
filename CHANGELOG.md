@@ -1,5 +1,18 @@
 # Change Log
 
+## 0.0.6 (April 2nd, 2021)
+
+- Set prefix default to "Learn"
+
+## 0.0.5 (March 29th, 2021)
+
+- Add graceful cleanup for temp files [Issue 41](https://github.com/microsoft/docs-scaffolding/issues/41)
+- Fix warning message for line endings [Issue 33](https://github.com/microsoft/docs-scaffolding/issues/33)
+
+## 0.0.4 (March 19th, 2021)
+
+- Improved offline support
+
 ## 0.0.3 (March 16th, 2021)
 
 - Remove unit prefix filter

@@ -185,6 +185,14 @@ export function moduleCleanup(moduleName: string, modulePath: string) {
   };
   replace.sync(options);
 
+  // fix CRLF warnings
+  options = {
+    files: `${modulePath}/*.yml`,
+    from: /\s+$/gm,
+    to: ``,
+  };
+  replace.sync(options);
+
   // remove any blank lines created during scaffolding
   options = {
     files: `${modulePath}/index.yml`,
