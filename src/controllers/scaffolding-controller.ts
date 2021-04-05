@@ -147,14 +147,14 @@ export function getSelectedFolder(
     sendTelemetryData(telemetryCommand, moduleType, moduleName);
     if (currentFolder) {
       copyTemplates(
-        modifiedModuleName,
+        moduleFolderName ,
         moduleName,
         moduleType,
         selectedFolder,
         true
       );
     } else {
-      copyTemplates(modifiedModuleName, moduleName, moduleType, selectedFolder);
+      copyTemplates(moduleFolderName , moduleName, moduleType, selectedFolder);
     }
   });
 }
