@@ -4,12 +4,11 @@ import { workspace } from "vscode";
 
 // settings.json values
 export async function getUserSetting(setting: string) {
-  console.log("get updated user settings");
   switch (setting) {
+    case "alias":
+        return workspace.getConfiguration("docs.scaffolding").alias;
     case "githubid":
       return workspace.getConfiguration("docs.scaffolding").githubid;
-    case "alias":
-      return workspace.getConfiguration("docs.scaffolding").alias;
     case "prefix":
       return workspace.getConfiguration("docs.scaffolding").prefix;
     case "product":

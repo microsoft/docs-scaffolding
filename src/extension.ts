@@ -1,7 +1,4 @@
-import {
-  commands,
-  ExtensionContext,
-} from "vscode";
+import { commands, ExtensionContext } from "vscode";
 import { scaffoldingCommand } from "./controllers/scaffolding-controller";
 import { downloadTemplateZip } from "./controllers/template-controller";
 import { Reporter } from "./helper/telemetry";
