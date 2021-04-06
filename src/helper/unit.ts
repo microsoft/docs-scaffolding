@@ -3,18 +3,15 @@ import { basename, join } from "path";
 import { readdirSync } from "fs";
 import { localTemplateRepoPath } from '../controllers/template-controller';
 import { getModuleUid, getSelectedFile, getUnitTitle, getUnitUid, naturalLanguageCompare, output, postError, publishedUidCheck, replaceExistingUnitTitle, sendTelemetryData, showStatusMessage, sleep, sleepTime } from '../helper/common';
-import { alias, gitHubID } from "../helper/user-settings";
+import { getUserSetting } from "../helper/user-settings";
 
 const fse = require("fs-extra");
 const replace = require("replace-in-file");
 const fs = require("fs");
-const yaml = require('js-yaml');
 const includeRegex = /includes\/.*\.md/;
 const uidRegex = /^uid.*/gm;
 
 let activeWorkingDirecotry: string;
-let author: string = gitHubID;
-let msAuthor: string = alias;
 
 export function renamePeerAndTargetUnits(uri: Uri, moveDown: boolean) {
     const telemetryCommand: string = 'reorder-unit';
@@ -156,6 +153,8 @@ export function copyUnitSelection(uri: Uri, unitType: string, contentTemplateDir
             replace.sync(options);
             let date: any = new Date(Date.now());
             date = date.toLocaleDateString();
+            let msAuthor: any = await getUserSetting('alias');
+            let author: any = await getUserSetting('githubid');
 
             sendTelemetryData(telemetryCommand, unitType, formattedUnitName);
             renameUnit(selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber)

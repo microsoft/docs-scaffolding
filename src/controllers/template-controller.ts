@@ -1,6 +1,6 @@
 import { join } from "path";
 import { postError, showStatusMessage } from "../helper/common";
-import { templateRepo } from "../helper/user-settings";
+import { getUserSetting } from "../helper/user-settings";
 import { homedir } from "os";
 import { copyFileSync, existsSync, mkdirSync } from "fs";
 import { extensionPath } from "../extension";
@@ -16,6 +16,7 @@ export async function downloadTemplateZip() {
     docsAuthoringHomeDirectory,
     "learn-scaffolding-main.zip"
   );
+  let templateRepo: any = await getUserSetting('template_repo');
   if (!existsSync(docsAuthoringHomeDirectory)) {
     mkdirSync(docsAuthoringHomeDirectory);
   }
