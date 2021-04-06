@@ -1,9 +1,9 @@
-import { alias, gitHubID, defaultPrefix, defaultProduct } from "../helper/user-settings";
+import { alias, gitHubID, defaultProduct, getUserSetting } from "../helper/user-settings";
 import { basename, join } from 'path';
 import { getModuleUid, postError, postInformation, showStatusMessage } from '../helper/common';
 
 const replace = require("replace-in-file");
-let learnRepo: string = defaultPrefix;
+// let learnRepo: string = defaultPrefix;
 let author: string = gitHubID;
 let msAuthor: string = alias;
 let product: string = defaultProduct;
@@ -44,7 +44,8 @@ export function stubModuleReferences(modulePath: string, moduleName: any) {
   stubRepoReferences(modulePath);
 }
 
-export function stubRepoReferences(modulePath: string) {
+export async function stubRepoReferences(modulePath: string) {
+  let learnRepo: any = await getUserSetting('prefix');
   if (!learnRepo) {
     showStatusMessage('No value for prefix setting so placeholder value will be used.');
     learnRepo = "{{learnRepo}}";
