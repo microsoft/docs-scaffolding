@@ -2,8 +2,8 @@
 
 import { Uri, window, workspace } from "vscode";
 import { reporter } from "./telemetry";
-import { readFileSync, rmdir } from "fs";
-import { join, parse } from "path";
+import { readFileSync, renameSync, rmdir } from "fs";
+import { basename, join, parse } from "path";
 import { default as Axios } from "axios";
 import { localTemplateRepoPath } from "../controllers/template-controller";
 
@@ -330,6 +330,45 @@ export function formatModuleName(moduleName: any, termsJsonPath: any) {
         .toLowerCase();
     });
     return formattedModuleName;
+  } catch (error) {
+    showStatusMessage(error);
+  }
+}
+
+export function renameCurrentFolder(uri: Uri) {
+  const selectedFolder = uri.fsPath;
+  const termsJsonPath = join(
+    localTemplateRepoPath,
+    "learn-scaffolding-main",
+    "terms.json"
+  );
+  const getUserInput = window.showInputBox({
+    placeHolder: `Module will be created in ${selectedFolder}.`,
+    prompt: "Enter new folder name.",
+    validateInput: (userInput) =>
+      userInput.length > 0 ? "" : "Please provide a folder name.",
+  });
+  getUserInput.then(async (folderName) => {
+    if (!folderName) {
+      return;
+    }
+    const currentFolderName = basename(selectedFolder);
+    const newFolderName = await formatModuleName(folderName, termsJsonPath);
+    const newFolderPath =  selectedFolder.replace(currentFolderName, newFolderName);
+    renameSync(selectedFolder, newFolderPath);
+    renameDirectoryUids(newFolderPath, currentFolderName, newFolderName);
+  });
+}
+
+function renameDirectoryUids(folderPath: string, oldFolderName: string, newFolderName: string) {
+  const regex = new RegExp(oldFolderName, "gm");
+  try {
+    const options = {
+      files: `${folderPath}/*.yml`,
+      from: regex,
+      to: newFolderName,
+    };
+    replace.sync(options);
   } catch (error) {
     showStatusMessage(error);
   }
