@@ -334,7 +334,7 @@ export function renameCurrentFolder(uri: Uri) {
     "terms.json"
   );
   const getUserInput = window.showInputBox({
-    placeHolder: `Module will be created in ${selectedFolder}.`,
+    placeHolder: basename(selectedFolder),
     prompt: "Enter new folder name.",
     validateInput: (userInput) =>
       userInput.length > 0 ? "" : "Please provide a folder name.",

@@ -20,7 +20,7 @@ import {
   sleepTime,
   updateUnitUid,
 } from "../helper/common";
-import { alias, gitHubID } from "../helper/user-settings";
+import { getUserSetting } from "../helper/user-settings";
 
 const fse = require("fs-extra");
 const replace = require("replace-in-file");
@@ -239,6 +239,8 @@ export function copyUnitSelection(
       replace.sync(options);
       let date: any = new Date(Date.now());
       date = date.toLocaleDateString();
+      let msAuthor: any = await getUserSetting('alias');
+      let author: any = await getUserSetting('githubid');
       sendTelemetryData(telemetryCommand, unitType, formattedUnitName);
       renameUnit(
         selectedFileDir,
