@@ -1,10 +1,19 @@
-'use-strict';
+"use-strict";
 
-import { workspace } from 'vscode';
+import { workspace } from "vscode";
 
 // settings.json values
-export const gitHubID: string = workspace.getConfiguration('docs.scaffolding').githubid;
-export const alias: string = workspace.getConfiguration('docs.scaffolding').alias;
-export const defaultPrefix: string = workspace.getConfiguration('docs.scaffolding').prefix;
-export const templateRepo: string = workspace.getConfiguration('docs.scaffolding').template_repo;
-export const defaultProduct: string = workspace.getConfiguration('docs.scaffolding').product;
+export async function getUserSetting(setting: string) {
+  switch (setting) {
+    case "alias":
+        return workspace.getConfiguration("docs.scaffolding").alias;
+    case "githubid":
+      return workspace.getConfiguration("docs.scaffolding").githubid;
+    case "prefix":
+      return workspace.getConfiguration("docs.scaffolding").prefix;
+    case "product":
+      return workspace.getConfiguration("docs.scaffolding").product;
+    case "template_repo":
+      return workspace.getConfiguration("docs.scaffolding").template_repo;
+  }
+}

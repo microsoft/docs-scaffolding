@@ -1,12 +1,8 @@
-import { alias, gitHubID, defaultPrefix, defaultProduct } from "../helper/user-settings";
+import { getUserSetting } from "../helper/user-settings";
 import { basename, join } from 'path';
 import { getModuleUid, postError, postInformation, showStatusMessage } from '../helper/common';
 
 const replace = require("replace-in-file");
-let learnRepo: string = defaultPrefix;
-let author: string = gitHubID;
-let msAuthor: string = alias;
-let product: string = defaultProduct;
 
 export function generateBaseUid(modulePath: string, moduleName: any, moduleType: string, rawTitle: string) {
   const options = {
@@ -44,7 +40,8 @@ export function stubModuleReferences(modulePath: string, moduleName: any) {
   stubRepoReferences(modulePath);
 }
 
-export function stubRepoReferences(modulePath: string) {
+export async function stubRepoReferences(modulePath: string) {
+  let learnRepo: any = await getUserSetting('prefix');
   if (!learnRepo) {
     showStatusMessage('No value for prefix setting so placeholder value will be used.');
     learnRepo = "{{learnRepo}}";
@@ -59,7 +56,8 @@ export function stubRepoReferences(modulePath: string) {
   stubGithubIdReferences(modulePath);
 }
 
-export function stubGithubIdReferences(modulePath: string) {
+export async function stubGithubIdReferences(modulePath: string) {
+  let author: any = await getUserSetting('githubid');
   if (!author) {
     showStatusMessage('No value for GitHub ID setting so placeholder value will be used.');
     author = "{{githubUsername}}";
@@ -74,7 +72,8 @@ export function stubGithubIdReferences(modulePath: string) {
   stubGithubAuthorReferences(modulePath);
 }
 
-export function stubGithubAuthorReferences(modulePath: string) {
+export async function stubGithubAuthorReferences(modulePath: string) {
+  let msAuthor: any = await getUserSetting('alias');
   if (!msAuthor) {
     showStatusMessage('No value for alias setting so placeholder value will be used.');
     msAuthor = "{{msUser}}";
@@ -158,7 +157,8 @@ export function stubUnitBlock(moduleName: string, modulePath: string, unitBlock:
   stubProductBlock(moduleName, modulePath);
 }
 
-export function stubProductBlock(moduleName: string, modulePath: string) {
+export async function stubProductBlock(moduleName: string, modulePath: string) {
+  let product: any = await getUserSetting('product');
   if (!product) {
     showStatusMessage('No value for product setting so placeholder value will be used.');
   } else {
