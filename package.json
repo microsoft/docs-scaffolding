@@ -20,7 +20,11 @@
 		"commands": [
 			{
 				"command": "scaffoldModule",
-				"title": "Learn: Create new module"
+				"title": "Learn: Create module in NEW folder"
+			},
+			{
+				"command": "scaffoldModuleInCurrentDirectory",
+				"title": "Learn: Create module in CURRENT folder"
 			},
 			{
 				"command": "moveSelectionUp",
@@ -79,6 +83,11 @@
 				{
 					"when": "explorerResourceIsFolder",
 					"command": "scaffoldModule",
+					"group": "1_modification"
+				},
+				{
+					"when": "explorerResourceIsFolder",
+					"command": "scaffoldModuleInCurrentDirectory",
 					"group": "1_modification"
 				},
 				{
