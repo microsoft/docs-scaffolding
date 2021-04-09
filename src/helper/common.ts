@@ -246,23 +246,16 @@ export function replaceExistingUnitTitle(unitPath: string) {
   });
 }
 
-export async function publishedUidCheck(
-  unitId: string,
-  unitName: string,
-  unitPath: string,
-  modulePath: string
-) {
+export async function publishedUidCheck(unitId: string) {
   const hierarchyServiceApi = `https://docs.microsoft.com/api/hierarchy/modules?unitId=${unitId}`;
-  await Axios.get(hierarchyServiceApi)
-    .then(function () {
-      // not needed because this is the expected behaviour; remove comment for debugging. showStatusMessage(`Live UID :${unitId}. Yml UID will not be changed.`);
-    })
-    .catch(function () {
-      showStatusMessage(
-        `UID ${unitId} is not published. Yml UID will be updated.`
-      );
-      updateUnitUid(unitName, unitPath, modulePath);
-    });
+  try {
+    //const response = await Axios.get(hierarchyServiceApi);
+    await Axios.get(hierarchyServiceApi);
+  return true;
+  } catch (error) {
+    return false;
+  }
+  
 }
 
 export function getUnitUid(selectedUnit: string) {
@@ -354,13 +347,50 @@ export function renameCurrentFolder(uri: Uri) {
     }
     const currentFolderName = basename(selectedFolder);
     const newFolderName = await formatModuleName(folderName, termsJsonPath);
-    const newFolderPath =  selectedFolder.replace(currentFolderName, newFolderName);
-    renameSync(selectedFolder, newFolderPath);
-    renameDirectoryUids(newFolderPath, currentFolderName, newFolderName);
+    const newFolderPath = selectedFolder.replace(
+      currentFolderName,
+      newFolderName
+    );
+    //renameSync(selectedFolder, newFolderPath);
+    //renameDirectoryUids(newFolderPath, currentFolderName, newFolderName);
+    renamedModulePublishCheck(
+      selectedFolder,
+      currentFolderName,
+      newFolderName,
+      newFolderPath
+    );
   });
 }
 
-function renameDirectoryUids(folderPath: string, oldFolderName: string, newFolderName: string) {
+async function renamedModulePublishCheck(
+  folderPath: string,
+  oldFolderName: string,
+  newFolderName: string,
+  newFolderPath: string
+) {
+  // get firt unit and create test uid
+  const firstUnitRegex = /units:[\s\S]*?-\s?(.*)/m;
+  const moduleIndex = join(folderPath, "index.yml");
+  const moduleIndexContent = readFileSync(moduleIndex, "utf8");
+  const firstUnit = moduleIndexContent.match(firstUnitRegex);
+  if (firstUnit) {
+    const newUid = firstUnit[1].replace(oldFolderName, newFolderName);
+    const isPublished = await publishedUidCheck(newUid);
+    if (isPublished) {
+      console.log(`renamedModulePublishCheck: ${isPublished}`);
+      // renameSync(folderPath, newFolderPath);
+      // renameFolderInUids(newFolderPath, oldFolderName, newFolderName);
+    } else {
+      console.log(`renamedModulePublishCheck - fail: ${isPublished}`);
+    }
+  }
+}
+
+function renameFolderInUids(
+  folderPath: string,
+  oldFolderName: string,
+  newFolderName: string
+) {
   const regex = new RegExp(oldFolderName, "gm");
   try {
     const options = {

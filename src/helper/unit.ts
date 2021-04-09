@@ -2,7 +2,7 @@ import { Uri, QuickPickItem, QuickPickOptions, window } from "vscode";
 import { basename, join } from "path";
 import { readdirSync } from "fs";
 import { localTemplateRepoPath } from '../controllers/template-controller';
-import { getModuleUid, getSelectedFile, getUnitTitle, getUnitUid, naturalLanguageCompare, output, postError, publishedUidCheck, replaceExistingUnitTitle, sendTelemetryData, showStatusMessage, sleep, sleepTime } from '../helper/common';
+import { getModuleUid, getSelectedFile, getUnitTitle, getUnitUid, naturalLanguageCompare, output, postError, publishedUidCheck, replaceExistingUnitTitle, sendTelemetryData, showStatusMessage, sleep, sleepTime, updateUnitUid } from '../helper/common';
 import { alias, gitHubID } from "../helper/user-settings";
 
 const fse = require("fs-extra");
@@ -241,7 +241,11 @@ export async function updateUnitName(uri: Uri) {
             }
             await replaceExistingUnitTitle(newFilePath);
             const unitUid = getUnitUid(newFilePath);
-            await publishedUidCheck(unitUid, newFilename, newFilePath, selectedFileDir);
+            // await publishedUidCheck(unitUid, newFilename, newFilePath, selectedFileDir);
+            const isPublished = await publishedUidCheck(unitUid);
+            if (isPublished) {
+                updateUnitUid(newFilename, newFilePath, selectedFileDir);
+            }
             sendTelemetryData(telemetryCommand, '', currentFilename);
             renameUnit(selectedFileDir, currentFilename, newUnitNumber, currentUnitNumber)
                 .then(() => updateIndex(selectedFileDir))

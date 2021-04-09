@@ -117,7 +117,7 @@ suite("Common", () => {
     replaceUnitPlaceholderWithTitle(filePath, "foo");
     expect(spy).to.be.have.been.called;
   });
-  test("Published uid check", async () => {
+/*   test("Published uid check", async () => {
     const spy = chai.spy(publishedUidCheck);
     const filePath = resolve(
       __dirname,
@@ -130,7 +130,7 @@ suite("Common", () => {
       filePath
     );
     expect(spy).to.be.have.been.called;
-  });
+  }); */
   test("Get unit uid", async () => {
     const filePath = resolve(
       __dirname,
