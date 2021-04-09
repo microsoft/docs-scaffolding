@@ -1,6 +1,7 @@
 import { Uri, QuickPickItem, QuickPickOptions, window } from "vscode";
 import { basename, join } from "path";
 import { readdirSync } from "fs";
+
 import { localTemplateRepoPath } from "../controllers/template-controller";
 import {
   getModuleUid,
@@ -29,8 +30,6 @@ const includeRegex = /includes\/.*\.md/;
 const uidRegex = /^uid.*/gm;
 
 let activeWorkingDirecotry: string;
-let author: string = gitHubID;
-let msAuthor: string = alias;
 
 export function renamePeerAndTargetUnits(uri: Uri, moveDown: boolean) {
   const telemetryCommand: string = "reorder-unit";
@@ -240,7 +239,6 @@ export function copyUnitSelection(
       replace.sync(options);
       let date: any = new Date(Date.now());
       date = date.toLocaleDateString();
-
       sendTelemetryData(telemetryCommand, unitType, formattedUnitName);
       renameUnit(
         selectedFileDir,
