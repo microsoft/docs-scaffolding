@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import * as chai from "chai";
 import { resolve } from "path";
-import { window } from "vscode";
+import { Uri, window } from "vscode";
 import {
   postWarning,
   postInformation,
@@ -171,13 +171,14 @@ suite("Common", () => {
     const moduleFolderName = formatModuleName(moduleName, filePath);
     expect(moduleFolderName).to.equal("choose-best-service-for-your-app");
   });
-  test("Rename selected folderr", async () => {
+  test("Rename selected folder", async () => {
     const spy = chai.spy(renameCurrentFolder);
-    const folderPath: any = resolve(
+    const uri = Uri;
+    const selectedFolder = uri.parse(resolve(
       __dirname,
-      "../../../../src/test/data/repo/units"
-    );
-    renameCurrentFolder(folderPath);
+      "../../../../src/test/data/repo/articles"
+    ));
+    renameCurrentFolder(selectedFolder);
     expect(spy).to.be.have.been.called;
   });
 });
