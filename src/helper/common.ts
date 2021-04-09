@@ -249,13 +249,11 @@ export function replaceExistingUnitTitle(unitPath: string) {
 export async function publishedUidCheck(unitId: string) {
   const hierarchyServiceApi = `https://docs.microsoft.com/api/hierarchy/modules?unitId=${unitId}`;
   try {
-    //const response = await Axios.get(hierarchyServiceApi);
     await Axios.get(hierarchyServiceApi);
-  return true;
+    return true;
   } catch (error) {
     return false;
   }
-  
 }
 
 export function getUnitUid(selectedUnit: string) {
@@ -351,8 +349,6 @@ export function renameCurrentFolder(uri: Uri) {
       currentFolderName,
       newFolderName
     );
-    //renameSync(selectedFolder, newFolderPath);
-    //renameDirectoryUids(newFolderPath, currentFolderName, newFolderName);
     renamedModulePublishCheck(
       selectedFolder,
       currentFolderName,
@@ -377,11 +373,11 @@ async function renamedModulePublishCheck(
     const newUid = firstUnit[1].replace(oldFolderName, newFolderName);
     const isPublished = await publishedUidCheck(newUid);
     if (isPublished) {
-      console.log(`renamedModulePublishCheck: ${isPublished}`);
-      // renameSync(folderPath, newFolderPath);
-      // renameFolderInUids(newFolderPath, oldFolderName, newFolderName);
+      postWarning(`Module ${basename(newFolderPath)} is published. Aborting folder rename command.`);
+      showStatusMessage(`Module ${basename(newFolderPath)} is published. Aborting folder rename command.`);
     } else {
-      console.log(`renamedModulePublishCheck - fail: ${isPublished}`);
+      renameSync(folderPath, newFolderPath);
+      renameFolderInUids(newFolderPath, oldFolderName, newFolderName);
     }
   }
 }

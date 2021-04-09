@@ -16,7 +16,7 @@ import {
   getUnitUid,
   updateUnitUid,
   replaceUnitPatternPlaceholder,
-  formatModuleName
+  formatModuleName,
 } from "../../../helper/common";
 
 const expect = chai.expect;
@@ -29,25 +29,25 @@ suite("Common", () => {
       __dirname,
       "../../../../src/test/data/repo/units/unit-template.yml"
     );
-		let options = {
-			files: filePath,
-			from: /^title:\s.*/gm,
-			to: `title: {{unitName}} # stub from default unit name`,
-		};
-		replace.sync(options);
-    options = {
-			files: filePath,
-			from: /type:\s.*/gm,
-			to: `type: {{patternType}} # stub based on selected scaffold: introduction | learning_content | exercise | summary`,
-		};
+    let options = {
+      files: filePath,
+      from: /^title:\s.*/gm,
+      to: `title: {{unitName}} # stub from default unit name`,
+    };
     replace.sync(options);
     options = {
-			files: filePath,
-			from: /^uid:\s.*/gm,
-			to: `uid: {{learnRepo}}.{{moduleName}}.{{unitName}} # stub from prefix + module folder name + default unit name`,
-		};
+      files: filePath,
+      from: /type:\s.*/gm,
+      to: `type: {{patternType}} # stub based on selected scaffold: introduction | learning_content | exercise | summary`,
+    };
     replace.sync(options);
-	});
+    options = {
+      files: filePath,
+      from: /^uid:\s.*/gm,
+      to: `uid: {{learnRepo}}.{{moduleName}}.{{unitName}} # stub from prefix + module folder name + default unit name`,
+    };
+    replace.sync(options);
+  });
   test("postWarning showWarning is called", async () => {
     const spy = chai.spy(window.showWarningMessage);
     postWarning("message");
@@ -117,20 +117,18 @@ suite("Common", () => {
     replaceUnitPlaceholderWithTitle(filePath, "foo");
     expect(spy).to.be.have.been.called;
   });
-/*   test("Published uid check", async () => {
-    const spy = chai.spy(publishedUidCheck);
-    const filePath = resolve(
-      __dirname,
-      "../../../../src/test/data/repo/units/unit-template.yml"
+  test("Published uid check (live link)", async () => {
+    const result = await publishedUidCheck(
+      "learn-wwl.secure-responsible-conversational-ai.introduction"
     );
-    publishedUidCheck(
-      "learn-wwl.responsible-conversational-ai.ensure-bot-reliability",
-      "foo",
-      filePath,
-      filePath
+    expect(result).to.be.true;
+  });
+  test("Published uid check (bad link)", async () => {
+    const result = await publishedUidCheck(
+      "foo"
     );
-    expect(spy).to.be.have.been.called;
-  }); */
+    expect(result).to.be.false;
+  });
   test("Get unit uid", async () => {
     const filePath = resolve(
       __dirname,

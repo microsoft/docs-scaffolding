@@ -18,6 +18,7 @@ import {
   deleteUnit,
   renameUnit,
   getSelectedFolder,
+  updateModuleFolderName
 } from "../../../controllers/scaffolding-controller";
 
 chai.use(spies);
@@ -61,6 +62,7 @@ suite("Scaffolding Controller", () => {
       { command: insertNewUnit.name, callback: insertNewUnit },
       { command: deleteUnit.name, callback: deleteUnit },
       { command: renameUnit.name, callback: renameUnit },
+      { command: updateModuleFolderName.name, callback: updateModuleFolderName },
     ];
     expect(scaffoldingCommand()).to.deep.equal(controllerCommands);
   });
