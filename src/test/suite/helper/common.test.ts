@@ -17,6 +17,7 @@ import {
   updateUnitUid,
   replaceUnitPatternPlaceholder,
   formatModuleName,
+  renameCurrentFolder
 } from "../../../helper/common";
 
 const expect = chai.expect;
@@ -169,5 +170,14 @@ suite("Common", () => {
     const moduleName = "Choose the best Service For Your Application";
     const moduleFolderName = formatModuleName(moduleName, filePath);
     expect(moduleFolderName).to.equal("choose-best-service-for-your-app");
+  });
+  test("Rename selected folderr", async () => {
+    const spy = chai.spy(renameCurrentFolder);
+    const folderPath: any = resolve(
+      __dirname,
+      "../../../../src/test/data/repo/units"
+    );
+    renameCurrentFolder(folderPath);
+    expect(spy).to.be.have.been.called;
   });
 });
