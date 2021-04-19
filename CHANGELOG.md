@@ -1,6 +1,6 @@
 # Change Log
 
-## 0.0.7 (April 12th, 2021)
+## 0.0.7 (April 19th, 2021)
 
 - Update settings logic [Issue 45](https://github.com/microsoft/docs-scaffolding/issues/45)
 - Add option to scaffold module in an existing folder
