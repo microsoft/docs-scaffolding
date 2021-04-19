@@ -13,7 +13,8 @@ import {
   returnJsonData,
   replaceUnitPlaceholderWithTitle,
   replaceUnitPatternPlaceholder,
-  formatModuleName
+  formatModuleName,
+  renameCurrentFolder,
 } from "../helper/common";
 import {
   addNewUnit,
@@ -43,6 +44,7 @@ export function scaffoldingCommand() {
     { command: insertNewUnit.name, callback: insertNewUnit },
     { command: deleteUnit.name, callback: deleteUnit },
     { command: renameUnit.name, callback: renameUnit },
+    { command: updateModuleFolderName.name, callback: updateModuleFolderName },
   ];
   return commands;
 }
@@ -135,7 +137,7 @@ export function getSelectedFolder(
   getUserInput.then((moduleName) => {
     if (!moduleName) {
       return;
-    } 
+    }
     const termsJsonPath = join(
       localTemplateRepoPath,
       "learn-scaffolding-main",
@@ -147,14 +149,14 @@ export function getSelectedFolder(
     sendTelemetryData(telemetryCommand, moduleType, moduleName);
     if (currentFolder) {
       copyTemplates(
-        moduleFolderName ,
+        moduleFolderName,
         moduleName,
         moduleType,
         selectedFolder,
         true
       );
     } else {
-      copyTemplates(moduleFolderName , moduleName, moduleType, selectedFolder);
+      copyTemplates(moduleFolderName, moduleName, moduleType, selectedFolder);
     }
   });
 }
@@ -246,7 +248,12 @@ export async function copyTemplates(
     }
   });
   if (currentFolder) {
-    generateBaseUid(scaffoldModule, basename(scaffoldModule), moduleType, rawModuleTitle);
+    generateBaseUid(
+      scaffoldModule,
+      basename(scaffoldModule),
+      moduleType,
+      rawModuleTitle
+    );
   } else {
     generateBaseUid(
       scaffoldModule,
@@ -275,4 +282,8 @@ export function deleteUnit(uri: Uri) {
 
 export function renameUnit(uri: Uri) {
   updateUnitName(uri);
+}
+
+export function updateModuleFolderName(uri: Uri) {
+  renameCurrentFolder(uri);
 }

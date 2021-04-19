@@ -2,8 +2,8 @@
 
 import { Uri, window, workspace } from "vscode";
 import { reporter } from "./telemetry";
-import { readFileSync, rmdir } from "fs";
-import { join, parse } from "path";
+import { readFileSync, renameSync, rmdir } from "fs";
+import { basename, join, parse } from "path";
 import { default as Axios } from "axios";
 import { localTemplateRepoPath } from "../controllers/template-controller";
 
@@ -246,23 +246,14 @@ export function replaceExistingUnitTitle(unitPath: string) {
   });
 }
 
-export async function publishedUidCheck(
-  unitId: string,
-  unitName: string,
-  unitPath: string,
-  modulePath: string
-) {
+export async function publishedUidCheck(unitId: string) {
   const hierarchyServiceApi = `https://docs.microsoft.com/api/hierarchy/modules?unitId=${unitId}`;
-  await Axios.get(hierarchyServiceApi)
-    .then(function () {
-      // not needed because this is the expected behaviour; remove comment for debugging. showStatusMessage(`Live UID :${unitId}. Yml UID will not be changed.`);
-    })
-    .catch(function () {
-      showStatusMessage(
-        `UID ${unitId} is not published. Yml UID will be updated.`
-      );
-      updateUnitUid(unitName, unitPath, modulePath);
-    });
+  try {
+    await Axios.get(hierarchyServiceApi);
+    return true;
+  } catch (error) {
+    return false;
+  }
 }
 
 export function getUnitUid(selectedUnit: string) {
@@ -330,6 +321,80 @@ export function formatModuleName(moduleName: any, termsJsonPath: any) {
         .toLowerCase();
     });
     return formattedModuleName;
+  } catch (error) {
+    showStatusMessage(error);
+  }
+}
+
+export function renameCurrentFolder(uri: Uri) {
+  const selectedFolder = uri.fsPath;
+  const termsJsonPath = join(
+    localTemplateRepoPath,
+    "learn-scaffolding-main",
+    "terms.json"
+  );
+  const getUserInput = window.showInputBox({
+    placeHolder: basename(selectedFolder),
+    prompt: "Enter new folder name.",
+    validateInput: (userInput) =>
+      userInput.length > 0 ? "" : "Please provide a folder name.",
+  });
+  getUserInput.then(async (folderName) => {
+    if (!folderName) {
+      return;
+    }
+    const currentFolderName = basename(selectedFolder);
+    const newFolderName = await formatModuleName(folderName, termsJsonPath);
+    const newFolderPath = selectedFolder.replace(
+      currentFolderName,
+      newFolderName
+    );
+    renamedModulePublishCheck(
+      selectedFolder,
+      currentFolderName,
+      newFolderName,
+      newFolderPath
+    );
+  });
+}
+
+async function renamedModulePublishCheck(
+  folderPath: string,
+  oldFolderName: string,
+  newFolderName: string,
+  newFolderPath: string
+) {
+  // get firt unit and create test uid
+  const firstUnitRegex = /units:[\s\S]*?-\s?(.*)/m;
+  const moduleIndex = join(folderPath, "index.yml");
+  const moduleIndexContent = readFileSync(moduleIndex, "utf8");
+  const firstUnit = moduleIndexContent.match(firstUnitRegex);
+  if (firstUnit) {
+    const newUid = firstUnit[1].replace(oldFolderName, newFolderName);
+    const isPublished = await publishedUidCheck(newUid);
+    if (isPublished) {
+      postWarning(`Module ${basename(newFolderPath)} is published. Aborting folder rename command.`);
+      showStatusMessage(`Module ${basename(newFolderPath)} is published. Aborting folder rename command.`);
+    } else {
+      renameSync(folderPath, newFolderPath);
+      renameFolderInUids(newFolderPath, oldFolderName, newFolderName);
+    }
+  }
+}
+
+function renameFolderInUids(
+  folderPath: string,
+  oldFolderName: string,
+  newFolderName: string
+) {
+  const regex = new RegExp(oldFolderName, "gm");
+  try {
+    const options = {
+      files: `${folderPath}/*.yml`,
+      from: regex,
+      to: newFolderName,
+    };
+    replace.sync(options);
   } catch (error) {
     showStatusMessage(error);
   }

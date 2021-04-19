@@ -27,6 +27,10 @@
 				"title": "Learn: Create module in CURRENT folder"
 			},
 			{
+				"command": "updateModuleFolderName",
+				"title": "Learn: Update module folder name"
+			},
+			{
 				"command": "moveSelectionUp",
 				"title": "Learn: Move unit up"
 			},
@@ -88,6 +92,11 @@
 				{
 					"when": "explorerResourceIsFolder",
 					"command": "scaffoldModuleInCurrentDirectory",
+					"group": "1_modification"
+				},
+				{
+					"when": "explorerResourceIsFolder",
+					"command": "updateModuleFolderName",
 					"group": "1_modification"
 				},
 				{
