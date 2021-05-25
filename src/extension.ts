@@ -4,6 +4,7 @@ import { downloadTemplateZip } from "./controllers/template-controller";
 import { Reporter } from "./helper/telemetry";
 
 export let extensionPath: any;
+export const telemetryError: string = "error";
 
 export async function activate(context: ExtensionContext) {
   extensionPath = context.extensionPath;

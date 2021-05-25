@@ -6,6 +6,7 @@ import { readFileSync, renameSync, rmdir } from "fs";
 import { basename, join, parse } from "path";
 import { default as Axios } from "axios";
 import { localTemplateRepoPath } from "../controllers/template-controller";
+import { telemetryError } from "../extension";
 
 export const output = window.createOutputChannel("docs-scaffolding");
 export const sleepTime = 50;
@@ -77,9 +78,10 @@ export function getRepoName(workspacePath: Uri) {
 export function sendTelemetryData(
   telemetryCommand: string,
   commandOption: string,
-  moduleName: string
+  moduleName: string,
+  commandError: string
 ) {
-  const telemetryProperties = { pattern: commandOption, name: moduleName };
+  const telemetryProperties = { pattern: commandOption, name: moduleName, error: commandError };
   reporter.sendTelemetryEvent(telemetryCommand, telemetryProperties);
 }
 
@@ -176,6 +178,7 @@ export function getModuleTitleTemplate(
     let data = JSON.parse(moduleJson);
     return data.moduleTitleTemplate;
   } catch (error) {
+    sendTelemetryData(telemetryError, "", "", error);
     postError(error);
     showStatusMessage(error);
   }
@@ -186,6 +189,7 @@ export function returnJsonData(jsonPath: string) {
     const moduleJson = readFileSync(jsonPath, "utf8");
     return JSON.parse(moduleJson);
   } catch (error) {
+    sendTelemetryData(telemetryError, "", "", error);
     postError(error);
     showStatusMessage(error);
   }

@@ -23,6 +23,7 @@ import {
   updateUnitName,
 } from "../helper/unit";
 import { localTemplateRepoPath } from "./template-controller";
+import { telemetryError } from '../extension';
 
 const platformRegex = /\\/g;
 const telemetryCommand: string = "create-module";
@@ -78,6 +79,7 @@ export async function moduleSelectionQuickPick(
       typeDefinitionJsonDirectory,
       function (err: string, files: any[]) {
         if (err) {
+          sendTelemetryData(telemetryError, "", "", `Unable to scan local template directory: ${typeDefinitionJsonDirectory}`);
           return postError(
             `Unable to scan local template directory: ${typeDefinitionJsonDirectory}. Please try again.`
           );
@@ -146,7 +148,7 @@ export function getSelectedFolder(
     const moduleFolderName = formatModuleName(moduleName, termsJsonPath);
     rawModuleTitle = moduleName;
     moduleName = moduleName.replace(/ /g, "-").toLowerCase();
-    sendTelemetryData(telemetryCommand, moduleType, moduleName);
+    sendTelemetryData(telemetryCommand, moduleType, moduleName, "");
     if (currentFolder) {
       copyTemplates(
         moduleFolderName,

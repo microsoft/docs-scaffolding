@@ -69,7 +69,7 @@ export function renamePeerAndTargetUnits(uri: Uri, moveDown: boolean) {
       showStatusMessage("Last unit cannot be moved down.");
       return;
     }
-    sendTelemetryData(telemetryCommand, "", currentFilename);
+    sendTelemetryData(telemetryCommand, "", currentFilename, "");
     renameUnit(
       selectedFileDir,
       existingUnitName,
@@ -241,7 +241,7 @@ export function copyUnitSelection(
       date = date.toLocaleDateString();
       let msAuthor: any = await getUserSetting('alias');
       let author: any = await getUserSetting('githubid');
-      sendTelemetryData(telemetryCommand, unitType, formattedUnitName);
+      sendTelemetryData(telemetryCommand, unitType, formattedUnitName, "");
       renameUnit(
         selectedFileDir,
         currentFilename,
@@ -310,7 +310,7 @@ export function removeUnit(uri: Uri) {
     fs.unlinkSync(includeMarkdown);
     updateIndex(selectedFileDir);
     bulkUpdateFileNamePrefix(selectedFileDir, currentUnitNumber, false);
-    sendTelemetryData(telemetryCommand, "", currentFilename);
+    sendTelemetryData(telemetryCommand, "", currentFilename, "");
   } catch (error) {
     output.appendLine(error);
   }
@@ -370,7 +370,7 @@ export async function updateUnitName(uri: Uri) {
         }
         await replaceExistingUnitTitle(newFilePath);
         updateUnitUid(newFilename, newFilePath, selectedFileDir);
-        sendTelemetryData(telemetryCommand, "", currentFilename);
+        sendTelemetryData(telemetryCommand, "", currentFilename, "");
         renameUnit(
           selectedFileDir,
           currentFilename,

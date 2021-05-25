@@ -1,9 +1,9 @@
 import { join } from "path";
-import { postError, showStatusMessage } from "../helper/common";
+import { postError, sendTelemetryData, showStatusMessage } from "../helper/common";
 import { getUserSetting } from "../helper/user-settings";
 import { homedir } from "os";
 import { copyFileSync, existsSync, mkdirSync } from "fs";
-import { extensionPath } from "../extension";
+import { extensionPath, telemetryError } from "../extension";
 
 export let localTemplateRepoPath: string;
 let templateZip: string;
@@ -37,6 +37,7 @@ export async function downloadTemplateZip() {
       templateZip = join(extensionPath, "learn-scaffolding-main.zip");
     }
     postError(error);
+    sendTelemetryData(telemetryError, "", "", `Error downloading templates from ${templateRepo}`);
     showStatusMessage(
       `Error downloading templates from ${templateRepo}. Loading local templates.`
     );
@@ -49,6 +50,7 @@ export async function unzipTemplates() {
   try {
     await extract(templateZip, { dir: localTemplateRepoPath });
   } catch (error) {
+    sendTelemetryData(telemetryError, "", "", error);
     postError(error);
     showStatusMessage(error);
   }
