@@ -345,24 +345,22 @@ export async function checkForUpdatedTemplates(
 export async function updateTemplatesPrompt(uri: Uri, currentFolder?: boolean) {
   try {
     showStatusMessage(`Updated templates are available.`);
-  await window
-    .showInformationMessage(
-      `Updated templates are available. Would you like downlad the latest templates?`,
-      "Yes",
-      "No"
-    )
-    .then(async (result) => {
-      if (result === "Yes") {
-        await downloadTemplateZip();
+    await window
+      .showInformationMessage(
+        `Updated templates are available. Would you like downlad the latest templates?`,
+        "Yes",
+        "No"
+      )
+      .then(async (result) => {
+        if (result === "Yes") {
+          await downloadTemplateZip();
+        }
         if (currentFolder) {
           moduleSelectionQuickPick(uri, true);
         } else {
           moduleSelectionQuickPick(uri);
         }
-      } else {
-        moduleSelectionQuickPick(uri);
-      }
-    });
+      });
   } catch (error) {
     showStatusMessage(error);
     postWarning(error);
