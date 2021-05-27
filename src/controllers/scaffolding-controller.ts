@@ -15,7 +15,7 @@ import {
   replaceUnitPatternPlaceholder,
   formatModuleName,
   renameCurrentFolder,
-  valueCompariosn as valueComparison,
+  valueComparison,
   postWarning,
 } from "../helper/common";
 import {
@@ -319,11 +319,14 @@ export async function checkForUpdatedTemplates(
         prDate = data.data[0].closed_at;
         prDate = new Date(prDate);
         const zipDownloadDate = new Date(stats.mtime);
+        // check to see if the local zip is newer than the most recent merged pr
+        // if the local zip is older, prompt the user to download the latest templates (valueComparison should return true)
+        // if the local zip is newer, show the pattern optoin quickpick (valueComparison should return false)
         if (valueComparison(zipDownloadDate, prDate)) {
           if (currentFolder) {
-            updateTemplatePrompt(uri, true);
+            updateTemplatesPrompt(uri, true);
           } else {
-            updateTemplatePrompt(uri);
+            updateTemplatesPrompt(uri);
           }
         } else {
           if (currentFolder) {
@@ -339,7 +342,7 @@ export async function checkForUpdatedTemplates(
   }
 }
 
-export async function updateTemplatePrompt(uri: Uri, currentFolder?: boolean) {
+export async function updateTemplatesPrompt(uri: Uri, currentFolder?: boolean) {
   try {
     showStatusMessage(`Updated templates are available.`);
   await window

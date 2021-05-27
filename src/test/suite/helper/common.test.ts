@@ -17,7 +17,8 @@ import {
   updateUnitUid,
   replaceUnitPatternPlaceholder,
   formatModuleName,
-  renameCurrentFolder
+  renameCurrentFolder,
+  valueComparison
 } from "../../../helper/common";
 
 const expect = chai.expect;
@@ -180,5 +181,17 @@ suite("Common", () => {
     ));
     renameCurrentFolder(selectedFolder);
     expect(spy).to.be.have.been.called;
+  });
+  test("Value comparison (testDate value is newer than startDate so return false) ", async () => {
+    const testDate = 'Wed May 26 2021 21:15:05 GMT-0700 (Pacific Daylight Time)';
+    const startDate = 'Thu May 13 2021 16:32:43 GMT-0700 (Pacific Daylight Time)';
+    const result = valueComparison(testDate, startDate);
+    expect(result).to.be.false;
+  });
+  test("Value comparison (testDate value is older than startDate so return true) ", async () => {
+    const testDate = 'Mon Apr 19 2021 11:00:26 GMT-0700 (Pacific Daylight Time)';
+    const startDate = 'Thu May 13 2021 16:32:43 GMT-0700 (Pacific Daylight Time)';
+    const result = valueComparison(testDate, startDate);
+    expect(result).to.be.true;
   });
 });

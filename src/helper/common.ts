@@ -400,6 +400,6 @@ function renameFolderInUids(
   }
 }
 
-export function valueCompariosn(firstValue: any, secondValue: any) {
+export function valueComparison(firstValue: any, secondValue: any) {
   return secondValue > firstValue;
 }
