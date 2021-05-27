@@ -3,7 +3,7 @@
 import { Uri, window, QuickPickItem, QuickPickOptions } from "vscode";
 import { basename, join, resolve } from "path";
 import { generateBaseUid } from "../helper/module";
-import { readFileSync, existsSync } from "fs";
+import { existsSync } from "fs";
 import {
   cleanupTempDirectory,
   postError,
@@ -57,22 +57,10 @@ export function scaffoldingCommand() {
 }
 
 export async function scaffoldModule(uri: Uri) {
-/*   typeDefinitionJsonDirectory = join(
-    localTemplateRepoPath,
-    "learn-scaffolding-main",
-    "module-type-definitions"
-  ); */
-  // moduleSelectionQuickPick(uri);
   checkForUpdatedTemplates(uri);
 }
 
 export async function scaffoldModuleInCurrentDirectory(uri: Uri) {
-/*   typeDefinitionJsonDirectory = join(
-    localTemplateRepoPath,
-    "learn-scaffolding-main",
-    "module-type-definitions"
-  );
-  moduleSelectionQuickPick(uri, true); */
   checkForUpdatedTemplates(uri, true);
 }
 
@@ -312,7 +300,6 @@ export async function checkForUpdatedTemplates( uri: Uri,
       prDate = new Date(prDate);
       const zipDownloadDate = new Date(stats.mtime);
       if (valueComparison(zipDownloadDate, prDate)) {
-          console.log('old');
           if (currentFolder) {
             updateTemplatePrompt(uri, true);
           } else {

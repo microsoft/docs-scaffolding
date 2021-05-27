@@ -2,18 +2,17 @@ import { join } from "path";
 import { postError, showStatusMessage } from "../helper/common";
 import { getUserSetting } from "../helper/user-settings";
 import { homedir } from "os";
-import { existsSync, mkdirSync } from "fs";
+import { copyFileSync, existsSync, mkdirSync } from "fs";
 import { extensionPath } from "../extension";
 
 export let localTemplateRepoPath: string;
 let templateZip: string;
-let offlineZip: string;
 
 export async function downloadTemplateZip() {
   const download = require("download");
   const tmp = require("tmp");
   const docsAuthoringHomeDirectory = join(homedir(), "Docs Authoring");
-  offlineZip = join(
+  const offlineZip = join(
     docsAuthoringHomeDirectory,
     "learn-scaffolding-main.zip"
   );
@@ -28,9 +27,9 @@ export async function downloadTemplateZip() {
     `Temp working directory ${localTemplateRepoPath} has been created.`
   );
   try {
-    //await download(templateRepo, localTemplateRepoPath);
+    await download(templateRepo, localTemplateRepoPath);
     templateZip = join(localTemplateRepoPath, "learn-scaffolding-main.zip");
-    //copyFileSync(templateZip, offlineZip);
+    copyFileSync(templateZip, offlineZip);
   } catch (error) {
     if (existsSync(offlineZip)) {
       templateZip = offlineZip;
@@ -54,4 +53,3 @@ export async function unzipTemplates() {
     showStatusMessage(error);
   }
 }
-
