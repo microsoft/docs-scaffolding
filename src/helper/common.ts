@@ -399,3 +399,7 @@ function renameFolderInUids(
     showStatusMessage(error);
   }
 }
+
+export function valueCompariosn(firstValue: any, secondValue: any) {
+  return secondValue > firstValue;
+}
