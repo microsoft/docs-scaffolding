@@ -16,6 +16,7 @@ import {
   formatModuleName,
   renameCurrentFolder,
   valueCompariosn as valueComparison,
+  postWarning,
 } from "../helper/common";
 import {
   addNewUnit,
@@ -23,7 +24,10 @@ import {
   removeUnit,
   updateUnitName,
 } from "../helper/unit";
-import { downloadTemplateZip, localTemplateRepoPath } from "./template-controller";
+import {
+  downloadTemplateZip,
+  localTemplateRepoPath,
+} from "./template-controller";
 import { statSync } from "fs";
 import { homedir } from "os";
 const { Octokit } = require("@octokit/rest");
@@ -33,9 +37,6 @@ const telemetryCommand: string = "create-module";
 const fse = require("fs-extra");
 const fs = require("fs");
 
-const docsAuthoringHomeDirectory = join(homedir(), "Docs Authoring");
-const offlineZip = join(docsAuthoringHomeDirectory, "learn-scaffolding-main.zip");
-const stats = statSync(offlineZip);
 let rawModuleTitle: string;
 let typeDefinitionJsonDirectory: string;
 
@@ -57,10 +58,20 @@ export function scaffoldingCommand() {
 }
 
 export async function scaffoldModule(uri: Uri) {
+  typeDefinitionJsonDirectory = join(
+    localTemplateRepoPath,
+    "learn-scaffolding-main",
+    "module-type-definitions"
+  );
   checkForUpdatedTemplates(uri);
 }
 
 export async function scaffoldModuleInCurrentDirectory(uri: Uri) {
+  typeDefinitionJsonDirectory = join(
+    localTemplateRepoPath,
+    "learn-scaffolding-main",
+    "module-type-definitions"
+  );
   checkForUpdatedTemplates(uri, true);
 }
 
@@ -285,52 +296,72 @@ export function updateModuleFolderName(uri: Uri) {
   renameCurrentFolder(uri);
 }
 
-export async function checkForUpdatedTemplates( uri: Uri,
-  currentFolder?: boolean) {
-  const octokit = new Octokit();
-  let prDate: any;
-  octokit.rest.pulls
-    .list({
-      owner: "MicrosoftDocs",
-      repo: "learn-scaffolding",
-      state: "closed",
-    })
-    .then((data: any) => {
-      prDate = data.data[0].closed_at;
-      prDate = new Date(prDate);
-      const zipDownloadDate = new Date(stats.mtime);
-      if (valueComparison(zipDownloadDate, prDate)) {
+export async function checkForUpdatedTemplates(
+  uri: Uri,
+  currentFolder?: boolean
+) {
+  try {
+    const octokit = new Octokit();
+    const docsAuthoringHomeDirectory = join(homedir(), "Docs Authoring");
+    const offlineZip = join(
+      docsAuthoringHomeDirectory,
+      "learn-scaffolding-main.zip"
+    );
+    const stats = statSync(offlineZip);
+    let prDate: any;
+    octokit.rest.pulls
+      .list({
+        owner: "MicrosoftDocs",
+        repo: "learn-scaffolding",
+        state: "closed",
+      })
+      .then((data: any) => {
+        prDate = data.data[0].closed_at;
+        prDate = new Date(prDate);
+        const zipDownloadDate = new Date(stats.mtime);
+        if (valueComparison(zipDownloadDate, prDate)) {
           if (currentFolder) {
             updateTemplatePrompt(uri, true);
           } else {
             updateTemplatePrompt(uri);
           }
-      } else {
-        if (currentFolder) {
-          moduleSelectionQuickPick(uri, true);
         } else {
-          moduleSelectionQuickPick(uri);
+          if (currentFolder) {
+            moduleSelectionQuickPick(uri, true);
+          } else {
+            moduleSelectionQuickPick(uri);
+          }
         }
-      }
-    });
+      });
+  } catch (error) {
+    showStatusMessage(error);
+    postWarning(error);
+  }
 }
 
 export async function updateTemplatePrompt(uri: Uri, currentFolder?: boolean) {
-	showStatusMessage(`Updated templates are available.`);
-	await window
-		.showInformationMessage(
-			`Updated templates are available. Would you like downlad the latest templates?`, 'Yes', 'No'
-		)
-		.then(async (result) => {
-			if (result === 'Yes') {
-				await downloadTemplateZip();
+  try {
+    showStatusMessage(`Updated templates are available.`);
+  await window
+    .showInformationMessage(
+      `Updated templates are available. Would you like downlad the latest templates?`,
+      "Yes",
+      "No"
+    )
+    .then(async (result) => {
+      if (result === "Yes") {
+        await downloadTemplateZip();
         if (currentFolder) {
           moduleSelectionQuickPick(uri, true);
         } else {
           moduleSelectionQuickPick(uri);
         }
-			} else {
-				moduleSelectionQuickPick(uri);
-			}
-		});
+      } else {
+        moduleSelectionQuickPick(uri);
+      }
+    });
+  } catch (error) {
+    showStatusMessage(error);
+    postWarning(error);
+  }
 }
