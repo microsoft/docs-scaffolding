@@ -6,6 +6,7 @@ import { readFileSync, renameSync, rmdir } from "fs";
 import { basename, join, parse } from "path";
 import { default as Axios } from "axios";
 import { localTemplateRepoPath } from "../controllers/template-controller";
+import { copyTemplates } from "../controllers/scaffolding-controller";
 
 export const output = window.createOutputChannel("docs-scaffolding");
 export const sleepTime = 50;
@@ -398,4 +399,29 @@ function renameFolderInUids(
   } catch (error) {
     showStatusMessage(error);
   }
+}
+
+export async function showOptionalFolderInputBox(modifiedModuleName: string,
+  moduleName: string,
+  moduleType: string,
+  selectedFolder: string) {
+    let folderName: string;
+  const termsJsonPath = join(
+    localTemplateRepoPath,
+    "learn-scaffolding-main",
+    "terms.json"
+  );
+  const getUserInput = window.showInputBox({
+    placeHolder: modifiedModuleName,
+    prompt:
+      "Press 'Enter' to confirm folder name or type a new folder name and press 'Enter'.",
+  });
+  getUserInput.then((optionalFolderName) => {
+    if (optionalFolderName) {
+      folderName = formatModuleName(optionalFolderName, termsJsonPath);
+    } else {
+      folderName = modifiedModuleName;
+    }
+    copyTemplates(folderName, moduleName, moduleType, selectedFolder);
+  });
 }
