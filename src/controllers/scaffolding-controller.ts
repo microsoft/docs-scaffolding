@@ -158,7 +158,6 @@ export function getSelectedFolder(
       );
     } else {
       showOptionalFolderInputBox(moduleFolderName, moduleName, moduleType, selectedFolder);
-      //copyTemplates(moduleFolderName, moduleName, moduleType, selectedFolder);
     }
   });
 }

@@ -374,8 +374,16 @@ async function renamedModulePublishCheck(
     const newUid = firstUnit[1].replace(oldFolderName, newFolderName);
     const isPublished = await publishedUidCheck(newUid);
     if (isPublished) {
-      postWarning(`Module ${basename(newFolderPath)} is published. Aborting folder rename command.`);
-      showStatusMessage(`Module ${basename(newFolderPath)} is published. Aborting folder rename command.`);
+      postWarning(
+        `Module ${basename(
+          newFolderPath
+        )} is published. Aborting folder rename command.`
+      );
+      showStatusMessage(
+        `Module ${basename(
+          newFolderPath
+        )} is published. Aborting folder rename command.`
+      );
     } else {
       renameSync(folderPath, newFolderPath);
       renameFolderInUids(newFolderPath, oldFolderName, newFolderName);
@@ -401,11 +409,13 @@ function renameFolderInUids(
   }
 }
 
-export async function showOptionalFolderInputBox(modifiedModuleName: string,
+export async function showOptionalFolderInputBox(
+  modifiedModuleName: string,
   moduleName: string,
   moduleType: string,
-  selectedFolder: string) {
-    let folderName: string;
+  selectedFolder: string
+) {
+  let folderName: string;
   const termsJsonPath = join(
     localTemplateRepoPath,
     "learn-scaffolding-main",
@@ -415,6 +425,8 @@ export async function showOptionalFolderInputBox(modifiedModuleName: string,
     placeHolder: modifiedModuleName,
     prompt:
       "Press 'Enter' to confirm folder name or type a new folder name and press 'Enter'.",
+    validateInput: (userInput) =>
+      !userInput.match(/[^a-zA-Z0-9-\s]/g) ? "" : "Only letters, numbers, dashes and spaces are allowed.",
   });
   getUserInput.then((optionalFolderName) => {
     if (optionalFolderName) {
