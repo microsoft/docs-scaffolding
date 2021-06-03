@@ -258,8 +258,7 @@ export async function copyTemplates(
   } else {
     generateBaseUid(
       scaffoldModule,
-      //modifiedModuleName,
-      moduleName,
+      modifiedModuleName,
       moduleType,
       rawModuleTitle
     );
