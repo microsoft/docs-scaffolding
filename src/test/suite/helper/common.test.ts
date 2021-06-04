@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import * as chai from "chai";
 import { resolve } from "path";
+import sinon = require("sinon");
 import { Uri, window } from "vscode";
 import {
   postWarning,
@@ -17,10 +18,17 @@ import {
   updateUnitUid,
   replaceUnitPatternPlaceholder,
   formatModuleName,
-  renameCurrentFolder
+  renameCurrentFolder,
+  showOptionalFolderInputBox
 } from "../../../helper/common";
+import * as common from "../../../helper/common";
+import { sleep, sleepTime } from "../../test.common/common";
 
 const expect = chai.expect;
+const contextSelectedFolder = resolve(
+  __dirname,
+  "../../../../src/test/data/repo/articles"
+);
 
 suite("Common", () => {
   suiteTeardown(async () => {
@@ -181,4 +189,16 @@ suite("Common", () => {
     renameCurrentFolder(selectedFolder);
     expect(spy).to.be.have.been.called;
   });
+  test('show optional folder inputbox', async () => {
+		const stubShowInputBox = sinon.stub(window, 'showInputBox');
+		stubShowInputBox.onCall(0).resolves('Intro to a long module title that is too long to be a valid folder name');
+    stubShowInputBox.onCall(1).resolves('Short name');
+		const spy = chai.spy.on(common, 'showOptionalFolderInputBox');
+		showOptionalFolderInputBox("modified title",
+    "test module",
+    "standard", contextSelectedFolder);
+		await sleep(sleepTime);
+		expect(spy).to.have.been.called();
+		stubShowInputBox.restore();
+	});
 });
