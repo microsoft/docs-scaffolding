@@ -15,6 +15,7 @@ import {
   replaceUnitPatternPlaceholder,
   formatModuleName,
   renameCurrentFolder,
+  showOptionalFolderInputBox,
 } from "../helper/common";
 import {
   addNewUnit,
@@ -134,7 +135,7 @@ export function getSelectedFolder(
     validateInput: (userInput) =>
       userInput.length > 0 ? "" : "Please provide a module name.",
   });
-  getUserInput.then((moduleName) => {
+  getUserInput.then(async (moduleName) => {
     if (!moduleName) {
       return;
     }
@@ -143,7 +144,7 @@ export function getSelectedFolder(
       "learn-scaffolding-main",
       "terms.json"
     );
-    const moduleFolderName = formatModuleName(moduleName, termsJsonPath);
+    let moduleFolderName: any = formatModuleName(moduleName, termsJsonPath);
     rawModuleTitle = moduleName;
     moduleName = moduleName.replace(/ /g, "-").toLowerCase();
     sendTelemetryData(telemetryCommand, moduleType, moduleName);
@@ -156,7 +157,7 @@ export function getSelectedFolder(
         true
       );
     } else {
-      copyTemplates(moduleFolderName, moduleName, moduleType, selectedFolder);
+      showOptionalFolderInputBox(moduleFolderName, moduleName, moduleType, selectedFolder);
     }
   });
 }
