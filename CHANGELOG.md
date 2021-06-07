@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.0.8 (June 4th, 2021)
+
+- Add support to specify a folder name when creating a module in a new folder
+
 ## 0.0.7 (April 19th, 2021)
 
 - Update settings logic [Issue 45](https://github.com/microsoft/docs-scaffolding/issues/45)
