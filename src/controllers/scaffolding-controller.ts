@@ -343,6 +343,11 @@ export async function checkForUpdatedTemplates(
         showStatusMessage(
           `${repoOwner}\\${templateRepo} is not available. Updated template check will be skipped.`
         );
+        if (currentFolder) {
+          moduleSelectionQuickPick(uri, true);
+        } else {
+          moduleSelectionQuickPick(uri);
+        }
       });
   } catch (error) {
     showStatusMessage(error);
