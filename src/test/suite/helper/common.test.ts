@@ -19,7 +19,7 @@ import {
   replaceUnitPatternPlaceholder,
   formatModuleName,
   renameCurrentFolder,
-  valueComparison
+  valueComparison,
   showOptionalFolderInputBox
 } from "../../../helper/common";
 import * as common from "../../../helper/common";

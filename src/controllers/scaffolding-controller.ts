@@ -302,6 +302,8 @@ export async function checkForUpdatedTemplates(
   currentFolder?: boolean
 ) {
   try {
+    const repoOwner = "MicrosoftDocs";
+    const templateRepo = "learn-scaffolding";
     const octokit = new Octokit();
     const docsAuthoringHomeDirectory = join(homedir(), "Docs Authoring");
     const offlineZip = join(
@@ -312,8 +314,8 @@ export async function checkForUpdatedTemplates(
     let prDate: any;
     octokit.rest.pulls
       .list({
-        owner: "MicrosoftDocs",
-        repo: "learn-scaffolding",
+        owner: repoOwner,
+        repo: templateRepo,
         state: "closed",
       })
       .then((data: any) => {
@@ -336,6 +338,11 @@ export async function checkForUpdatedTemplates(
             moduleSelectionQuickPick(uri);
           }
         }
+      })
+      .catch(() => {
+        showStatusMessage(
+          `${repoOwner}\\${templateRepo} is not available. Updated template check will be skipped.`
+        );
       });
   } catch (error) {
     showStatusMessage(error);
