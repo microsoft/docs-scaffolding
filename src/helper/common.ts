@@ -409,6 +409,10 @@ function renameFolderInUids(
   }
 }
 
+export function valueComparison(firstValue: any, secondValue: any) {
+  return secondValue > firstValue;
+}
+
 export async function showOptionalFolderInputBox(
   modifiedModuleName: string,
   moduleName: string,

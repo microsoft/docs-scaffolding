@@ -3,7 +3,7 @@
 import { Uri, window, QuickPickItem, QuickPickOptions } from "vscode";
 import { basename, join, resolve } from "path";
 import { generateBaseUid } from "../helper/module";
-import { readFileSync, existsSync } from "fs";
+import { existsSync } from "fs";
 import {
   cleanupTempDirectory,
   postError,
@@ -15,6 +15,8 @@ import {
   replaceUnitPatternPlaceholder,
   formatModuleName,
   renameCurrentFolder,
+  valueComparison,
+  postWarning,
   showOptionalFolderInputBox,
 } from "../helper/common";
 import {
@@ -23,7 +25,13 @@ import {
   removeUnit,
   updateUnitName,
 } from "../helper/unit";
-import { localTemplateRepoPath } from "./template-controller";
+import {
+  downloadTemplateZip,
+  localTemplateRepoPath,
+} from "./template-controller";
+import { statSync } from "fs";
+import { homedir } from "os";
+const { Octokit } = require("@octokit/rest");
 
 const platformRegex = /\\/g;
 const telemetryCommand: string = "create-module";
@@ -56,7 +64,7 @@ export async function scaffoldModule(uri: Uri) {
     "learn-scaffolding-main",
     "module-type-definitions"
   );
-  moduleSelectionQuickPick(uri);
+  checkForUpdatedTemplates(uri);
 }
 
 export async function scaffoldModuleInCurrentDirectory(uri: Uri) {
@@ -65,7 +73,7 @@ export async function scaffoldModuleInCurrentDirectory(uri: Uri) {
     "learn-scaffolding-main",
     "module-type-definitions"
   );
-  moduleSelectionQuickPick(uri, true);
+  checkForUpdatedTemplates(uri, true);
 }
 
 /* loop through module type definitions directory and store each module type */
@@ -287,4 +295,87 @@ export function renameUnit(uri: Uri) {
 
 export function updateModuleFolderName(uri: Uri) {
   renameCurrentFolder(uri);
+}
+
+export async function checkForUpdatedTemplates(
+  uri: Uri,
+  currentFolder?: boolean
+) {
+  try {
+    const repoOwner = "MicrosoftDocs";
+    const templateRepo = "learn-scaffolding";
+    const octokit = new Octokit();
+    const docsAuthoringHomeDirectory = join(homedir(), "Docs Authoring");
+    const offlineZip = join(
+      docsAuthoringHomeDirectory,
+      "learn-scaffolding-main.zip"
+    );
+    const stats = statSync(offlineZip);
+    let prDate: any;
+    octokit.rest.pulls
+      .list({
+        owner: repoOwner,
+        repo: templateRepo,
+        state: "closed",
+      })
+      .then((data: any) => {
+        prDate = data.data[0].closed_at;
+        prDate = new Date(prDate);
+        const zipDownloadDate = new Date(stats.mtime);
+        // check to see if the local zip is newer than the most recent merged pr
+        // if the local zip is older, prompt the user to download the latest templates (valueComparison should return true)
+        // if the local zip is newer, show the pattern optoin quickpick (valueComparison should return false)
+        if (valueComparison(zipDownloadDate, prDate)) {
+          if (currentFolder) {
+            updateTemplatesPrompt(uri, true);
+          } else {
+            updateTemplatesPrompt(uri);
+          }
+        } else {
+          if (currentFolder) {
+            moduleSelectionQuickPick(uri, true);
+          } else {
+            moduleSelectionQuickPick(uri);
+          }
+        }
+      })
+      .catch(() => {
+        showStatusMessage(
+          `${repoOwner}\\${templateRepo} is not available. Updated template check will be skipped.`
+        );
+        if (currentFolder) {
+          moduleSelectionQuickPick(uri, true);
+        } else {
+          moduleSelectionQuickPick(uri);
+        }
+      });
+  } catch (error) {
+    showStatusMessage(error);
+    postWarning(error);
+  }
+}
+
+export async function updateTemplatesPrompt(uri: Uri, currentFolder?: boolean) {
+  try {
+    showStatusMessage(`Updated templates are available.`);
+    await window
+      .showInformationMessage(
+        `Updated templates are available. Would you like downlad the latest templates?`,
+        "Yes",
+        "No"
+      )
+      .then(async (result) => {
+        if (result === "Yes") {
+          await downloadTemplateZip();
+        }
+        if (currentFolder) {
+          moduleSelectionQuickPick(uri, true);
+        } else {
+          moduleSelectionQuickPick(uri);
+        }
+      });
+  } catch (error) {
+    showStatusMessage(error);
+    postWarning(error);
+  }
 }

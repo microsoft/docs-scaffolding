@@ -18,7 +18,9 @@ import {
   deleteUnit,
   renameUnit,
   getSelectedFolder,
-  updateModuleFolderName
+  updateModuleFolderName,
+  checkForUpdatedTemplates,
+  updateTemplatesPrompt
 } from "../../../controllers/scaffolding-controller";
 
 chai.use(spies);
@@ -116,6 +118,18 @@ suite("Scaffolding Controller", () => {
   test("Rename unit", async () => {
     const spy = chai.spy.on(scaffoldingController, "renameUnit");
     renameUnit(uri);
+    await sleep(sleepTime);
+    expect(spy).to.have.been.called();
+  });
+  test("Check for updated templates", async () => {
+    const spy = chai.spy.on(scaffoldingController, "checkForUpdatedTemplates");
+    checkForUpdatedTemplates(uri);
+    await sleep(sleepTime);
+    expect(spy).to.have.been.called();
+  });
+  test("Prompt user to update templates", async () => {
+    const spy = chai.spy.on(scaffoldingController, "updateTemplatesPrompt");
+    updateTemplatesPrompt(uri);
     await sleep(sleepTime);
     expect(spy).to.have.been.called();
   });
