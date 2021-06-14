@@ -8,7 +8,7 @@ import { extensionPath } from "../extension";
 export let localTemplateRepoPath: string;
 let templateZip: string;
 
-export async function downloadTemplateZip() {
+export async function downloadTemplateZip2() {
   const download = require("download");
   const tmp = require("tmp");
   const docsAuthoringHomeDirectory = join(homedir(), "Docs Authoring");
@@ -16,7 +16,7 @@ export async function downloadTemplateZip() {
     docsAuthoringHomeDirectory,
     "learn-scaffolding-main.zip"
   );
-  let templateRepo: any = await getUserSetting('template_repo');
+  let templateRepo: any = await getUserSetting("template_repo");
   if (!existsSync(docsAuthoringHomeDirectory)) {
     mkdirSync(docsAuthoringHomeDirectory);
   }
@@ -42,6 +42,19 @@ export async function downloadTemplateZip() {
     );
   }
   unzipTemplates();
+}
+
+export async function downloadTemplateZip() {
+  let templateRepo: any = await getUserSetting("template_repo");
+  const url = templateRepo;
+  const tmp = require("tmp");
+  const localTemplateRepoPath = tmp.dirSync({ unsafeCleanup: true }).name;
+  const { DownloaderHelper } = require("node-downloader-helper");
+  const downloadZip = new DownloaderHelper(url, localTemplateRepoPath);
+  downloadZip.on("end", () => showStatusMessage(
+    `Template repo zip file successfully downloaded to ${localTemplateRepoPath}.`
+  ));
+  downloadZip.start();
 }
 
 export async function unzipTemplates() {
