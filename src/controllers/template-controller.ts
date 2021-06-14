@@ -8,8 +8,7 @@ import { extensionPath } from "../extension";
 export let localTemplateRepoPath: string;
 let templateZip: string;
 
-export async function downloadTemplateZip2() {
-  const download = require("download");
+export async function downloadTemplateZip() {
   const tmp = require("tmp");
   const docsAuthoringHomeDirectory = join(homedir(), "Docs Authoring");
   const offlineZip = join(
@@ -27,7 +26,7 @@ export async function downloadTemplateZip2() {
     `Temp working directory ${localTemplateRepoPath} has been created.`
   );
   try {
-    await download(templateRepo, localTemplateRepoPath);
+    await runDownloader(templateRepo);
     templateZip = join(localTemplateRepoPath, "learn-scaffolding-main.zip");
     copyFileSync(templateZip, offlineZip);
   } catch (error) {
@@ -36,24 +35,26 @@ export async function downloadTemplateZip2() {
     } else {
       templateZip = join(extensionPath, "learn-scaffolding-main.zip");
     }
-    postError(error);
-    showStatusMessage(
-      `Error downloading templates from ${templateRepo}. Loading local templates.`
-    );
   }
   unzipTemplates();
 }
 
-export async function downloadTemplateZip() {
-  let templateRepo: any = await getUserSetting("template_repo");
-  const url = templateRepo;
-  const tmp = require("tmp");
-  const localTemplateRepoPath = tmp.dirSync({ unsafeCleanup: true }).name;
+export async function runDownloader(url: string) {
   const { DownloaderHelper } = require("node-downloader-helper");
   const downloadZip = new DownloaderHelper(url, localTemplateRepoPath);
-  downloadZip.on("end", () => showStatusMessage(
-    `Template repo zip file successfully downloaded to ${localTemplateRepoPath}.`
-  ));
+  downloadZip.on("end", () =>
+    showStatusMessage(
+      `Template repo zip file successfully downloaded to ${localTemplateRepoPath}.`
+    )
+  );
+  downloadZip.on("error", () => {
+    showStatusMessage(
+      `Error downloading templates from ${url}. Loading local templates.`
+    );
+    postError(
+      `Error downloading templates from ${url}. Loading local templates.`
+    );
+  });
   downloadZip.start();
 }
 
