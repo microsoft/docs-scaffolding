@@ -42,10 +42,12 @@ export async function downloadTemplateZip() {
 export async function runDownloader(url: string) {
   const { DownloaderHelper } = require("node-downloader-helper");
   const downloadZip = new DownloaderHelper(url, localTemplateRepoPath);
-  downloadZip.on("end", () =>
+  downloadZip.on("end", () => {
     showStatusMessage(
       `Template repo zip file successfully downloaded to ${localTemplateRepoPath}.`
-    )
+    );
+    return;
+  }
   );
   downloadZip.on("error", () => {
     showStatusMessage(
