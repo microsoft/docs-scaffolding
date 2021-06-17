@@ -1,6 +1,6 @@
 # Change Log
 
-## 0.0.9 (June 15th, 2021)
+## 0.0.9 (June 17th, 2021)
 
 - Added node-downloader-helper package
 - Remove download and download-git-repo packages to reduce dependencies and resolve security vulnerabilities
