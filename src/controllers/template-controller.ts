@@ -47,8 +47,7 @@ export async function runDownloader(url: string) {
       `Template repo zip file successfully downloaded to ${localTemplateRepoPath}.`
     );
     return;
-  }
-  );
+  });
   downloadZip.on("error", () => {
     showStatusMessage(
       `Error downloading templates from ${url}. Loading local templates.`
@@ -61,9 +60,10 @@ export async function runDownloader(url: string) {
 }
 
 export async function unzipTemplates() {
-  const extract = require("extract-zip");
+  const AdmZip = require('adm-zip');
   try {
-    await extract(templateZip, { dir: localTemplateRepoPath });
+    const file = new AdmZip(templateZip);
+    file.extractAllTo(localTemplateRepoPath);
   } catch (error) {
     postError(error);
     showStatusMessage(error);

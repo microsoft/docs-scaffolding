@@ -1,5 +1,10 @@
 # Change Log
 
+## 0.0.9 (June 17th, 2021)
+
+- Added node-downloader-helper package
+- Remove download and download-git-repo packages to reduce dependencies and resolve security vulnerabilities
+
 ## 0.0.8 (June 4th, 2021)
 
 - Add support to specify a folder name when creating a module in a new folder

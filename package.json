@@ -4,7 +4,7 @@
 	"description": "A Visual Studio Code extension developed to aid with scaffolding and updating Learn modules.",
 	"icon": "media/docs-logo-ms.png",
 	"aiKey": "0a0e5961-85c2-451a-bce8-6a54e37c93be",
-	"version": "0.0.8",
+	"version": "0.0.9",
 	"publisher": "docsmsft",
 	"engines": {
 		"vscode": "^1.50.0"
@@ -159,8 +159,8 @@
 	"dependencies": {
 		"@octokit/rest": "^18.5.3",
 		"@types/sinon": "^9.0.8",
+		"adm-zip": "^0.5.5",
 		"axios": "^0.21.1",
-		"extract-zip": "^2.0.1",
 		"fs-extra": "^9.0.1",
 		"js-yaml": "^4.0.0",
 		"node-downloader-helper": "^1.0.18",
