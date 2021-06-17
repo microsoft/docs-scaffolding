@@ -9,8 +9,9 @@ import { sleep, sleepTime } from '../../test.common/common';
 import sinon = require('sinon');
 import * as templateController from '../../../controllers/template-controller';
 import {
-	downloadTemplateZip, unzipTemplates
+	downloadTemplateZip, unzipTemplates, runDownloader
 } from '../../../controllers/template-controller';
+import { getUserSetting } from '../../../helper/user-settings';
 
 chai.use(spies);
 const expect = chai.expect;
@@ -39,6 +40,13 @@ suite('Template Controller', () => {
 	test('Unzip downloaded repo zip', async () => {
 		const spy = chai.spy.on(templateController, 'unzipTemplates');
 		unzipTemplates();
+		await sleep(sleepTime);
+		expect(spy).to.have.been.called();
+	});
+	test('Run downloader', async () => {
+		const templateRepo: any = await getUserSetting("template_repo");
+		const spy = chai.spy.on(templateController, 'runDownloader');
+		runDownloader(templateRepo);
 		await sleep(sleepTime);
 		expect(spy).to.have.been.called();
 	});
