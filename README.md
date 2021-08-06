@@ -1,5 +1,7 @@
 # README
 
+## 📣 This repository has been ARCHIVED. Development will continue internally. Thank you for all of your contributions! 📣
+
 This extension provides automation for creating a Learn module based on a pre-defined pattern and for updating module structure after creation.
 
 The Learn team has defined several standard patterns for Learn modules, each serving a different customer need:

@@ -1,5 +1,7 @@
 # Microsoft Open Source Code of Conduct
 
+## 📣 This repository has been ARCHIVED. Development will continue internally. Thank you for all of your contributions! 📣
+
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
 
 Resources:
